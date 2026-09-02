@@ -25,31 +25,29 @@ def _page_start(path: Path) -> int:
     return 0
 
 
-def run(outputs_dir, source_file, db_path=None) -> tuple[int | None, int]:
-    """Annotate tiap window sebuah modul lalu ingest berurutan ke satu module di DB."""
-    db.init_db(db_path)
-    conn = db.connect(db_path)
-    module_id, total = None, 0
-    try:
-        for cl in content_lists(Path(outputs_dir)):
-            blocks = annotate.annotate(cl)
-            annotated_path = cl.parent / "annotated.json"
-            annotated_path.write_text(
-                json.dumps([asdict(b) for b in blocks], ensure_ascii=False, indent=2),
-                encoding="utf-8",
-            )
-            module_id, count = ingest.ingest(conn, annotated_path, source_file)
-            total += count
-            print(f"[OK] {cl.parent.name}: {count} blok")
-    finally:
-        conn.close()
-    return module_id, total
+def run(conn, outputs_dir, chapter_id) -> int:
+    """Annotate tiap window sebuah bab lalu ingest berurutan ke chapter tersebut."""
+    total = 0
+    for cl in content_lists(Path(outputs_dir)):
+        blocks = annotate.annotate(cl)
+        annotated_path = cl.parent / "annotated.json"
+        annotated_path.write_text(
+            json.dumps([asdict(b) for b in blocks], ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        total += ingest.ingest(conn, annotated_path, chapter_id)
+        print(f"[OK] {cl.parent.name}")
+    return total
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Annotate + ingest semua window MinerU sebuah modul ke DB.")
-    ap.add_argument("--outputs", required=True, help="folder output batch modul (berisi window p####-####)")
-    ap.add_argument("--source-file", required=True, help="nama file PDF asli untuk identitas module")
+    ap = argparse.ArgumentParser(description="Annotate + ingest semua window satu bab ke DB.")
+    ap.add_argument("--outputs", required=True, help="folder output batch untuk satu bab")
+    ap.add_argument("--module-id", type=int, default=None, help="id modul yang sudah ada")
+    ap.add_argument("--module-title", default=None, help="judul modul baru bila --module-id tidak diberi")
+    ap.add_argument("--chapter-number", type=int, default=None)
+    ap.add_argument("--chapter-title", default=None)
+    ap.add_argument("--source-file", default=None)
     ap.add_argument("--db", default=None)
     return ap.parse_args()
 
@@ -60,11 +58,18 @@ def main() -> int:
     if not outputs.exists():
         print(f"[ERROR] folder output tidak ada: {outputs}", file=sys.stderr)
         return 2
-    module_id, total = run(outputs, args.source_file, args.db)
-    if module_id is None:
-        print("[WARN] tidak ada content_list untuk diproses", file=sys.stderr)
-        return 1
-    print(f"[SELESAI] module id={module_id}, total {total} blok")
+
+    db.init_db(args.db)
+    conn = db.connect(args.db)
+    try:
+        module_id = args.module_id or ingest.create_module(conn, args.module_title or "Modul")
+        chapter_id = ingest.create_chapter(
+            conn, module_id, args.chapter_number, args.chapter_title, args.source_file
+        )
+        total = run(conn, outputs, chapter_id)
+    finally:
+        conn.close()
+    print(f"[SELESAI] module id={module_id}, chapter id={chapter_id}, total {total} blok")
     return 0
 
 

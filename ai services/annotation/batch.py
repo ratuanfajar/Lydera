@@ -26,7 +26,7 @@ def plan(pdf: Path, base_out: Path, max_pages: int) -> list[Window]:
     last = len(PdfReader(str(pdf)).pages) - 1
     windows: list[Window] = []
     for s, e in _windows(0, last, max_pages):
-        windows.append(Window(f"hlm {s}-{e}", s, e, base_out / pdf.stem / f"p{s:04d}-{e:04d}"))
+        windows.append(Window(f"hlm {s}-{e}", s, e, base_out / f"p{s:04d}-{e:04d}"))
     return windows
 
 

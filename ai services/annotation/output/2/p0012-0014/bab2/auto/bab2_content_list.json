@@ -1,0 +1,530 @@
+[
+    {
+        "type": "text",
+        "text": "3. Apa yang kalian ketahui tentang sudut-sudut pada segitiga yang dapat digunakan untuk menentukan besarnya $\\angle A C B ?$ $\\angle A C B =$",
+        "bbox": [
+            203,
+            101,
+            858,
+            158
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/ba747442a3260068d67a11eff5e21dd31396c665b49b37f2b309576f00a0be0f.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            181,
+            234,
+            230
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Tahukah Kamu?",
+        "text_level": 2,
+        "bbox": [
+            247,
+            196,
+            383,
+            214
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kasus 4 dikenal dengan nama Teorema Thales.",
+        "bbox": [
+            188,
+            239,
+            570,
+            258
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Thales adalah orang Yunani yang menjadi matematikawan, ahli astronomi, dan filsuf. Dalam Matematika, Thales adalah orang pertama yang menerapkan argumentasi deduktif dalam geometri. Dia adalah orang pertama yang namanya disematkan pada teorema.",
+        "bbox": [
+            187,
+            267,
+            658,
+            369
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Teorema Thales:",
+        "text_level": 2,
+        "bbox": [
+            188,
+            378,
+            339,
+            396
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jika tiga titik A, B, C terletak pada lingkaran dan AB adalah diameter, maka $\\angle A C B$ siku-siku.",
+        "bbox": [
+            187,
+            397,
+            658,
+            438
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/575a393832387423017feb283deb57491434bbd4fcea2e17430d3c3236d8f66a.jpg",
+        "image_caption": [],
+        "image_footnote": [
+            "sumber: en.wikipedia.org/Wilhelm Meyer (2021)"
+        ],
+        "bbox": [
+            675,
+            271,
+            831,
+            411
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Latihan",
+        "text_level": 2,
+        "bbox": [
+            177,
+            495,
+            256,
+            513
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2.1",
+        "text_level": 2,
+        "bbox": [
+            275,
+            496,
+            311,
+            515
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Ini adalah Kasus 3 dari bukti Eksplorasi 2.1.",
+        "bbox": [
+            168,
+            544,
+            563,
+            562
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/4c6ee0aefb9a28bb2bdca80a839894b85535d24be6f5e1039cf549c1ca080b21.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            209,
+            565,
+            414,
+            699
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. Gambarkan sudut pusat yang menghadap ke busur yang sama dengan sudut keliling $\\angle B A C$",
+        "bbox": [
+            433,
+            569,
+            856,
+            609
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Apakah pada lingkaran berikut juga berlaku bahwa sudut pusat besarnya dua kali lipat sudut keliling? Buktikan.",
+        "bbox": [
+            433,
+            613,
+            858,
+            674
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/74e88788c2b7f4bb271b21d1249eb96d3b5e0e114e3a5f651024fa79a648e8b7.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            709,
+            273,
+            758
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Petunjuk",
+        "text_level": 2,
+        "bbox": [
+            284,
+            724,
+            363,
+            743
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Buatlah diameter yang melalui titik A dan titik O.",
+        "bbox": [
+            225,
+            768,
+            631,
+            788
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "57",
+        "bbox": [
+            822,
+            915,
+            849,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Jika $\\angle B O C = 9 0 ^ { \\circ }$ , berapakah besar $\\angle B E C 3$",
+        "bbox": [
+            139,
+            103,
+            574,
+            123
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/01758483a49aa74cfd27cbc0863dd9ac8d62d50b20ffeb990223a8a100bb5c96.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            387,
+            139,
+            577,
+            279
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Lingkaran A berjari-jari 2 satuan. Jika panjang ${ \\overline { { B C } } } = 2 ,$ tentukan besar $\\angle B D C$",
+        "bbox": [
+            139,
+            299,
+            829,
+            320
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/3036467a3eebd491de554a486d7a9d75ff7e20e1d67b360e71fd7a3583c9c7a2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            379,
+            327,
+            570,
+            480
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. $\\overline { { A B } }$ adalah diameter pada lingkaran berikut. Jari-jari lingkaran 8,5 cm dan panjang $\\overline { { A C } } = 8$ cm. Tentukan:",
+        "bbox": [
+            139,
+            496,
+            831,
+            537
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/00670454636dd1694e66320279930e51c355d386552a3a26f0e0db57437f28aa.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            361,
+            543,
+            581,
+            687
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. besar $\\angle A C B$",
+        "bbox": [
+            176,
+            691,
+            335,
+            711
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. panjang $\\overline { { A B } }$",
+        "bbox": [
+            176,
+            716,
+            330,
+            737
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "c. panjang $\\overline { { B C } }$",
+        "bbox": [
+            177,
+            741,
+            326,
+            761
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "58",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "5. Apa yang salah pada gambar berikut?",
+        "bbox": [
+            166,
+            100,
+            513,
+            123
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/b54adcdbc26363128643a42b5a8efd96ccbc882283aec1e0b495d649872da2f5.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            411,
+            127,
+            605,
+            259
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "6. Lingkaran A berjari-jari 2 cm. Tentukan:",
+        "bbox": [
+            166,
+            276,
+            544,
+            298
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/baea0f848416ebdd6b06a05e0a059f5c80ecec8a129c5d2fdf62b9c1159f28cb.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            409,
+            304,
+            611,
+            438
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. besar $\\angle B D C$   \nb. jika $\\angle C A D = 9 0 ^ { \\circ }$ , tentukan besar $\\angle A C D$   \nc. panjang CD",
+        "bbox": [
+            201,
+            451,
+            616,
+            523
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/911409ed2706aeda820c58c8e5a95fc66340151765e50cd24296d4c5ac2c2bba.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            532,
+            273,
+            581
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kreatif",
+        "text_level": 2,
+        "bbox": [
+            282,
+            545,
+            449,
+            566
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Jelaskan cara memanfaatkan alat gambar teknik berbentuk T ini untuk menentukan letak titik pusat piring.",
+        "bbox": [
+            201,
+            590,
+            768,
+            633
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/a1095324af4e9294e9990a1ec3cf2c0f7722035ce58a646b7ff58349d1f44126.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            594,
+            580,
+            856,
+            703
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "8.",
+        "bbox": [
+            168,
+            692,
+            188,
+            711
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/0b889a7595a8a277bbb5a2926cda5d22f95d52881bc5f5bdeb7eeb17c2176ba0.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            694,
+            273,
+            743
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kritis",
+        "text_level": 2,
+        "bbox": [
+            282,
+            707,
+            436,
+            728
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Pada gambar berikut, titik P dan titik Q adalah mercusuar. Daerah dengan karang berbahaya telah dipetakan dan lingkaran menyatakan daerah berbahaya tersebut. Kapal diharapkan tidak memasuki daerah lingkaran untuk menghindari kemungkinan kandas.",
+        "bbox": [
+            201,
+            753,
+            858,
+            837
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "59",
+        "bbox": [
+            820,
+            915,
+            851,
+            932
+        ],
+        "page_idx": 2
+    }
+]

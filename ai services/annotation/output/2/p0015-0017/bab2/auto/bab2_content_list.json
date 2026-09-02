@@ -1,0 +1,484 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/2fcecaac4269169d9d94012641e7e02a51d909dfc775a399c50ceb22b54112ab.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            144,
+            104,
+            411,
+            245
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pelajari sudut yang dibentuk antara cahaya dari kedua mercusuar $( \\angle P C Q )$ jika kapal berada di luar lingkaran/pada lingkaran/di dalam lingkaran. Menurutmu, informasi apa yang perlu diketahui kapten kapal tentang lokasi ini untuk memastikan kapalnya tidak kandas?",
+        "bbox": [
+            425,
+            101,
+            833,
+            226
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Rangkuman",
+        "text_level": 2,
+        "bbox": [
+            141,
+            284,
+            322,
+            311
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sifat-sifat sudut pada lingkaran:",
+        "bbox": [
+            141,
+            319,
+            405,
+            339
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Sudut keliling yang menghadap pada busur yang sama, besarnya sama.",
+        "bbox": [
+            141,
+            347,
+            754,
+            366
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/825a26bb1a0e5d8d58484b055bd8941b8824223f8761c83603f724c8489a4c59.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            381,
+            373,
+            565,
+            507
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Sudut pusat besarnya dua kali sudut keliling yang menghadap pada busur yang sama.",
+        "bbox": [
+            141,
+            523,
+            831,
+            561
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/32c8121359549d5d4e2e0963a4f6aba3c0c8c26b6587cf2ed105d22412cf8d9e.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            396,
+            560,
+            594,
+            686
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Sudut keliling yang menghadap pada diameter lingkaran, adalah sudut siku-siku.",
+        "bbox": [
+            141,
+            698,
+            829,
+            717
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/bdf27c002705a4e10c13e64c5b8f6b7d709691ee707e52a777aa8ba0f5e6e52b.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            387,
+            732,
+            570,
+            847
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "60",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah saya memahami hubungan sudut keliling dan busur lingkaran?",
+        "bbox": [
+            187,
+            164,
+            805,
+            182
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Apakah saya memahami hubungan sudut keliling dan sudut pusat?",
+        "bbox": [
+            187,
+            188,
+            772,
+            207
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Apakah saya bisa mengerjakan soal-soal yang terkait dengan sudut keliling dan sudut pusat lingkaran?",
+        "bbox": [
+            187,
+            211,
+            836,
+            251
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "B. Lingkaran dan Garis Singgung",
+        "text_level": 2,
+        "bbox": [
+            168,
+            319,
+            658,
+            347
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/c046a39ec4b1d573d51501c427752cd18ecc91bbad355381c9fb5b82f6ca7442.jpg",
+        "image_caption": [
+            "Gambar 2.4 Roda Kereta Api"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            170,
+            357,
+            504,
+            500
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Roda kereta api menyentuh rel kereta di satu titik. Secara matematis dikatakan bahwa rel adalah garis singgung roda dan titik sentuhnya disebut sebagai titik singgung.",
+        "bbox": [
+            519,
+            354,
+            858,
+            458
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi 2.2",
+        "text_level": 2,
+        "bbox": [
+            177,
+            564,
+            339,
+            585
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/9e555ad4e0282b6ef87e85ecf111b8d05f1e72c95f8297aaf27c7668e7e55e4f.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            609,
+            227,
+            651
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ayo Bereksplorasi",
+        "text_level": 2,
+        "bbox": [
+            238,
+            621,
+            372,
+            638
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Dalam tugasnya, seorang navigator pada kapal laut perlu menghitung jarak pelabuhan yang berada pada cakrawala.",
+        "bbox": [
+            166,
+            667,
+            855,
+            707
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/5066e39f9376420190e2e964ca99f78672e39369e760ff884bfe05a1ea30b0e3.jpg",
+        "image_caption": [
+            "Gambar 2.5 Cakrawala"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            262,
+            717,
+            561,
+            855
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/a772b2653260b9a388fb1744a4ae4d250324eab0c50c491b9daeabd561e67558.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            581,
+            732,
+            759,
+            841
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "header",
+        "text": "",
+        "bbox": [
+            168,
+            105,
+            236,
+            153
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "header",
+        "text": "Ayo Berefleksi",
+        "bbox": [
+            247,
+            120,
+            368,
+            139
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            916,
+            794,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "61",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Titik biru mewakili posisi navigator pada kapal, titik oranye adalah pelabuhan yang tampak di cakrawala. Garis merah adalah jarak navigator ke permukaan air. Garis biru mewakili pandangan navigator ke pelabuhan, secara matematis merupakan garis singgung. Mari bereksplorasi menyelidiki sifat-sifat garis singgung.",
+        "bbox": [
+            141,
+            103,
+            831,
+            185
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Pelabuhan pertama kali terlihat sebagai sebuah titik di kejauhan. Garis singgung menyentuh lingkaran pada tepat satu titik (disebut titik singgung). Gunakan busur derajat untuk mengukur besar sudut yang dibentuk oleh garis singgung dan jari-jari lingkaran (pada titik singgung).",
+        "bbox": [
+            143,
+            193,
+            831,
+            274
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Sudut yang dibentuk oleh garis singgung dan jari-jari lingkaran pada titik singgung B besarnya",
+        "bbox": [
+            176,
+            278,
+            831,
+            317
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/c274ded95b4aeb394c6f25b266f354362f1b3cb1505fc5c7ab0ecf21a487196a.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            366,
+            324,
+            600,
+            487
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Bagaimana dengan garis singgung yang menyinggung di titik berbeda? Jika ada titik singgung lain, berapa besar sudut antara garis singgung dan jari-jari di titik singgung itu?",
+        "bbox": [
+            177,
+            495,
+            831,
+            554
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Kalian dapat menjawab pertanyaan ini dengan cara:",
+        "bbox": [
+            177,
+            560,
+            603,
+            578
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/32ad0493eb092855b4b4d9b8d36c192322c91f375af54ed0a3ebdf8b99fe4ab4.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            181,
+            592,
+            245,
+            639
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berteknologi",
+        "text_level": 2,
+        "bbox": [
+            256,
+            606,
+            401,
+            623
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Jika tersedia, disarankan menggunakan aplikasi semacam GeoGebra atau Desmos.",
+        "bbox": [
+            198,
+            650,
+            590,
+            687
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "https://www.geogebra.org/m/cjdyK8UR#material/ u6Ev7bHg",
+        "bbox": [
+            198,
+            691,
+            612,
+            729
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/f644f4b4d15502358eef6b359dd3144f76ea0c030a0e8be3a1c6e9717edb1a69.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            680,
+            655,
+            790,
+            735
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "62",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            916,
+            471,
+            932
+        ],
+        "page_idx": 2
+    }
+]

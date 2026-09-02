@@ -59,7 +59,7 @@ uv run python run_mineru.py --pdf modul.pdf [--out DIR] [--start N] [--end N] \
 ```
 
 ### batch.py
-Menerima PDF modul yang sudah terfokus, memecah seluruh halamannya menjadi window sebesar `--max-pages`, lalu menjalankan `run_mineru.run` per window ke folder terpisah `output/<stem>/p{awal}-{akhir}/`. Window diproses berurutan menurut halaman.
+Menerima PDF modul yang sudah terfokus, memecah seluruh halamannya menjadi window sebesar `--max-pages`, lalu menjalankan `run_mineru.run` per window ke folder terpisah `<out>/p{awal}-{akhir}/`. Window diproses berurutan menurut halaman.
 
 ```
 uv run python batch.py --pdf modul.pdf [--out DIR] [--max-pages 3] \
@@ -94,11 +94,14 @@ Klien OpenRouter berbasis SDK openai. Menyediakan `complete_text` dan `complete_
 Cache berbasis berkas dengan kunci hash dari konten, model, dan `PROMPT_VERSION`. Antarmuka `get(namespace, *parts)` dan `put(namespace, value, *parts)`. Penulisan bersifat atomik. Cache bersifat opsional untuk kebenaran; menghapus isi `.cache/` hanya membuat panggilan MLLM dihitung ulang.
 
 ### pipeline.py
-Orkestrator anotasi dan penyimpanan untuk satu modul. Mencari seluruh `content_list.json` di folder output, mengurutkannya menurut halaman, menganotasi tiap window, menulis `annotated.json` per folder, lalu memanggil ingest backend agar semua blok masuk ke satu baris modul.
+Orkestrator anotasi dan penyimpanan untuk satu bab. Membuat modul dan bab, mencari seluruh `content_list.json` di folder output, mengurutkannya menurut halaman, menganotasi tiap window, menulis `annotated.json` per folder, lalu memanggil ingest backend agar semua blok masuk ke satu bab.
 
 ```
-uv run python pipeline.py --outputs OUTPUT_DIR/<stem> --source-file modul.pdf [--db PATH]
+uv run python pipeline.py --outputs OUTPUT_DIR/<stem> \
+  --module-title "Judul Modul" --chapter-number 1 --chapter-title "Judul Bab" --source-file bab1.pdf [--db PATH]
 ```
+
+Untuk menambah bab lain ke modul yang sudah ada, ganti `--module-title` dengan `--module-id N`. Nilai nomor dan judul bab berasal dari pemanggil, bukan dari ekstraksi otomatis.
 
 ### regenerate.py
 Titik panggil untuk alur validasi guru (human in the loop). Fungsi `regenerate(block_type, feedback, ...)` menghasilkan ulang bacaan satu blok berdasarkan feedback guru untuk jenis formula, table, dan image. Backend memanggil fungsi ini lalu memperbarui basis data sendiri; layanan AI tidak menyentuh basis data.
