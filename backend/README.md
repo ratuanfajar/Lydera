@@ -5,24 +5,36 @@ Penyimpanan hasil anotasi ke basis data. Backend memakai SQLite melalui modul `s
 ## Berkas
 
 ### schema.sql
-Definisi dua tabel: `module` dan `block`.
+Definisi tiga tabel: `module`, `chapter`, dan `block`. Relasinya satu modul memiliki banyak bab, satu bab memiliki banyak blok.
 
-Tabel `module` menyimpan identitas buku.
+Tabel `module` menyimpan identitas buku. Satu modul dibuat sekali, lalu bab-babnya diunggah ke dalamnya.
 
 | Kolom | Tipe | Keterangan |
 |---|---|---|
 | `id` | INTEGER | Primary key |
-| `source_file` | TEXT | Nama berkas PDF sumber, unik |
-| `title` | TEXT | Nama tampilan modul, diambil dari nama berkas tanpa ekstensi |
+| `title` | TEXT | Nama modul, mis. Matematika Kelas XI |
 | `created_at` | TEXT | Waktu pembuatan baris |
+
+Tabel `chapter` menyimpan tiap bab dalam sebuah modul. Satu baris untuk satu bab yang diunggah.
+
+| Kolom | Tipe | Keterangan |
+|---|---|---|
+| `id` | INTEGER | Primary key |
+| `module_id` | INTEGER | Referensi ke `module(id)`, dihapus mengikuti modul |
+| `number` | INTEGER | Nomor bab, boleh kosong |
+| `title` | TEXT | Judul bab, boleh kosong |
+| `source_file` | TEXT | Nama berkas PDF bab, boleh kosong |
+| `created_at` | TEXT | Waktu pembuatan baris |
+
+Nilai `number`, `title`, dan `source_file` berasal dari input pengunggah, bukan dari ekstraksi otomatis isi dokumen.
 
 Tabel `block` menyimpan konten per blok yang sudah dianotasi.
 
 | Kolom | Tipe | Keterangan |
 |---|---|---|
 | `id` | INTEGER | Primary key |
-| `module_id` | INTEGER | Referensi ke `module(id)`, dihapus mengikuti modul |
-| `reading_order` | INTEGER | Urutan baca |
+| `chapter_id` | INTEGER | Referensi ke `chapter(id)`, dihapus mengikuti bab |
+| `reading_order` | INTEGER | Urutan baca dalam bab |
 | `block_type` | TEXT | `heading`, `text`, `formula`, `table`, atau `image` |
 | `readable_text` | TEXT | Teks siap dibacakan pembaca layar |
 | `review_priority` | TEXT | `low`, `normal`, atau `high` |
@@ -32,7 +44,7 @@ Tabel `block` menyimpan konten per blok yang sudah dianotasi.
 | `image_file` | TEXT | Nama berkas gambar, bukan path |
 | `created_at` | TEXT | Waktu pembuatan baris |
 
-Indeks `ix_block_module_order` dibuat pada `block(module_id, reading_order)`.
+Indeks `ix_chapter_module` pada `chapter(module_id, number)` dan `ix_block_chapter_order` pada `block(chapter_id, reading_order)`.
 
 Kolom `image_file` menyimpan nama berkas saja (bukan path), sehingga basis data tidak terikat lokasi penyimpanan. Pemetaan nama berkas ke path atau URL dilakukan oleh pembaca dengan basis folder yang dikonfigurasi.
 
@@ -45,22 +57,26 @@ Koneksi dan inisialisasi basis data.
 Basis data default berada di `backend/lydera.db`.
 
 ### ingest.py
-Menyimpan blok dari `annotated.json` ke basis data.
+Membuat modul dan bab, lalu menyimpan blok dari `annotated.json` ke sebuah bab.
 
-- `ingest(conn, annotated_path, source_file)` membaca `annotated.json`, mencari atau membuat modul berdasarkan `source_file`, lalu menyisipkan blok. Mengembalikan `(module_id, jumlah_blok)`.
-- `module_meta(source_file)` menyusun `source_file` dan `title` dari nama berkas.
-- `find_or_create_module(conn, meta)` mengembalikan `module_id` yang ada atau membuat baris modul baru.
-- `current_max_order(conn, module_id)` mengembalikan `reading_order` terbesar milik modul.
+- `create_module(conn, title)` membuat baris modul dan mengembalikan `module_id`.
+- `create_chapter(conn, module_id, number, title, source_file)` membuat baris bab di bawah modul dan mengembalikan `chapter_id`.
+- `ingest(conn, annotated_path, chapter_id)` membaca `annotated.json` dan menyisipkan blok ke bab tersebut. Mengembalikan jumlah blok.
+- `current_max_order(conn, chapter_id)` mengembalikan `reading_order` terbesar milik bab.
 
-Penyimpanan bersifat bertahap. `reading_order` dihitung dari nilai terbesar yang ada ditambah kelipatan `READING_ORDER_STEP` (10), sehingga beberapa potongan modul yang diproses terpisah tetap menyambung dalam satu modul.
+Penyimpanan blok bersifat bertahap dalam satu bab. `reading_order` dihitung dari nilai terbesar yang ada ditambah kelipatan `READING_ORDER_STEP` (10), sehingga beberapa window dari satu bab yang diproses terpisah tetap menyambung.
+
+Identitas modul dan bab berasal dari pemanggil (backend atau orkestrator), bukan ditebak dari nama berkas. Grouping bab ke modul terjadi karena bab-bab dibuat di bawah `module_id` yang sama.
 
 ```
-uv run python ingest.py annotated.json source_file.pdf
+uv run python ingest.py annotated.json "Judul Modul"
 ```
+
+Perintah di atas membuat satu modul dan satu bab lalu memasukkan blok, sebagai jalur uji ringkas.
 
 ## Hubungan dengan AI Service
 
-Orkestrator `pipeline.py` di layanan AI memanggil `ingest.ingest` untuk tiap window sebuah modul secara berurutan, sehingga seluruh blok masuk ke satu baris `module`. Layanan AI menghasilkan `annotated.json`; backend yang menyimpannya ke basis data.
+Layanan AI menghasilkan `annotated.json` per bab. Orkestrator `pipeline.py` di layanan AI membuat modul dan bab lalu memanggil `ingest.ingest` untuk tiap window bab tersebut, sehingga seluruh blok masuk ke satu `chapter` di bawah satu `module`. Untuk menambah bab lain ke modul yang sama, pemanggil memakai `module_id` yang sudah ada.
 
 ## Catatan
 

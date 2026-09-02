@@ -1,10 +1,15 @@
 import base64
+import time
 from functools import lru_cache
 from pathlib import Path
 
-from openai import OpenAI
+from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
 import config
+
+RETRYABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError)
+MAX_RETRIES = 5
+BACKOFF_BASE = 2
 
 
 @lru_cache(maxsize=1)
@@ -12,8 +17,20 @@ def client() -> OpenAI:
     return OpenAI(base_url=config.OPENROUTER_BASE_URL, api_key=config.OPENROUTER_API_KEY)
 
 
+def _create(**kwargs):
+    delay = BACKOFF_BASE
+    for attempt in range(MAX_RETRIES):
+        try:
+            return client().chat.completions.create(**kwargs)
+        except RETRYABLE:
+            if attempt == MAX_RETRIES - 1:
+                raise
+            time.sleep(delay)
+            delay *= 2
+
+
 def complete_text(system: str, user: str, model: str | None = None) -> str:
-    response = client().chat.completions.create(
+    response = _create(
         model=model or config.TEXT_MODEL,
         max_tokens=config.TEXT_MAX_TOKENS,
         extra_body={"reasoning": {"enabled": False}},
@@ -26,7 +43,7 @@ def complete_text(system: str, user: str, model: str | None = None) -> str:
 
 
 def complete_vision(system: str, user: str, image_path: Path, model: str | None = None) -> str:
-    response = client().chat.completions.create(
+    response = _create(
         model=model or config.VISION_MODEL,
         max_tokens=config.VISION_MAX_TOKENS,
         extra_body={"reasoning": {"enabled": False}},
