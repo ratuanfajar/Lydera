@@ -1,0 +1,341 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/8c7bd5f0b6d43f83a6a17cae8dbb5d9b77f68b1c52eb954742b99128db4d4bcb.jpg",
+        "image_caption": [
+            "c."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            214,
+            116,
+            752,
+            384
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/476fff58bc7257c6be6b1ffaf3c04f55e25c64dd95319d9ed5b70fd320fd1c69.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            214,
+            407,
+            755,
+            691
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. a. Berikan contoh suatu situasi atau fungsi dalam kehidupan sehari-hari di mana domain fungsi tidak dapat berharga negatif.",
+        "bbox": [
+            137,
+            705,
+            833,
+            745
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Berikan contoh suatu situasi atau fungsi dalam kehidupan sehari-hari di mana range tidak dapat berharga negatif.",
+        "bbox": [
+            168,
+            750,
+            833,
+            790
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "4. a. Tentukan fungsi yang menyatakan hubungan antara suhu dalam Celcius dan Kelvin.",
+        "bbox": [
+            135,
+            796,
+            834,
+            834
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan juga domain dan range dari fungsi tersebut. Petunjuk: apakah ada suhu terendah dan tertinggi di alam semesta?",
+        "bbox": [
+            170,
+            839,
+            834,
+            879
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "16",
+        "bbox": [
+            139,
+            916,
+            170,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            185,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "5. (Depresiasi nilai laptop) Seorang YouTuber membeli sebuah laptop baru seharga Rp20.000.000,00. Jika harga jual laptop tersebut pada tahun ke-t turun secara eksponensial dan dideskripsikan oleh fungsi berikut:",
+        "bbox": [
+            166,
+            101,
+            858,
+            162
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "equation",
+        "img_path": "images/7b804814d4d972736e3270d14d41cb348b0d69ac0b595356c1548e138942c8ed.jpg",
+        "text": "$$\nH \\left( t \\right) = 2 0 . 0 0 0 . 0 0 0 \\times e ^ { - 0 . 2 5 t } ,\n$$",
+        "text_format": "latex",
+        "bbox": [
+            400,
+            164,
+            660,
+            185
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Berapakah harga jual laptop tersebut pada tahun ke-5?",
+        "bbox": [
+            201,
+            192,
+            686,
+            211
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan domain dan range-nya.",
+        "bbox": [
+            201,
+            215,
+            515,
+            235
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "6. Tekanan udara berkurang jika ketinggian dari permukaan laut bertambah sebagaimana yang ditunjukkan oleh grafik di bawah ini. Tekanan udara dinyatakan dalam kiloPascal dan ketinggian di atas permukaan laut dinyatakan dalam kaki. Satu kaki = 0,3 m.",
+        "bbox": [
+            166,
+            241,
+            858,
+            320
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/fc22e8ba49c7711df2765ef0a3126ee32a33988fd953be75d1b820fc20e89a51.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [
+            "a. Tuliskan domain dan range dari fungsi ini.",
+            "b. Apakah ada tekanan udara bernilai negatif?"
+        ],
+        "bbox": [
+            205,
+            324,
+            812,
+            627
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "7. Grafik suhu terhadap ketinggian di atas permukaan laut diberikan di bawah ini. Suhu diberikan dalam derajat Fahrenheit dan ketinggian di atas permukaan laut dalam kaki.",
+        "bbox": [
+            166,
+            686,
+            858,
+            747
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "17",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/d6957f35b254c6203e2e953441d46f4727e54ddd95f9c2d58ccf46e0517c02ef.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            179,
+            99,
+            744,
+            441
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Tuliskan domain dan range dari fungsi ini.",
+        "bbox": [
+            176,
+            454,
+            565,
+            472
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/4acff03b1df3be33f5e3d1770e06e5700658ae74378a65ef5eba19bd6858aebe.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            177,
+            504,
+            247,
+            552
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Gunakan Geogebra untuk menyelesaikan tugas ini.",
+        "bbox": [
+            176,
+            564,
+            594,
+            582
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Gambarkan suatu fungsi dengan ketentuan sebagai berikut.",
+        "bbox": [
+            176,
+            585,
+            662,
+            603
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Domain memenuhi $0 ~ \\leq x ~ \\leq 1 0$",
+        "bbox": [
+            176,
+            609,
+            513,
+            627
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Range memenuhi $3 ~ \\leq y ~ \\leq 2 3$",
+        "bbox": [
+            177,
+            633,
+            495,
+            652
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Titik (1,5) dan (4,11) memenuhi fungsi yang dimaksud.",
+        "bbox": [
+            176,
+            658,
+            669,
+            676
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "B. Komposisi Fungsi",
+        "text_level": 2,
+        "bbox": [
+            141,
+            724,
+            456,
+            752
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Sebelum belajar tentang komposisi fungsi secara mendalam, coba amati dan pahami cara menggabungkan dua fungsi dalam eksplorasi berikut.",
+        "bbox": [
+            137,
+            768,
+            831,
+            809
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "18",
+        "bbox": [
+            141,
+            916,
+            170,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            185,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 2
+    }
+]

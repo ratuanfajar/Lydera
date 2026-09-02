@@ -1,0 +1,407 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/3f535deb40dcd1a8f6e7aeba2d81d49e96cfa376595a80e9c842a4bfb78a52c9.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            103,
+            211,
+            150
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Tahukah Kamu?",
+        "text_level": 2,
+        "bbox": [
+            222,
+            119,
+            355,
+            136
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Dua gelombang apa saja jika bertemu akan berpadu. Perpaduan dua gelombang atau lebih dapat dinyatakan dengan penjumlahan kedua atau lebih fungsi sinus. Penjumlahan kedua fungsi sebenarnya adalah penjumlahan simpangan gelombang. Simpangan gelombang ditunjukkan oleh ketinggian gelombang dalam grafik.",
+        "bbox": [
+            141,
+            158,
+            831,
+            239
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/fa979a0d2536b28ffc9632b389e4e0fdcd7affa5103cd964120b53087cfec4ad.jpg",
+        "image_caption": [
+            "Gambar 1.18 Penjumlahan Dua Fungsi Gelombang",
+            "Penjumlahan dua fungsi gelombang dapat menghasilkan gelombang baru dengan simpangan yang lebih besar atau simpangan lebih kecil bahkan simpangan nol. Jika ada dua pengeras suara dalam suatu ruangan maka bunyi bergantian terdengar keras dan lemah sesuai dengan posisi pendengar karena penjumlahan dua fungsi gelombang."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            144,
+            250,
+            477,
+            377
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/f5383d3b69d9b46018def0ea40cf39c1897d559b526def6b68a0ac62a43dbe65.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            451,
+            209,
+            499
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berteknologi",
+        "text_level": 2,
+        "bbox": [
+            222,
+            466,
+            363,
+            484
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kode QR berikut ini berisi video yang mengilustrasikan penjumlahan grafik dua fungsi pada Gambar 1.18. https://youtu.be/JZaFl8yR1tc",
+        "bbox": [
+            161,
+            508,
+            618,
+            569
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/c16710abd4dc3c0c66ed4d9f9ace8a14e280295cf0f2298f193c40ddb86b5c62.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            695,
+            508,
+            803,
+            588
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Perkalian dan Pembagian Fungsi",
+        "text_level": 2,
+        "bbox": [
+            141,
+            625,
+            546,
+            647
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kalian telah melihat bahwa operasi penjumlahan dan pengurangan bisa diterapkan terhadap dua fungsi. Operasi ini bisa diperluas penerapannya untuk lebih dari dua fungsi. Sekarang, bagaimana dengan operasi perkalian dan pembagian dua atau lebih fungsi?",
+        "bbox": [
+            141,
+            656,
+            831,
+            737
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jika $f ( x )$ dan $g ( x )$ merupakan dua fungsi dengan domain masing-masing $D _ { f }$ dan $D _ { g } .$ . Maka perkalian $( f \\cdot g ) ( x ) = f ( x ) \\cdot g ( x )$ menghasilkan fungsi yang baru dengan domain $D _ { f } \\cap D _ { g }$",
+        "bbox": [
+            141,
+            747,
+            831,
+            807
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "22",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pembagian dua fungsi $\\begin{array} { r } { \\left( \\frac { f } { g } \\right) ( x ) = \\frac { f ( x ) } { g ( x ) } } \\end{array}$ secara umum belum tentu menghasilkan fungsi. Supaya $\\textstyle { \\frac { f } { g } }$ menjadi sebuah fungsi, pembagi g tidak boleh memiliki nilai 0. Dengan kata lain, $\\textstyle { \\frac { f } { g } }$ adalah fungsi dengan domain $\\left( D _ { f } \\cap D _ { g } \\right) - \\left\\{ x | g \\left( x \\right) = 0 \\right\\}$",
+        "bbox": [
+            165,
+            105,
+            858,
+            193
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Latihan 1.3",
+        "text_level": 2,
+        "bbox": [
+            176,
+            218,
+            315,
+            241
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Jika $f ( x ) = { \\sqrt { x + 3 } }$ dan $g \\left( x \\right) = x + 3$",
+        "bbox": [
+            166,
+            268,
+            515,
+            287
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Tentukan $f \\left( x \\right) + g ( x )$",
+        "bbox": [
+            201,
+            294,
+            433,
+            312
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan domain dan range dari $f \\left( x \\right) + g ( x )$",
+        "bbox": [
+            201,
+            317,
+            620,
+            336
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. $f ( x ) = x ^ { 2 } + 2 \\mathrm { d a n } g ( x ) = 2 x - 5$",
+        "bbox": [
+            165,
+            343,
+            478,
+            360
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Tentukan $f \\left( x \\right) - g ( x )$",
+        "bbox": [
+            201,
+            366,
+            433,
+            385
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan domain dan range dari $f \\left( x \\right) - g ( x )$",
+        "bbox": [
+            200,
+            390,
+            620,
+            409
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Buatlah suatu fungsi kuadrat dan fungsi eksponensial! Tentukan hasil penjumlahan dan pengurangan kedua fungsi tersebut!",
+        "bbox": [
+            165,
+            415,
+            858,
+            455
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. Dua fungsi, f(x) (berwarna merah) dan $g ( x )$ (berwarna biru) diberikan di bawah ini.",
+        "bbox": [
+            165,
+            460,
+            856,
+            498
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "table",
+        "img_path": "images/e0ee0698cd223d0e7909b0469438459ce6b657268b4955a66c5f5eb84c87d22f.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>f(x)</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>0</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr></table>",
+        "bbox": [
+            207,
+            507,
+            757,
+            765
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            445,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "23",
+        "bbox": [
+            820,
+            916,
+            851,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/ab1b44082e06a7b3d281366246d21fe366459b36c6a604ce5e6001d60c97e261.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            179,
+            101,
+            733,
+            390
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Tentukan",
+        "bbox": [
+            176,
+            401,
+            266,
+            418
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. (f + g)(2) b. (f –g)(1) c. (fg)(3) d. $( { \\frac { f } { g } } ) ( 4 )$",
+        "bbox": [
+            172,
+            425,
+            321,
+            527
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "5. Pendapatan dari penjualan suatu produk adalah $R \\left( x \\right) = - 2 0 x ^ { 2 } + 1 0 0 0 x ,$ sedangkan biaya produksi C(x) adalah 100x + 8000. Jumlah produk dinyatakan dalam x. Tentukan keuntungan sebagai fungsi dari jumlah produk x.",
+        "bbox": [
+            139,
+            545,
+            834,
+            631
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "6. Jika f (3) = 7, g (3) = 6, f (6) = 13, g (6) = 12, tentukan a. f(3) + g(3) b. f (3) − g(3) c. f(3)  g(3) d. f(3)  g(3)",
+        "bbox": [
+            137,
+            639,
+            680,
+            754
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "7. Berikan contoh nyata tentang perkalian dua fungsi dalam kehidupan sehari-hari.",
+        "bbox": [
+            137,
+            760,
+            831,
+            780
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "8. Berikan contoh nyata tentang pembagian dua fungsi dalam kehidupan seharihari.",
+        "bbox": [
+            137,
+            785,
+            833,
+            823
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "24",
+        "bbox": [
+            139,
+            916,
+            170,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            185,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 2
+    }
+]

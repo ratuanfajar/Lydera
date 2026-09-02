@@ -1,0 +1,464 @@
+[
+    {
+        "type": "text",
+        "text": "c. Plotlah dengan menggunakan beberapa titik fungsi invers $g ^ { - 1 } ( x )$",
+        "bbox": [
+            176,
+            104,
+            754,
+            125
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "d. Bandingkan apakah grafik yang diperoleh sama dengan grafik pada bagian (a).",
+        "bbox": [
+            176,
+            132,
+            829,
+            172
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "4. Diketahui $f \\left( x \\right) = 2 x + b$ dan $f ( f ( x ) ) = 4 x + 6$ . Tentukan nilai b dan $f ^ { - 1 } ( x )$",
+        "bbox": [
+            141,
+            180,
+            827,
+            201
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "5. Populasi badak Jawa terhadap waktu diberikan pada grafik di bawah ini.",
+        "bbox": [
+            141,
+            205,
+            765,
+            225
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/1460fa48a94be2d0680f8e7eccaefe8dc5bfab62312c3ee52a1b14d894a20eb9.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [
+            "Sumber: www.ourworldindata.org (2021)"
+        ],
+        "bbox": [
+            225,
+            241,
+            781,
+            516
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Apakah grafik ini menunjukkan fungsi bijektif atau surjektif? Jelaskan.",
+        "bbox": [
+            177,
+            549,
+            750,
+            569
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "40",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Refleksi",
+        "text_level": 2,
+        "bbox": [
+            168,
+            103,
+            291,
+            128
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah saya sudah dapat membedakan fungsi dengan bukan fungsi dengan beberapa cara?",
+        "bbox": [
+            166,
+            139,
+            856,
+            178
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Bagaimana saya menentukan domain, kodomain, dan range dari suatu fungsi?",
+        "bbox": [
+            166,
+            184,
+            840,
+            203
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Bagaimana saya menentukan dua fungsi atau lebih dapat dikomposisi?",
+        "bbox": [
+            166,
+            207,
+            779,
+            227
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. Apakah saya dapat membedakan fungsi injektif, fungsi surjektif, dan fungsi bijektif?",
+        "bbox": [
+            166,
+            233,
+            856,
+            271
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "5. Bagaimana saya dapat menentukan suatu fungsi dapat mempunyai invers?",
+        "bbox": [
+            166,
+            276,
+            807,
+            298
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Uji Kompetensi",
+        "text_level": 2,
+        "bbox": [
+            168,
+            344,
+            400,
+            370
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Hubungan antara keuntungan yang diperoleh dengan harga barang yang dijual diberikan sebagai $U \\left( x \\right) = - 7 5 x ^ { 2 } + 3 0 0 x - 1 4 0$ , di mana x adalah harga barang dalam kelipatan Rp10.000,00.",
+        "bbox": [
+            166,
+            380,
+            856,
+            439
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Apakah $U ( x )$ merupakan suatu fungsi? Jelaskan.",
+        "bbox": [
+            201,
+            445,
+            642,
+            464
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Jika U(x) merupakan suatu fungsi, tentukan domain dan range-nya.",
+        "bbox": [
+            201,
+            470,
+            798,
+            488
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "c. Jika diinginkan keuntungan tertentu dapatkah diketahui harga barang?",
+        "bbox": [
+            201,
+            495,
+            818,
+            513
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "d. Jika $U ( x )$ merupakan suatu fungsi, apakah fungsi ini mempunyai invers? Jelaskan.",
+        "bbox": [
+            203,
+            519,
+            855,
+            557
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Berikan satu contoh situasi nyata yang bisa diberikan dalam fungsi di mana fungsi tersebut mempunyai invers.",
+        "bbox": [
+            166,
+            564,
+            856,
+            603
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Berikan satu contoh situasi nyata yang mana suatu fungsi tersebut tidak mempunyai invers.",
+        "bbox": [
+            166,
+            607,
+            856,
+            647
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. Berikan satu contoh situasi nyata yang bisa diberikan dalam komposisi fungsi.",
+        "bbox": [
+            166,
+            652,
+            842,
+            671
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "5. Perhatikan diagram panah di bawah ini.",
+        "bbox": [
+            166,
+            678,
+            533,
+            695
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Apakah fungsi $g ( x )$ mempunyai fungsi invers? Jelaskan.",
+        "bbox": [
+            203,
+            698,
+            660,
+            716
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/c721ca465523b80d9ac5a56685aaa3c3b1de713cad6c5558d4e59115c16376c6.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            405,
+            729,
+            655,
+            876
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "41",
+        "bbox": [
+            822,
+            916,
+            847,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "6. Perhatikan percakapan di bawah ini .",
+        "bbox": [
+            139,
+            103,
+            484,
+            120
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Anton : Suatu fungsi dapat dipastikan mempunyai fungsi invers atau tidak dengan menggunakan diagram panah.",
+        "bbox": [
+            176,
+            121,
+            831,
+            161
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Toni : Saya tidak setuju karena diagram panah tidak memberikan informasi lengkap.",
+        "bbox": [
+            176,
+            168,
+            831,
+            207
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Setujukah kamu dengan pendapat keduanya? Adakah pendapatmu yang diperlukan untuk melengkapi kedua pendapat tersebut?",
+        "bbox": [
+            176,
+            218,
+            833,
+            259
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "7. Perhatikan kedua grafik di bawah ini.",
+        "bbox": [
+            139,
+            263,
+            488,
+            282
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/949da67acf834bd1f98cef48b43a41027e6af7866230f13de1311521a9c65f5d.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            267,
+            291,
+            801,
+            674
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Tentukan nilai $( f \\circ g ) ( 2 )$",
+        "bbox": [
+            176,
+            686,
+            423,
+            704
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan nilai yang menyebabkan $( f \\circ g ) ( x ) = 4$",
+        "bbox": [
+            176,
+            709,
+            638,
+            728
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "c. Apakah $( f \\circ g ) ( x )$ berupa fungsi linear atau kuadrat? Jelaskan.",
+        "bbox": [
+            176,
+            735,
+            728,
+            753
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "d. Apakah (g ◦ f)(x) berupa fungsi linear atau kuadrat? Jelaskan.",
+        "bbox": [
+            176,
+            758,
+            730,
+            777
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "e. Apa yang harus dilakukan dengan domain f(x) jika diinginkan f(x) mempunyai invers?",
+        "bbox": [
+            176,
+            782,
+            831,
+            822
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "42",
+        "bbox": [
+            141,
+            916,
+            170,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            185,
+            916,
+            471,
+            932
+        ],
+        "page_idx": 2
+    }
+]

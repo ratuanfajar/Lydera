@@ -1,0 +1,23 @@
+[project]
+name = "ai-services"
+version = "0.1.0"
+description = "Lydera AI service: ekstraksi MinerU + anotasi MLLM untuk modul aksesibel"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mineru[core]>=3.4.5",
+    "openai>=2.54.0",
+    "torch==2.8.0",
+    "torchvision==0.23.0",
+]
+
+# Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.
+# Tanpa ini, resolusi default mengambil wheel CPU (torch ...+cpu).
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+torchvision = { index = "pytorch-cu126" }

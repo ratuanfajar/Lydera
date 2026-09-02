@@ -1,0 +1,324 @@
+[
+    {
+        "type": "text",
+        "text": "Hubungan antara pemakaian bahan bakar dengan jarak tempuh dipengaruhi oleh beberapa hal seperti kepadatan lalu lintas, jalan mulus, dan jenis mobil. Pernahkah kalian memikirkan bahwa model fungsi sangat diperlukan untuk membuat hubungan antara pemakaian bahan bakar dengan jarak tempuh sebuah mobil?",
+        "bbox": [
+            187,
+            158,
+            838,
+            259
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Seperti yang kalian sudah ketahui, relasi sering juga ditampilkan dalam bentuk grafik. Kalian dapat menentukan apakah relasi semacam ini merupakan fungsi atau bukan dengan menggunakan Tes garis vertikal. Caranya yaitu cukup menggeser garis vertikal dari kiri ke kanan (atau sebaliknya) dan melewati grafik relasi. Apabila garis vertikal tersebut memotong grafik di dua atau lebih titik yang berbeda, maka relasi tersebut bukanlah fungsi.",
+        "bbox": [
+            166,
+            283,
+            858,
+            406
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gambar A",
+        "text_level": 2,
+        "bbox": [
+            168,
+            430,
+            264,
+            447
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/52f27e65ef71783ca8ad399a469f2fb505f005ebff5cac35a9375783e9edafe8.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            459,
+            491,
+            581
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gambar A menampilkan grafik dari relasi dengan persamaan $x = y ^ { 2 }$ . Dengan menggunakan Tes garis vertikal, dapat dilihat bahwa pada $x = 2$ garis vertikal memotong grafik pada dua titik yang berbeda. Relasi ini bukanlah suatu fungsi.",
+        "bbox": [
+            508,
+            458,
+            858,
+            581
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gambar B",
+        "text_level": 2,
+        "bbox": [
+            168,
+            611,
+            262,
+            627
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/cd5af66b37abbad4c64be3d60daf15f45a5b71c3c2891f78e488ae02fa0f9d0f.jpg",
+        "image_caption": [
+            "Gambar 1.8 Penggunaan Tes Garis Vertikal untuk Menentukan Relasi"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            639,
+            493,
+            761
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gambar B menampilkan grafik dari relasi dengan persamaan $y = x ^ { 3 }$ Dengan menggunakan Tes garis vertikal, dapat dilihat bahwa untuk setiap nilai x, garis vertikal memotong grafik tepat pada satu titik. Relasi ini adalah suatu fungsi.",
+        "bbox": [
+            506,
+            638,
+            858,
+            761
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "?",
+        "bbox": [
+            168,
+            103,
+            236,
+            150
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "Tahukah Kamu?",
+        "bbox": [
+            247,
+            119,
+            381,
+            136
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "7",
+        "bbox": [
+            833,
+            916,
+            849,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Latihan",
+        "text_level": 2,
+        "bbox": [
+            152,
+            113,
+            234,
+            135
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah relasi-relasi di bawah ini merupakan fungsi? Jelaskan alasanmu.",
+        "bbox": [
+            141,
+            154,
+            763,
+            174
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Relasi antara jumlah penjualan HP Galaksi seri A terhadap waktu.",
+        "bbox": [
+            176,
+            180,
+            754,
+            198
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/74aa39ba6872eccdab20c755893bb437d1ebde1f6e691e20366e0a5fc2693e93.jpg",
+        "content": "",
+        "chart_caption": [
+            "b. Relasi antara lama mengunggah video di YouTube terhadap waktu."
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            220,
+            213,
+            763,
+            431
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/0aed84fd2406271543a548d981be4756b4b414da4324d4e1852a6d4edb2a817e.jpg",
+        "content": "",
+        "chart_caption": [
+            "Sumber: tubularinsights.com (2010)"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            253,
+            496,
+            724,
+            766
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Satuan energi adalah Joule dan kalori dengan 1 J = 2,4 kal. Apakah hubungan antara Joule dan kalori merupakan suatu fungsi? Jelaskan.",
+        "bbox": [
+            141,
+            803,
+            829,
+            845
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "8",
+        "bbox": [
+            141,
+            916,
+            157,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Berdasarkan data, pada tahun 2001 perusahaan A mampu menjual 9 laptop. Pada tahun 2002 dan 2003 perusahaan A mampu menjual masing-masing 27 dan 81 laptop. Apabila relasi antara tahun dan jumlah penjualan laptop membentuk fungsi eksponensial, berapa penjualan laptop pada tahun 2007?",
+        "bbox": [
+            165,
+            101,
+            860,
+            184
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "4. Tentukan relasi mana dari grafik-grafik berikut yang merupakan fungsi (gunakan tes garis vertikal).",
+        "bbox": [
+            163,
+            188,
+            858,
+            227
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a.",
+        "bbox": [
+            203,
+            237,
+            225,
+            250
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/fcd25bfe806b8936c32073f093ed22e3a28a2558a7e4263d4867044b77475b17.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            242,
+            245,
+            721,
+            495
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/2d806c533725937b01b48c876bbfc9efc2b368f59a6e089c2b83162bf89c9b05.jpg",
+        "image_caption": [
+            "b."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            242,
+            516,
+            719,
+            765
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            22,
+            915,
+            796,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "9",
+        "bbox": [
+            831,
+            916,
+            851,
+            931
+        ],
+        "page_idx": 2
+    }
+]

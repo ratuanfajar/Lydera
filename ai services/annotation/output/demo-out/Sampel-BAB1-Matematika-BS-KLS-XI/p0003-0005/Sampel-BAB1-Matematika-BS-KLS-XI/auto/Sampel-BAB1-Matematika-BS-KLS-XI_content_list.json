@@ -1,0 +1,370 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/1ceb9370d72e905bca00a4101ebd7249511fc0b5a94eb54ad539633b28f4b07f.jpg",
+        "image_caption": [
+            "Peta Konsep"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            150,
+            748,
+            400
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/dfcd20cb0cb0a132a0b71c9840e6e64e341e575ba607fc485f9c12e65a3580f9.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            452,
+            211,
+            500
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Mengingat Kembali",
+        "text_level": 2,
+        "bbox": [
+            220,
+            467,
+            416,
+            487
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/d2e0931361d390adcdbee97e168ddfdb7a1c3f5412c96db7b11181d55ade4f09.jpg",
+        "image_caption": [],
+        "image_footnote": [
+            "Gambar 1.3 Ronaldo dengan Nomor Punggung 7 Sumber: twitter.com/Manchester United (2021)"
+        ],
+        "bbox": [
+            144,
+            515,
+            390,
+            658
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Relasi dapat dipahami dalam banyak hal di kehidupan sehari-hari. Konsep relasi menjelaskan hubungan antara anggota-anggota dari dua himpunan. Contohnya, setiap pemain bola di tim Manchester United memiliki nomor punggung masing-masing. Ronaldo memiliki nomor punggung 7.",
+        "bbox": [
+            405,
+            509,
+            833,
+            655
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Hubungan ini biasanya dijelaskan dalam bentuk himpunan pasangan berurutan, diagram panah, dan diagram Kartesius.",
+        "bbox": [
+            405,
+            662,
+            831,
+            723
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "A. Fungsi",
+        "text_level": 2,
+        "bbox": [
+            141,
+            753,
+            297,
+            780
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Fungsi merupakan suatu relasi yang menghubungkan satu anggota dari suatu himpunan tepat ke satu anggota di himpunan yang lain. Fungsi adalah relasi yang lebih spesifik. Fungsi biasa dinyatakan dalam bentuk f(x) = y , di mana f merupakan fungsi, x merupakan variabel masukan (input) dan y adalah variabel keluaran (output). Kalian dapat memahami konsep ini dengan membayangkan fungsi sebagai mesin seperti pada gambar berikut:",
+        "bbox": [
+            139,
+            789,
+            833,
+            871
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "4",
+        "bbox": [
+            141,
+            916,
+            159,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            166,
+            101,
+            856,
+            143
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/941614bd7f887efd1cd52e049e5c2829ca0a5f413eb3aaad2aecdfd7dbebfd98.jpg",
+        "image_caption": [
+            "Gambar 1.4 Analogi Fungsi Mesin"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            411,
+            154,
+            647,
+            275
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Jelaslah, kalian dapat simpulkan bahwa ada relasi yang merupakan fungsi dan ada yang bukan merupakan fungsi.",
+        "bbox": [
+            166,
+            312,
+            856,
+            353
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Fungsi dan Bukan Fungsi",
+        "text_level": 2,
+        "bbox": [
+            168,
+            372,
+            489,
+            394
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Secara ilustratif, hubungan antara fungsi dan relasi dapat dipahami melalui Gambar 1.5 dan Gambar 1.6.",
+        "bbox": [
+            166,
+            403,
+            856,
+            443
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Pada bagian ini, kalian akan belajar menentukan relasi-relasi yang merupakan fungsi dan bukan merupakan fungsi. Relasi-relasi ini akan disajikan dalam bentuk diagram panah dan diagram Kartesius.",
+        "bbox": [
+            166,
+            452,
+            585,
+            554
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan contoh ketiga diagram panah berikut. Ada yang menunjukkan relasi yang berupa fungsi dan ada yang menunjukkan bukan fungsi.",
+        "bbox": [
+            166,
+            562,
+            583,
+            625
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/d3c0578f9194c6f58765e82f23220a2cd9fd8eb14c2e0c08111c7cc08f587cd2.jpg",
+        "image_caption": [
+            "Gambar 1.5 Ada Relasi yang Bukan Fungsi"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            625,
+            452,
+            834,
+            598
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/af642842d8fd9f209afdab313da6629d4b100950e745695b9a425571830551d5.jpg",
+        "image_caption": [
+            "Gambar 1.6 Relasi Merupakan Fungsi dan Bukan Fungsi"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            656,
+            855,
+            815
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "5",
+        "bbox": [
+            833,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Relasi yang terdapat pada Gambar 1.6 (a) dan (b) merupakan fungsi karena relasi tersebut menghubungkan satu anggota himpunan input dengan tepat satu anggota himpunan output. Gambar 1.6 (c) merupakan contoh relasi yang bukan fungsi karena relasi tersebut menghubungkan satu anggota; “q” ke dua anggota berbeda “y” dan “z” .",
+        "bbox": [
+            139,
+            103,
+            833,
+            202
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/4bb32051a42fb53948318830d0eac43a751f6b98e8633cc1fd3832ff36e284d3.jpg",
+        "image_caption": [
+            "a."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            223,
+            211,
+            272
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berdiskusi",
+        "text_level": 2,
+        "bbox": [
+            220,
+            239,
+            346,
+            256
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Diskusikan dalam kelompok, apakah kedua relasi dalam diagram Kartesius ini merupakan fungsi atau bukan fungsi.",
+        "bbox": [
+            141,
+            282,
+            833,
+            321
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Tuliskan juga pasangan berurutan dari setiap titik.",
+        "bbox": [
+            141,
+            331,
+            554,
+            349
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/66538ac773c57b6f0607e449b2a887b3fe97bf0eb67f9dae5d91037791be991a.jpg",
+        "image_caption": [
+            "b."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            216,
+            365,
+            590,
+            581
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/976ff5284a41c27deee946a08bed119564fdba823a116c405cfcd6f5c85f3f93.jpg",
+        "image_caption": [
+            "Gambar 1.7 Relasi dalam Diagram Kartesius"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            218,
+            596,
+            633,
+            822
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "6",
+        "bbox": [
+            139,
+            916,
+            159,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            916,
+            473,
+            932
+        ],
+        "page_idx": 2
+    }
+]

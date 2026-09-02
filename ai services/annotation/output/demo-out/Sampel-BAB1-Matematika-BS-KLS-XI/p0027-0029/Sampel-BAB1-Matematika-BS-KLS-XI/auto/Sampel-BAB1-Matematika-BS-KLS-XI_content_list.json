@@ -1,0 +1,639 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/c6469207ec049925212eb18e1d2f0d0137ff06fe1184c3c082bee9b293606810.jpg",
+        "image_caption": [
+            "Gambar 1.22 Domain dan Range dari Fungsi Komposisi"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            271,
+            107,
+            702,
+            305
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Masalah Kedua",
+        "text_level": 2,
+        "bbox": [
+            141,
+            347,
+            280,
+            364
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan kedua grafik di bawah ini. Misalkan, fungsi yang dinyatakan oleh grafik kiri adalah $f ( x )$ dan fungsi yang dinyatakan oleh grafik kanan adalah $g ( x )$ Apakah kedua fungsi dapat dikomposisikan menurut $( g \\circ f ) ( x ) ?$ Jelaskan jawaban kalian!",
+        "bbox": [
+            139,
+            373,
+            831,
+            454
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/6b9d843d1b6e59621e65ccbf9b36486197007e44609d4ce2e9c1b42ff50098db.jpg",
+        "image_caption": [
+            "Gambar 1.23 Grafik Dua Fungsi"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            288,
+            476,
+            722,
+            672
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Syarat Komposisi Fungsi",
+        "text_level": 2,
+        "bbox": [
+            141,
+            711,
+            359,
+            729
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kedua masalah di atas memberikan pemahaman yang jelas syarat agar dua fungsi dapat dikomposisikan.",
+        "bbox": [
+            141,
+            739,
+            831,
+            777
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Dua fungsi $f$ dan g dapat dikomposisikan sebagai $f \\circ g$ jika range dari g merupakan himpunan bagian dari domain $f .$ Ini merupakan syarat komposisi fungsi.",
+        "bbox": [
+            139,
+            780,
+            831,
+            821
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pertanyaan menarik lainnya adalah “Apakah operasi komposisi fungsi memenuhi sifat komutatif dan asosiatif?”",
+        "bbox": [
+            139,
+            829,
+            831,
+            867
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "28",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi 1.5",
+        "text_level": 2,
+        "bbox": [
+            177,
+            112,
+            339,
+            135
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Sifat Komutatif",
+        "text_level": 2,
+        "bbox": [
+            166,
+            157,
+            324,
+            176
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Masalah Pertama",
+        "text_level": 2,
+        "bbox": [
+            166,
+            184,
+            322,
+            201
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Selidikilah apakah harga setelah diskon 25% yang dilanjutkan dengan diskon 20% sama dengan harga setelah diskon 20% yang dilanjutkan dengan diskon 25%. Apakah berlaku sifat komutatif dalam komposisi fungsi ini?",
+        "bbox": [
+            166,
+            206,
+            856,
+            268
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Masalah Kedua",
+        "text_level": 2,
+        "bbox": [
+            166,
+            283,
+            306,
+            300
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Selidikilah apakah harga setelah diskon 25% yang dilanjutkan dengan potongan Rp15.000,00 sama dengan harga setelah kena potongan Rp15.000,00 yang dilanjutkan dengan diskon 25%. Apakah berlaku sifat komutatif dalam komposisi fungsi ini?",
+        "bbox": [
+            166,
+            307,
+            858,
+            369
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Masalah Ketiga",
+        "text_level": 2,
+        "bbox": [
+            166,
+            385,
+            306,
+            403
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan tiga fungsi di bawah ini, yaitu f, g dan $h$",
+        "bbox": [
+            166,
+            409,
+            600,
+            427
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "equation",
+        "img_path": "images/7458c1f3d9ae8924aefa12c8c9454aab4b832b4d15b36a21bfa3470b4cc59cce.jpg",
+        "text": "$$\n\\begin{array} { r } { f ( x ) = 2 x + 1 , g ( x ) = x ^ { 2 } + 4 \\mathrm { d a n } h \\left( x \\right) = \\frac { 1 } { \\left( x + 1 \\right) } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            166,
+            435,
+            585,
+            458
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Tentukan domain dan range dari masing-masing fungsi!",
+        "bbox": [
+            166,
+            466,
+            627,
+            484
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• Dengan informasi tentang domain dan range dari masing-masing fungsi, selidikilah apakah komposisi-komposisi di bawah ini merupakan fungsi:",
+        "bbox": [
+            166,
+            492,
+            856,
+            532
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "equation",
+        "img_path": "images/433e7dfae16faf987e97bc8afd55699795ace9450ba0d1b62be6d4c0c664614e.jpg",
+        "text": "$$\ng _ { } \\circ  { f , f } \\circ  { g , f } \\circ  { h , h } \\circ  { f , g } \\circ  { h , h } \\circ  { g } !\n$$",
+        "text_format": "latex",
+        "bbox": [
+            203,
+            533,
+            633,
+            553
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "• Mari cek apakah komposisi-komposisi di atas bersifat komutatif!",
+        "bbox": [
+            168,
+            558,
+            732,
+            577
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "equation",
+        "img_path": "images/861741c610a6601610215e074ef2baa75526891c65777b5b2da3704d4eece540.jpg",
+        "text": "$$\n\\mathrm { a } . \\quad g \\circ f = f \\circ g \\ ?\n$$",
+        "text_format": "latex",
+        "bbox": [
+            203,
+            582,
+            412,
+            602
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "equation",
+        "img_path": "images/9652f0c4ed3b6faa8ab213cf45c397880211e94f50620b0009308cc4dd67692d.jpg",
+        "text": "$$\n\\mathrm { b } . \\quad f \\circ h = h \\circ f ?\n$$",
+        "text_format": "latex",
+        "bbox": [
+            203,
+            606,
+            412,
+            626
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "equation",
+        "img_path": "images/a94d6ece85513724df6880f465af3ed7b0e5c9d20c57ee347deda65ffb21e924.jpg",
+        "text": "$$\n\\mathsf { c . } \\quad g \\circ h = h \\circ g ?\n$$",
+        "text_format": "latex",
+        "bbox": [
+            203,
+            630,
+            411,
+            651
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Berdasarkan Eksplorasi 1.5 ternyata komposisi fungsi secara umum tidak memenuhi sifat komutatif.",
+        "bbox": [
+            166,
+            676,
+            858,
+            715
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Sifat Asosiatif",
+        "text_level": 2,
+        "bbox": [
+            166,
+            731,
+            311,
+            749
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi dilakukan untuk mengecek apakah operasi komposisi fungsi memenuhi sifat asosiatif.",
+        "bbox": [
+            166,
+            757,
+            856,
+            796
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "29",
+        "bbox": [
+            822,
+            916,
+            849,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan kembali tiga fungsi di bawah ini, yaitu $f , g$ dan h:",
+        "bbox": [
+            141,
+            104,
+            645,
+            123
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "equation",
+        "img_path": "images/330cee72414dd034a9df9ee3bc908a0d46cc03c48c22fa71e3662b13d942d225.jpg",
+        "text": "$$\n\\begin{array} { r } { f ( x ) = 2 x + 1 , g ( x ) = x ^ { 2 } + 4 \\mathrm { ~ d a n ~ } h \\left( x \\right) = \\frac { 1 } { \\left( x + 1 \\right) } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            141,
+            131,
+            565,
+            154
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Selidikilah apakah operasi asosiatif secara umum berlaku untuk komposisi fungsi, dengan kata lain cek apakah persamaan-persamaan berikut benar:",
+        "bbox": [
+            141,
+            161,
+            831,
+            200
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "$\\begin{array} { r } { \\left( f \\left( h \\circ g \\right) \\right) ( x ) = ( ( f \\circ h ) \\circ g ) ( x ) ? } \\end{array}$",
+        "bbox": [
+            177,
+            205,
+            510,
+            225
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "$\\begin{array} { r } { \\left( h \\left( f \\circ g \\right) \\right) ( x ) = ( ( h \\circ f ) \\circ g ) ( x ) ? } \\end{array}$",
+        "bbox": [
+            177,
+            230,
+            510,
+            249
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "$\\left( g \\left( f \\circ h \\right) \\right) ( x ) = ( ( g \\circ f ) \\circ h ) ( x ) ?$",
+        "bbox": [
+            177,
+            254,
+            510,
+            274
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Pikirkan konfigurasi komposisi lain yang mungkin dari ketiga fungsi di atas. Cek apakah sifat asosiatif masih terpenuhi.",
+        "bbox": [
+            141,
+            279,
+            831,
+            317
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Berdasarkan Eksplorasi 1.5 ternyata komposisi fungsi memenuhi sifat asosiatif.",
+        "bbox": [
+            141,
+            332,
+            803,
+            349
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Komposisi dua fungsi injektif dan dua fungsi surjektif",
+        "bbox": [
+            141,
+            365,
+            658,
+            385
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Untuk memahami fungi injektif dan fungsi surjektif lihat halaman 32 dan 33.",
+        "bbox": [
+            141,
+            390,
+            768,
+            409
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/26b4360e6d84a315a8636cc46717a2044b0b638e5e5db1db5e080bfa8966e592.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            431,
+            209,
+            478
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Bekerja Sama",
+        "text_level": 2,
+        "bbox": [
+            220,
+            446,
+            372,
+            463
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Misalkan $g : A  B$ dan $f : B \\to C$ merupakan dua fungsi injektif. Apakah fungsi komposisi $f \\circ g \\mathrm { j u g a }$ bersifat injektif? Berikan alasanmu!",
+        "bbox": [
+            161,
+            488,
+            783,
+            528
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Misalkan $g : A  B$ dan $f : B \\to C$ merupakan dua fungsi surjektif. Apakah fungsi komposisi $f \\circ g$ juga bersifat surjektif? Berikan alasanmu!",
+        "bbox": [
+            161,
+            533,
+            792,
+            573
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Latihan 1.4",
+        "text_level": 2,
+        "bbox": [
+            152,
+            631,
+            288,
+            651
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Jika $\\textstyle f ( x ) = { \\frac { 1 } { x } }$ dan $g \\left( x \\right) = 2 x + 1$ , tentukan",
+        "bbox": [
+            141,
+            679,
+            563,
+            700
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. $( f \\circ g ) ( x )$",
+        "bbox": [
+            177,
+            705,
+            310,
+            723
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. $\\left( f \\circ g \\right) ( 3 ) \\mathrm { d a n } \\left( f \\circ g \\right) ( - 3 )$",
+        "bbox": [
+            177,
+            728,
+            458,
+            748
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "c. $f ( a ) \\mathrm { j i k a } ( f \\circ g ) ( a ) = - 1 .$",
+        "bbox": [
+            177,
+            753,
+            451,
+            772
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Jika $\\textstyle f ( x ) = { \\frac { 1 } { ( 2 x + 1 ) } }$ dan $g ( x ) \\ = \\ 2 x ^ { 2 } \\ + \\ 1$ , tentukan",
+        "bbox": [
+            141,
+            777,
+            622,
+            798
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. $( f \\circ g ) \\ ( x )$",
+        "bbox": [
+            177,
+            802,
+            317,
+            821
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. $( g \\circ f ) \\ ( x )$",
+        "bbox": [
+            177,
+            826,
+            317,
+            845
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "30",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 2
+    }
+]

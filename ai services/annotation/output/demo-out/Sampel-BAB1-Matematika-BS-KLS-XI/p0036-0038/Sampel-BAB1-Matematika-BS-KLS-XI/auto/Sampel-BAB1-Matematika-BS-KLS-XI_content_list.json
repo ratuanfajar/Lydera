@@ -1,0 +1,496 @@
+[
+    {
+        "type": "text",
+        "text": "Eksplorasi",
+        "text_level": 2,
+        "bbox": [
+            177,
+            113,
+            284,
+            132
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Masalah berikut ini akan membantu kalian memahami syarat sebuah fungsi untuk memiliki invers.",
+        "bbox": [
+            166,
+            150,
+            856,
+            190
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sebuah mobil melaju di jalan raya. Kecepatan tiap menit diukur dan dicatat dalam tabel di bawah ini:",
+        "bbox": [
+            166,
+            200,
+            856,
+            238
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "table",
+        "img_path": "images/32a5adb1ddaa2fa8f81ea4144f779548854c0ed52b91bffb907ae1989a2ab69c.jpg",
+        "table_caption": [
+            "Tabel 1.3 Kecepatan Mobil Terhadap Waktu"
+        ],
+        "table_footnote": [
+            "Dari data pada Tabel 1.3, jawablah pertanyaan berikut:"
+        ],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Waktu (menit)(x)</td><td rowspan=1 colspan=1>Kecepatan Mobil (m/menit)(y)</td></tr><tr><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>100</td></tr><tr><td rowspan=1 colspan=1>2</td><td rowspan=1 colspan=1>180</td></tr><tr><td rowspan=1 colspan=1>3</td><td rowspan=1 colspan=1>193</td></tr><tr><td rowspan=1 colspan=1>4</td><td rowspan=1 colspan=1>185</td></tr><tr><td rowspan=1 colspan=1>5</td><td rowspan=1 colspan=1>180</td></tr><tr><td rowspan=1 colspan=1>6</td><td rowspan=1 colspan=1>165</td></tr><tr><td rowspan=1 colspan=1>7</td><td rowspan=1 colspan=1>175</td></tr><tr><td rowspan=1 colspan=1>8</td><td rowspan=1 colspan=1>186</td></tr><tr><td rowspan=1 colspan=1>9</td><td rowspan=1 colspan=1>190</td></tr><tr><td rowspan=1 colspan=1>10</td><td rowspan=1 colspan=1>166</td></tr></table>",
+        "bbox": [
+            240,
+            275,
+            783,
+            557
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah data waktu dan kecepatan membentuk relasi? Jika ya, apakah relasi itu adalah fungsi?",
+        "bbox": [
+            166,
+            597,
+            855,
+            635
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Plot data dengan sumbu x adalah waktu dan sumbu sumbu y adalah kecepatan.",
+        "bbox": [
+            166,
+            641,
+            853,
+            660
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Sekarang, kalian tentukan invers relasi dari pertanyaan 1.",
+        "bbox": [
+            166,
+            666,
+            669,
+            686
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "4. Dari definisi fungsi yang kalian pelajari, apakah invers relasi pada pertanyaan (3) adalah fungsi? Jelaskan alasanmu.",
+        "bbox": [
+            166,
+            691,
+            855,
+            729
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "5. Apabila pada menit ke-5 kecepatan diubah menjadi 182 m/menit, apakah relasi antara waktu dan kecepatan merupakan relasi surjektif dan injektif?",
+        "bbox": [
+            166,
+            735,
+            856,
+            774
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "6. Dengan perubahan ini, apakah invers relasi adalah fungsi? Jika ya, apakah fungsi injektif dan surjektif (bijektif)?",
+        "bbox": [
+            166,
+            780,
+            856,
+            819
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "37",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/d81a290101456f044366b8194f6966e5ce4e359335d9d409168ec9ba6fde578b.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            103,
+            209,
+            152
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Misalkan, f dan g adalah fungsi. Jika $( f \\circ g ) ( x ) = x$ dan $( g \\circ f ) ( x ) = x$ maka g adalah fungsi invers dari f dan f adalah fungsi invers dari g.",
+        "bbox": [
+            161,
+            165,
+            805,
+            206
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/ffff5e7bcc84df39e140f4ace9adaef8d53110ad6f05ef037af32a0c065eff48.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            241,
+            209,
+            288
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kritis",
+        "text_level": 2,
+        "bbox": [
+            220,
+            255,
+            374,
+            274
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Setujukah kalian bahwa konversi satuan merupakan fungsi yang mempunyai invers? Jelaskan jawaban kalian.",
+        "bbox": [
+            161,
+            298,
+            809,
+            336
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Berikan satu contoh konversi satuan, tentukan juga domain dan range-nya.",
+        "bbox": [
+            161,
+            340,
+            770,
+            358
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi",
+        "text_level": 2,
+        "bbox": [
+            152,
+            406,
+            256,
+            427
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Kalian akan menyelidiki invers dari komposisi fungsi.",
+        "bbox": [
+            141,
+            454,
+            577,
+            472
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Sebuah toko mainan memberikan potongan harga berupa diskon 20% dan dilanjutkan dengan potongan harga Rp10.000,00. Jawablah pertanyaan-pertanyaan berikut!",
+        "bbox": [
+            141,
+            480,
+            829,
+            521
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Jika $f : A  B$ dipahami sebagai fungsi harga setelah diskon 20%, dimana A adalah domain harga asal, dan B adalah kodomain dengan anggota harga setelah diskon. Maka tuliskan persamaan matematis untuk fungsi ini.",
+        "bbox": [
+            141,
+            529,
+            831,
+            590
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Jika $g : B  C$ sebagai fungsi potongan harga Rp10.000,00 setelah diskon 20%, dengan $C$ adalah kodomain dengan anggota harga akhir. Maka tuliskan persamaan matematis untuk fungsi ini.",
+        "bbox": [
+            141,
+            596,
+            831,
+            655
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Apakah benar harga akhir dapat diperoleh dengan cukup menggunakan fungsi $( g \\circ f ) ( x ) ?$ Jelaskan alasanmu.",
+        "bbox": [
+            141,
+            662,
+            829,
+            700
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. Apakah bedanya fungsi komposisi $( g \\circ f ) ( x )$ dan $( f \\circ g ) ( x ) ?$",
+        "bbox": [
+            141,
+            705,
+            684,
+            724
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "5. Misal fungsi $( g \\circ f ) ( x )$ memiliki invers. Jika diketahui harga akhir mainan, coba tuliskan fungsi yang dapat digunakan untuk memperoleh harga asal (gunakan fungsi invers dari g dan f lalu komposisikan).",
+        "bbox": [
+            141,
+            729,
+            831,
+            790
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "6. Gunakan fungsi dari nomor 5, untuk mengetahui harga asal mainan jika diketahui harga akhir sebesar Rp30.000,00.",
+        "bbox": [
+            141,
+            796,
+            829,
+            835
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "header",
+        "text": "Tahukah Kamu?",
+        "bbox": [
+            222,
+            119,
+            355,
+            136
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "38",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "7.",
+        "bbox": [
+            168,
+            103,
+            188,
+            119
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/201f8cfec1f0d840f99597a9a0c37915ed60e5300594317bf99c02c9990d331f.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            103,
+            273,
+            152
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kritis",
+        "text_level": 2,
+        "bbox": [
+            282,
+            119,
+            436,
+            136
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Apakah benar secara umum, jika $( g \\circ f ) ( x )$ memiliki invers maka $\\left( g \\circ f \\right) ^ { - 1 } \\left( x \\right) =$ $( f ^ { - 1 } \\circ g ^ { - 1 } ) ( x ) ?$",
+        "bbox": [
+            203,
+            162,
+            855,
+            203
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Latihan",
+        "text_level": 2,
+        "bbox": [
+            177,
+            243,
+            260,
+            263
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Gambarkan fungsi-fungsi di bawah ini dan tentukan apakah fungsi-fungsi tersebut mempunyai fungsi invers. Jelaskan alasanmu. a. $f \\left( x \\right) = x ^ { 2 }$ b. $f ( x ) = 2 ^ { x }$ c. $f \\left( x \\right) = { \\sqrt { 2 x } }$",
+        "bbox": [
+            166,
+            292,
+            856,
+            357
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Tentukan fungsi invers (jika ada) dari fungsi-fungsi di bawah ini, juga domain dan range-nya. a. $f \\left( x \\right) = x ^ { 3 }$ b. $f \\left( x \\right) = - 3 x + 1$ c. $f \\left( x \\right) = { \\sqrt { x - 3 } }$ d. $\\textstyle f \\left( x \\right) = { \\frac { x + 4 } { 2 x - 5 } }$",
+        "bbox": [
+            165,
+            361,
+            855,
+            505
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3. Berikut ini adalah grafik dari fungsi $g \\left( x \\right) = \\sqrt { 2 x - 3 }$",
+        "bbox": [
+            166,
+            513,
+            656,
+            533
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "chart",
+        "img_path": "images/12e3bfdcbc20c789769a8ffa96ee788601ebf599fedcc85ff71e209056e4004e.jpg",
+        "content": "",
+        "chart_caption": [],
+        "chart_footnote": [],
+        "bbox": [
+            365,
+            544,
+            691,
+            782
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Gambarkan grafik dari invers fungsi g(x) dengan pencerminan terhadap $y = x$",
+        "bbox": [
+            201,
+            798,
+            855,
+            835
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Temukan persamaan matematis untuk fungsi invers $g ^ { - 1 } ( x )$",
+        "bbox": [
+            201,
+            846,
+            732,
+            866
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "39",
+        "bbox": [
+            822,
+            916,
+            849,
+            931
+        ],
+        "page_idx": 2
+    }
+]
