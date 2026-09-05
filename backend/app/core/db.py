@@ -2,7 +2,8 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import func
 from datetime import datetime
-from config import settings
+from core.config import settings
+from typing import AsyncGenerator
 
 
 engine = create_async_engine(
@@ -20,6 +21,10 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as session:
+        yield session
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
         server_default=func.now()

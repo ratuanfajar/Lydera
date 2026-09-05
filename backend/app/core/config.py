@@ -39,6 +39,6 @@ class Settings(BaseSettings):
     @property
     def DATABASE_URL(self) -> str:
         if os.getenv("TESTING") == "True" or os.getenv("APP_ENV") == "testing":
-            return os.getenv("DATABASE_URL")
+            return os.getenv("DB_URL")
         return self.DB_URL
 settings = Settings()
