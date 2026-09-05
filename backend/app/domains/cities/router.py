@@ -18,10 +18,10 @@ async def get_cities(service: CityService = Depends(get_city_service)):
 
 @router.post(
     "",
-    response_model=Response[str],
+    response_model=Response[CityResponse],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_city(
-     city: Annotated[CityCreate, Body()], 
+     dto: Annotated[CityCreate, Body()], 
      service: CityService = Depends(get_city_service)):
-    return await service.create_city(city)
+     return await service.create_city(dto)

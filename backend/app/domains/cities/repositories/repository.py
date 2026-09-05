@@ -11,8 +11,7 @@ class CityRepository(CityRepositoryInterface):
     async def create_city(self, name: str) -> City:
         city = City(name=name)
         self.db.add(city)
-        await self.db.commit()
-        await self.db.refresh(city)
+        await self.db.flush()
         return city
 
     async def get_list_city(self) -> list[City]:
