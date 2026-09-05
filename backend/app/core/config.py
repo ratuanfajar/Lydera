@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     PORT: int = os.getenv("PORT","8000")
 
     # Database
-    DB_ENGINE: str = os.getenv("DB","postgresql")
+    DB_ENGINE: str = os.getenv("DB_ENGINE","postgresql")
     DB_HOST: str = os.getenv("DB_HOST","localhost")
     DB_PORT: int = os.getenv("DB_PORT",5432)
     DB_NAME: str = os.getenv("DB_NAME")

@@ -1,5 +1,7 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import func
+from datetime import datetime
 from config import settings
 
 
@@ -18,6 +20,14 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
 )
-
-class Base(DeclarativeBase):
+class TimestampMixin:
+    created_at: Mapped[datetime] = mapped_column(
+        server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+class Base(DeclarativeBase, TimestampMixin):
     pass
+
