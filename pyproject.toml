@@ -9,6 +9,12 @@ dependencies = [
     "openai>=2.54.0",
     "torch==2.8.0",
     "torchvision==0.23.0",
+    "alembic>=1.19.1",
+    "asyncpg>=0.31.0",
+    "fastapi[standard]>=0.141.1",
+    "pwdlib[argon2]>=0.3.1",
+    "pyjwt>=2.13.0",
+    "sqlalchemy>=2.0.52",
 ]
 
 # Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.
@@ -22,7 +28,3 @@ explicit = true
 torch = { index = "pytorch-cu126" }
 torchvision = { index = "pytorch-cu126" }
 
-[tool.uv.workspace]
-members = [
-    "backend",
-]
