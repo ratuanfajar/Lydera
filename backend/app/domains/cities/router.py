@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, status, Body
+from utils.role import Role
+from core.security import Roles
 from core.route import WrappedRoute
 from typing import Annotated
 from domains.cities.depedencies import get_city_service
 from domains.cities.services import CityService
-from core.response import Response
+from core.response import COMMON_VALIDATION_RESPONSES, Response
 from domains.cities.schemas import CityResponse, CityCreate
 
 router = APIRouter(prefix="/cities", tags=["cities"], route_class=WrappedRoute)
@@ -11,17 +13,23 @@ router = APIRouter(prefix="/cities", tags=["cities"], route_class=WrappedRoute)
 
 @router.get(
     "",
+    description="Requires the ADMIN role.",
     response_model=Response[list[CityResponse]])
-async def get_cities(service: CityService = Depends(get_city_service)):
+async def get_cities(
+     current_user: Roles(Role.ADMIN),
+     service: CityService = Depends(get_city_service)):
     return await service.get_list_city()
 
 
 @router.post(
     "",
+    description="Requires the ADMIN role.",
     response_model=Response[CityResponse],
     status_code=status.HTTP_201_CREATED,
+    responses=COMMON_VALIDATION_RESPONSES
 )
 async def create_city(
+     current_user: Roles(Role.ADMIN),
      dto: Annotated[CityCreate, Body()], 
      service: CityService = Depends(get_city_service)):
      return await service.create_city(dto)

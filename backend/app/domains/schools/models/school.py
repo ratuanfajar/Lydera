@@ -16,7 +16,7 @@ class School(Base):
             ),
         nullable=False
     )
-
+    
     city: Mapped["City"] = relationship(
         back_populates="schools"
     )

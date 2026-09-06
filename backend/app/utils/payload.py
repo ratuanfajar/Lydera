@@ -1,0 +1,11 @@
+
+
+from pydantic import BaseModel
+from utils.role import Role
+
+class Payload(BaseModel):
+    sub: int
+    profile_id: int
+    role: Role
+    iat: int | None = None
+    exp: int | None = None
