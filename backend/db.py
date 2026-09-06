@@ -1,19 +1,28 @@
-import sqlite3
+import os
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent / "lydera.db"
-SCHEMA_PATH = Path(__file__).parent / "schema.sql"
+import psycopg
+from dotenv import load_dotenv
+from psycopg.rows import dict_row
+
+BACKEND_DIR = Path(__file__).parent
+SCHEMA_PATH = BACKEND_DIR / "schema.sql"
+
+load_dotenv(BACKEND_DIR / ".env")
+
+DATABASE_URL = os.getenv("DATABASE_URL") or "postgresql://postgres:postgres@localhost:5432/lydera"
 
 
-def connect(db_path=None) -> sqlite3.Connection:
-    conn = sqlite3.connect(db_path or DB_PATH)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+def connect() -> psycopg.Connection:
+    return psycopg.connect(DATABASE_URL, row_factory=dict_row)
 
 
-def init_db(db_path=None) -> None:
-    conn = connect(db_path)
-    conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
-    conn.commit()
-    conn.close()
+def init_db() -> None:
+    conn = connect()
+    try:
+        statements = [s.strip() for s in SCHEMA_PATH.read_text(encoding="utf-8").split(";") if s.strip()]
+        for statement in statements:
+            conn.execute(statement)
+        conn.commit()
+    finally:
+        conn.close()

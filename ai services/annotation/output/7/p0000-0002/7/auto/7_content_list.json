@@ -1,0 +1,442 @@
+[
+    {
+        "type": "text",
+        "text": "Lubang untuk memeriksa selokan (lihat Gambar 2.2) umumnya berbentuk lingkaran. Bagaimana kaitan bentuk lingkaran dengan keselamatan pekerja yang sedang berada di dalam? Apa yang terjadi jika tutup lubang bentuknya bangun datar yang berbeda? Bagaimana jika tutupnya berbentuk persegi? Bagaimana jika persegi panjang?",
+        "bbox": [
+            187,
+            164,
+            836,
+            266
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/ac07fffe6d3861925aab95cf94d0bf30409ff3b29a0fe0a0ac8e250dbe7d6ad2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            292,
+            234,
+            340
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Tahukah Kamu?",
+        "text_level": 2,
+        "bbox": [
+            247,
+            307,
+            383,
+            325
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pythagoras adalah matematikawan yang hidup pada abad keenam Sebelum Masehi. Para pengikutnya membentuk sebuah sekte tertutup yang disebut Pythagoreans. Pengikut sekte ini menganggap lingkaran sebagai bangun yang sempurna.",
+        "bbox": [
+            187,
+            350,
+            836,
+            431
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Archimedes adalah matematikawan Yunani kuno yang hidup pada abad ketiga Sebelum Masehi. Menurut legenda, Archimedes sedang berkonsentrasi penuh mempelajari lingkaran (yang digambarkan pada pasir di hadapannya) saat kota tempat tinggalnya dikalahkan dalam perang. Pasukan lawan (yang ditugaskan membawa Archimedes pada pemimpin mereka) menanyakan identitasnya. Archimedes (yang konsentrasinya terganggu oleh kehadiran mereka) menjawab dengan gusar, “Jangan ganggu lingkaran saya!” Kalimat tersebut disebut sebagai kata-kata terakhir Archimedes.",
+        "bbox": [
+            188,
+            437,
+            836,
+            601
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pada bab ini kalian akan mempelajari tentang lingkaran dan teorema-teorema yang berhubungan dengan lingkaran. Kalian juga akan menerapkan teorema-teorema itu untuk menyelesaikan masalah yang terkait dengan lingkaran.",
+        "bbox": [
+            166,
+            623,
+            856,
+            686
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pertanyaan pemantik",
+        "text_level": 2,
+        "bbox": [
+            168,
+            716,
+            488,
+            741
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Mengapa roda sepeda berbentuk lingkaran?",
+        "bbox": [
+            166,
+            750,
+            565,
+            769
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Apa saja sifat-sifat lingkaran?",
+        "bbox": [
+            166,
+            776,
+            447,
+            794
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Apakah semua lingkaran sebangun?",
+        "bbox": [
+            166,
+            800,
+            502,
+            818
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Bangun datar yang seperti apa yang semua titik sudutnya terletak pada lingkaran?",
+        "bbox": [
+            166,
+            823,
+            856,
+            843
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "",
+        "bbox": [
+            168,
+            105,
+            236,
+            153
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "Ayo Berpikir Kritis",
+        "bbox": [
+            247,
+            120,
+            400,
+            139
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            916,
+            794,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "47",
+        "bbox": [
+            822,
+            916,
+            849,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kata Kunci",
+        "text_level": 2,
+        "bbox": [
+            141,
+            103,
+            310,
+            128
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Lingkaran, jari-jari, diameter, sudut pusat, sudut keliling, busur lingkaran, garis singgung, tali busur, segiempat tali busur, teorema Thales, teorema Ptolemeus",
+        "bbox": [
+            139,
+            139,
+            831,
+            180
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Peta Konsep",
+        "text_level": 2,
+        "bbox": [
+            141,
+            210,
+            333,
+            238
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/c0204e79be5b169bff3757c325a7bfbd7f410e17de5915ca7ff001469a9bcb7c.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            139,
+            242,
+            827,
+            566
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/8d97b3b116480167c014af9b643ae87710789a3dc36ae455cde186766a0a5b68.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            585,
+            211,
+            633
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ayo Mengingat Kembali",
+        "text_level": 2,
+        "bbox": [
+            220,
+            600,
+            416,
+            619
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Gambarkan sebuah titik pada kertas, beri nama titik O. Ambil penggaris dan tandai sebuah titik yang berjarak 2 cm dari titik O (beri nama titik A). Tandai titik lain yang berjarak 2 cm dari titik O. Gambarkan 10 titik lain yang berjarak 2 cm dari titik O.",
+        "bbox": [
+            141,
+            641,
+            831,
+            703
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Jika semua (termasuk titik-titik lain yang belum kalian gambarkan) titik yang berjarak 2 cm dari titik O dihubungkan, bangun datar apa yang kalian dapatkan?",
+        "bbox": [
+            141,
+            711,
+            831,
+            750
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Titik O disebut apa untuk bangun datar tersebut?",
+        "bbox": [
+            141,
+            754,
+            583,
+            774
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Jarak 2 cm itu disebut apa bagi bangun datar tersebut?",
+        "bbox": [
+            141,
+            780,
+            622,
+            800
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "48",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/8c77ebe2792bb9bf556b528b99dec3ca923d31a20cc43cdf570276a85db8b1e6.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            425,
+            103,
+            594,
+            221
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Lingkaran adalah tempat kedudukan titik-titik yang jaraknya sama dari suatu titik tertentu (disebut pusat lingkaran). Jarak yang sama itu disebut jari-jari.",
+        "bbox": [
+            166,
+            233,
+            858,
+            274
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/99128da3f33d74c2635fb883d760ebde7b790615efcc5f803730f3252e8766f8.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            429,
+            286,
+            590,
+            397
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ruas garis yang menghubungkan pusat lingkaran dengan salah satu titik pada lingkaran juga disebut jari-jari.",
+        "bbox": [
+            165,
+            413,
+            858,
+            452
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Daerah yang dibatasi oleh lingkaran disebut daerah lingkaran.",
+        "bbox": [
+            166,
+            460,
+            682,
+            480
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/683bf1805147f8f93494e28b29703f79b05782a6ac11d8ef530781ba6d43884a.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            427,
+            490,
+            592,
+            607
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "A. Lingkaran dan Busur Lingkaran",
+        "text_level": 2,
+        "bbox": [
+            166,
+            654,
+            677,
+            683
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/b29e2489789878de864e75c1aab3523198f7468d31ed330c7a25a451b73990d8.jpg",
+        "image_caption": [],
+        "image_footnote": [
+            "Gambar 2.3 Mercusuar"
+        ],
+        "bbox": [
+            170,
+            694,
+            502,
+            864
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Pada masa sebelum adanya GPS (Global Positioning System), mercusuar dibangun untuk menolong kapal bernavigasi sehingga tidak menabrak karang. Daerah yang diterangi oleh lampu mercusuar berbentuk daerah lingkaran. Kapal bernavigasi dengan memanfaatkan perhitungan sudut yang akurat sehingga dapat berlayar dengan aman.",
+        "bbox": [
+            515,
+            694,
+            858,
+            880
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "49",
+        "bbox": [
+            820,
+            916,
+            851,
+            932
+        ],
+        "page_idx": 2
+    }
+]

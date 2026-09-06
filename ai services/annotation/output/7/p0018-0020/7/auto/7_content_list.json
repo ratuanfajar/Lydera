@@ -1,0 +1,490 @@
+[
+    {
+        "type": "text",
+        "text": "6. Jika navigator tersebut mengetahui jari-jari bumi, dan ketinggiannya dari permukaan air (berdasarkan ukuran kapal), bagaimana cara dia menentukan jarak kapal dengan pelabuhan yang tampak di cakrawala?",
+        "bbox": [
+            165,
+            101,
+            858,
+            164
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Latihan",
+        "text_level": 2,
+        "bbox": [
+            177,
+            210,
+            256,
+            231
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2.2",
+        "bbox": [
+            273,
+            210,
+            313,
+            231
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Jika jari-jari lingkaran A adalah 7 cm dan titik P berjarak 25 cm dari titik A, berapakah panjang garis singgung $\\overline { { P B } } ?$",
+        "bbox": [
+            166,
+            251,
+            856,
+            292
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/173857047b834858c6edd85a2077b6e284a2ff5dfe7c9cf040bca9b41b990694.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            282,
+            299,
+            737,
+            426
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Pada gambar berikut, $\\overline { { B D } }$ dan $\\overline { { C D } }$ adalah garis singgung lingkaran A. Jika $\\angle B A C = 1 4 7 ^ { \\circ }$ , tentukan besar $\\angle B D C$",
+        "bbox": [
+            165,
+            446,
+            856,
+            487
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/5141fbe244bfb8d8b7de39dc43c1c8b4a676a25ccd753408627f0a5956b55656.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            286,
+            494,
+            733,
+            647
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3.",
+        "bbox": [
+            168,
+            664,
+            188,
+            682
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/2b868871fb72a7d83e22b673591e90a478545e5bbdbb8db8876c9a53ec49d102.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            667,
+            273,
+            716
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kreatif",
+        "text_level": 2,
+        "bbox": [
+            282,
+            682,
+            449,
+            701
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Bram, seorang navigator kapal laut, tahu bahwa jari-jari lingkaran bumi panjangnya 6.371 km. Ruang kemudi kapal berada pada ketinggian 40 m dari permukaan laut. Tentukan jarak cakrawala yang dapat Bram lihat.",
+        "bbox": [
+            201,
+            727,
+            588,
+            830
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/0976c839de14ca01117876e8f4def79b1daa51c9fc059460d962e3f3bf6a021c.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            601,
+            727,
+            855,
+            827
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "65",
+        "bbox": [
+            820,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Satelit komunikasi mengorbit bumi pada posisi yang tetap terhadap bumi (artinya jika dilihat dari bumi, satelit tersebut akan berada pada ketinggian dan bujur yang sama, meskipun bumi berputar dan mengelilingi matahari). Satelit Telkom-4 (Merah Putih) mengorbit bumi pada garis bujur 108<sup>◦</sup> BT. Jika jari-jari bumi adalah 6.371 km dan satelit Telkom-4 terletak pada ketinggian 35.786 km dari permukaan bumi, apakah Satelit Telkom-4 dapat memancarkan sinyal ke seluruh wilayah Indonesia?",
+        "bbox": [
+            176,
+            164,
+            833,
+            307
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/b2dd9dc1236402a92d396ed6c6930717a3db006462fd7e3307f4ed5a042fc7a2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            346,
+            313,
+            656,
+            413
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "5. Garis singgung persekutuan luar",
+        "text_level": 2,
+        "bbox": [
+            141,
+            422,
+            462,
+            441
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Garis singgung persekutuan adalah garis singgung yang merupakan garis singgung bagi dua lingkaran. CD merupakan garis singgung persekutuan luar untuk lingkaran A dan lingkaran B.",
+        "bbox": [
+            172,
+            443,
+            831,
+            503
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/cb96ff210dbd3af83bb731422d32f45c252fceb4776a8fd664b08e3de1a6760e.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            322,
+            509,
+            682,
+            630
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Lingkaran A dan lingkaran B memiliki dua buah garis singgung persekutuan luar. Gambarkan garis singgung persekutuan luar yang lain.",
+        "bbox": [
+            176,
+            638,
+            829,
+            679
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan panjang garis singgung persekutuan luar CD (s) jika jarak kedua pusat lingkaran (d) dan jari-jari masing-masing lingkaran diketahui (r dan R).",
+        "bbox": [
+            176,
+            682,
+            831,
+            743
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/d4919fc480c06af1d2185a9e6aacd9b975fbbf04baeb0fbf858a5dd07dab6efc.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            216,
+            753,
+            282,
+            802
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Petunjuk",
+        "text_level": 2,
+        "bbox": [
+            295,
+            769,
+            374,
+            788
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Gambarkan garis bantu sehingga kalian dapat memanfaatkan Teorema Pythagoras.",
+        "bbox": [
+            234,
+            810,
+            811,
+            850
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "header",
+        "text": "0",
+        "bbox": [
+            179,
+            105,
+            247,
+            153
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "header",
+        "text": "Ayo Berpikir Kritis",
+        "bbox": [
+            256,
+            120,
+            411,
+            139
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "66",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "6. Rantai sepeda berfungsi untuk memindahkan daya penggerak dari pedal ke roda.",
+        "bbox": [
+            166,
+            101,
+            855,
+            121
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/3f1c85eaa1c1be79fc4104bac0d86fe7a6d052621cf82036bf7d49c7026ec68e.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            401,
+            133,
+            653,
+            202
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Tunjukkan garis singgung persekutuan luar pada gambar rantai sepeda tersebut.",
+        "bbox": [
+            201,
+            217,
+            856,
+            255
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan panjang garis singgung persekutuan luarnya jika jari-jari lingkaran yang lebih besar = 5 cm, jari-jari lingkaran yang lebih kecil = 3 cm, dan jarak antar kedua pusat lingkaran = 44 cm.",
+        "bbox": [
+            201,
+            260,
+            858,
+            321
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "7. Garis singgung persekutuan dalam",
+        "text_level": 2,
+        "bbox": [
+            166,
+            327,
+            508,
+            344
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Selain garis singgung persekutuan luar, ada juga garis singgung persekutuan dalam. $\\overline { { E F } }$ merupakan garis singgung persekutuan dalam untuk lingkaran A dan lingkaran B.",
+        "bbox": [
+            194,
+            347,
+            858,
+            407
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/ba9f2f629fd4867165c535bc772ae282fca4721bd7a8f0aba1df356a188471b5.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            310,
+            413,
+            711,
+            576
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Lingkaran A dan lingkaran B memiliki dua buah garis singgung persekutuan dalam. Gambarkan garis singgung persekutuan dalam yang lain.",
+        "bbox": [
+            201,
+            584,
+            856,
+            625
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan panjang garis singgung persekutuan dalam $\\overline { { E F } } \\left( g \\right)$ jika jarak kedua pusat lingkaran (d ) dan jari-jari masing-masing lingkaran diketahui (r dan R ).",
+        "bbox": [
+            203,
+            629,
+            858,
+            688
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/bcbea4555726b13ad2c3d47c9773b905a239452836a210d6bd73e626a6f11bb8.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            242,
+            700,
+            310,
+            749
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Petunjuk",
+        "text_level": 2,
+        "bbox": [
+            319,
+            715,
+            401,
+            733
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Gambarkan garis bantu sehingga kalian dapat memanfaatkan Teorema Pythagoras.",
+        "bbox": [
+            260,
+            754,
+            836,
+            796
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "67",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 2
+    }
+]

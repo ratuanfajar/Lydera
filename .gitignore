@@ -16,12 +16,15 @@ __pycache__/
 # ai services/annotation/output/
 ai services/annotation/.cache/
 
-# Basis data SQLite
+# Basis data SQLite (peninggalan, sebelum pindah ke PostgreSQL)
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
 *.bak
+
+# PDF hasil upload guru (mentah + terpotong)
+backend/uploads/
 
 # Data modul PDF (besar, berhak cipta, tidak di-push)
 data/

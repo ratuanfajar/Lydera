@@ -1,0 +1,628 @@
+[
+    {
+        "type": "text",
+        "text": "Kasus 2",
+        "text_level": 2,
+        "bbox": [
+            141,
+            103,
+            253,
+            119
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sekarang perhatikan kasus yang lebih umum, saat $\\overline { { A C } }$ tidak melalui pusat lingkaran. B",
+        "bbox": [
+            174,
+            121,
+            831,
+            162
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/a74dcf51fe7f47f374f0558316821bcedff66d0ef433db8c32cac66d77a698a2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            394,
+            152,
+            609,
+            286
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Tarik $\\overline { { A D } }$ melalui titik $O ,$ membelah α menjadi $\\alpha = \\alpha _ { 1 } + \\alpha _ { 2 }$",
+        "bbox": [
+            176,
+            296,
+            699,
+            317
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Dengan cara yang sama dengan",
+        "bbox": [
+            176,
+            328,
+            442,
+            349
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "img_path": "images/4f517a30e319df12cb4504c7b10b3c3547a12dcac68bc05ed4da85d9eb218ed9.jpg",
+        "text": "$$\n\\beta _ { 1 } = 2 \\alpha _ { 1 }\n$$",
+        "text_format": "latex",
+        "bbox": [
+            491,
+            329,
+            585,
+            349
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "…… (1)",
+        "bbox": [
+            669,
+            329,
+            743,
+            348
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kasus 1",
+        "bbox": [
+            177,
+            349,
+            247,
+            368
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Dengan cara serupa",
+        "bbox": [
+            176,
+            376,
+            348,
+            396
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "img_path": "images/e4c45e449c678425be6460c343e6ded529517dc597cfd97514c3c7be0e132370.jpg",
+        "text": "$$\n\\beta _ { 2 } = 2 \\alpha _ { 2 }\n$$",
+        "text_format": "latex",
+        "bbox": [
+            491,
+            376,
+            587,
+            396
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "…… (2)",
+        "bbox": [
+            669,
+            376,
+            743,
+            394
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gunakan (1) dan (2)",
+        "bbox": [
+            176,
+            403,
+            352,
+            423
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "img_path": "images/598b2f3581ca97130c4f75bc25279b94178415d5f673583b54919a306e03990f.jpg",
+        "text": "$$\n\\begin{array} { c } { \\beta = \\beta _ { 1 } + \\beta _ { 2 } } \\\\ { { { } } } \\\\ { { { } = \\dots . . . . } } \\end{array}\n$$",
+        "text_format": "latex",
+        "bbox": [
+            493,
+            406,
+            614,
+            447
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Kasus 3",
+        "bbox": [
+            141,
+            467,
+            253,
+            483
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "akan kalian lakukan pada Latihan 2.1 no. 1.",
+        "bbox": [
+            174,
+            487,
+            535,
+            505
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Kasus 4",
+        "bbox": [
+            141,
+            512,
+            251,
+            528
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kasus 4 adalah kasus khusus untuk sudut keliling yang menghadap pada diameter lingkaran $( \\angle A C B )$",
+        "bbox": [
+            174,
+            531,
+            831,
+            572
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Bukti:",
+        "bbox": [
+            177,
+            576,
+            234,
+            594
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/f5ddc5a70464c49562dae49ec556a4a94c59267b9d7dae38ca131fc8f6bcbc31.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            401,
+            592,
+            600,
+            717
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Gambarkan jari-jari ${ \\overline { { P C } } } .$ . Segitiga jenis apakah $\\triangle A P C$ dan $\\triangle B P C ?$ Bagaimana kalian tahu?",
+        "bbox": [
+            176,
+            733,
+            831,
+            774
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Nyatakan besarnya sudut-sudut yang sama pada $\\triangle A P C$ sebagai $x ^ { \\circ }$ dan besarnya sudut-sudut yang sama pada $\\triangle B P C$ sebagai $y ^ { \\circ }$ , tuliskan sudutsudut pada $\\triangle A B C$ dalam $x ^ { \\circ }$ dan $y ^ { \\circ }$",
+        "bbox": [
+            176,
+            780,
+            831,
+            841
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. $\\angle A = . . .$ b. $\\angle B = . . .$ c. $\\angle C = \\ldots$",
+        "bbox": [
+            211,
+            843,
+            809,
+            864
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "56",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Apa yang kalian ketahui tentang sudut-sudut pada segitiga yang dapat digunakan untuk menentukan besarnya $\\angle A C B ?$ $\\angle A C B =$",
+        "bbox": [
+            203,
+            101,
+            858,
+            158
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/0054771fed210a8c079aa9de3d920cccc1625646da79d3653c212d6f4d334701.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            181,
+            234,
+            230
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Tahukah Kamu?",
+        "text_level": 2,
+        "bbox": [
+            247,
+            196,
+            383,
+            214
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Kasus 4 dikenal dengan nama Teorema Thales.",
+        "bbox": [
+            188,
+            239,
+            570,
+            258
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Thales adalah orang Yunani yang menjadi matematikawan, ahli astronomi, dan filsuf. Dalam Matematika, Thales adalah orang pertama yang menerapkan argumentasi deduktif dalam geometri. Dia adalah orang pertama yang namanya disematkan pada teorema.",
+        "bbox": [
+            187,
+            267,
+            658,
+            369
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Teorema Thales:",
+        "text_level": 2,
+        "bbox": [
+            188,
+            378,
+            339,
+            396
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Jika tiga titik A, B, C terletak pada lingkaran dan AB adalah diameter, maka $\\angle A C B$ siku-siku.",
+        "bbox": [
+            187,
+            397,
+            658,
+            438
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/c22eb95be445f7d3c19335599265fc33190f661888a5dc0873d9a5c28bb58002.jpg",
+        "image_caption": [],
+        "image_footnote": [
+            "sumber: en.wikipedia.org/Wilhelm Meyer (2021)"
+        ],
+        "bbox": [
+            675,
+            271,
+            831,
+            411
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Latihan",
+        "text_level": 2,
+        "bbox": [
+            177,
+            495,
+            256,
+            513
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.1",
+        "text_level": 2,
+        "bbox": [
+            275,
+            496,
+            311,
+            515
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Ini adalah Kasus 3 dari bukti Eksplorasi 2.1.",
+        "bbox": [
+            168,
+            544,
+            563,
+            562
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/4722fea2f999de2ac2087b97d0931bb0bfd91c744775f835f70193054f3d0896.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            209,
+            565,
+            414,
+            699
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Gambarkan sudut pusat yang menghadap ke busur yang sama dengan sudut keliling $\\angle B A C$",
+        "bbox": [
+            433,
+            569,
+            856,
+            609
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Apakah pada lingkaran berikut juga berlaku bahwa sudut pusat besarnya dua kali lipat sudut keliling? Buktikan.",
+        "bbox": [
+            433,
+            613,
+            858,
+            674
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/07274b21909ae5f23bc040e8790f77057fc98fce8f079539ef68cf77add94845.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            709,
+            273,
+            758
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Petunjuk",
+        "text_level": 2,
+        "bbox": [
+            284,
+            724,
+            363,
+            743
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Buatlah diameter yang melalui titik A dan titik O.",
+        "bbox": [
+            225,
+            768,
+            631,
+            788
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "57",
+        "bbox": [
+            822,
+            915,
+            849,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Jika $\\angle B O C = 9 0 ^ { \\circ }$ , berapakah besar $\\angle B E C 3$",
+        "bbox": [
+            139,
+            103,
+            574,
+            123
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/4d95c7f7a7d12674c4da061286e223d4ca222ce2702cc09b5ce49f6dffc7c5de.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            387,
+            139,
+            577,
+            279
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3. Lingkaran A berjari-jari 2 satuan. Jika panjang ${ \\overline { { B C } } } = 2 ,$ tentukan besar $\\angle B D C$",
+        "bbox": [
+            139,
+            299,
+            829,
+            320
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/ba39be4da591282890a47592f10df4e4ae991f92f10bad2db5fcf0a1aacf9c4e.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            379,
+            327,
+            570,
+            480
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "4. $\\overline { { A B } }$ adalah diameter pada lingkaran berikut. Jari-jari lingkaran 8,5 cm dan panjang $\\overline { { A C } } = 8$ cm. Tentukan:",
+        "bbox": [
+            139,
+            496,
+            831,
+            537
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/85650298c9c3c8e7a9ed972e6f8b0f53ab381e95445a5c195c8da2311a10c98b.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            361,
+            543,
+            581,
+            687
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. besar $\\angle A C B$",
+        "bbox": [
+            176,
+            691,
+            335,
+            711
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. panjang $\\overline { { A B } }$",
+        "bbox": [
+            176,
+            716,
+            330,
+            737
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "c. panjang $\\overline { { B C } }$",
+        "bbox": [
+            177,
+            741,
+            326,
+            761
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "58",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 2
+    }
+]

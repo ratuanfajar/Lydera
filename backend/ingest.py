@@ -7,21 +7,23 @@ import db
 READING_ORDER_STEP = 10
 
 
-def create_module(conn, title) -> int:
+def create_module(conn, title, fase_id) -> int:
     """Buat satu modul (buku) dan kembalikan id-nya."""
-    cursor = conn.execute("INSERT INTO module (title) VALUES (?)", (title,))
+    row = conn.execute(
+        "INSERT INTO module (title, fase_id) VALUES (%s, %s) RETURNING id", (title, fase_id)
+    ).fetchone()
     conn.commit()
-    return int(cursor.lastrowid)
+    return row["id"]
 
 
-def create_chapter(conn, module_id, number=None, title=None, source_file=None) -> int:
+def create_chapter(conn, module_id, number=None, title=None, source_file=None, cp_id=None) -> int:
     """Buat satu bab di bawah modul dan kembalikan id-nya."""
-    cursor = conn.execute(
-        "INSERT INTO chapter (module_id, number, title, source_file) VALUES (?, ?, ?, ?)",
-        (module_id, number, title, source_file),
-    )
+    row = conn.execute(
+        "INSERT INTO chapter (module_id, number, title, source_file, cp_id) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+        (module_id, number, title, source_file, cp_id),
+    ).fetchone()
     conn.commit()
-    return int(cursor.lastrowid)
+    return row["id"]
 
 
 def ingest(conn, annotated_path, chapter_id) -> int:
@@ -33,7 +35,7 @@ def ingest(conn, annotated_path, chapter_id) -> int:
             """INSERT INTO block
                  (chapter_id, reading_order, block_type, readable_text, review_priority,
                   heading_level, source_markup, caption, image_file)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
             (chapter_id, base + offset * READING_ORDER_STEP, block["block_type"],
              block["readable_text"], block.get("review_priority", "normal"),
              block.get("heading_level"), block.get("source_markup", ""),
@@ -44,14 +46,14 @@ def ingest(conn, annotated_path, chapter_id) -> int:
 
 
 def current_max_order(conn, chapter_id) -> int:
-    row = conn.execute("SELECT MAX(reading_order) AS m FROM block WHERE chapter_id = ?", (chapter_id,)).fetchone()
+    row = conn.execute("SELECT MAX(reading_order) AS m FROM block WHERE chapter_id = %s", (chapter_id,)).fetchone()
     return row["m"] or 0
 
 
 if __name__ == "__main__":
     db.init_db()
     connection = db.connect()
-    module_id = create_module(connection, sys.argv[2] if len(sys.argv) > 2 else "Modul")
+    module_id = create_module(connection, sys.argv[2] if len(sys.argv) > 2 else "Modul", None)
     chapter_id = create_chapter(connection, module_id, source_file=sys.argv[1])
     count = ingest(connection, sys.argv[1], chapter_id)
     connection.close()

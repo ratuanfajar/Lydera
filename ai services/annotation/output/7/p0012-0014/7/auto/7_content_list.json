@@ -1,0 +1,511 @@
+[
+    {
+        "type": "text",
+        "text": "5. Apa yang salah pada gambar berikut?",
+        "bbox": [
+            166,
+            100,
+            513,
+            123
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/9f1dc2cdc854fda8e74bc61200e66545e3e36632cfc29df1ea4aba07ad66daf7.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            411,
+            127,
+            605,
+            259
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "6. Lingkaran A berjari-jari 2 cm. Tentukan:",
+        "bbox": [
+            166,
+            276,
+            544,
+            298
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/2a6c5d08de70e4bebcf3381cc2c82e0ae7d6b684c315755a704418786b42c7c5.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            409,
+            304,
+            611,
+            438
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. besar $\\angle B D C$   \nb. jika $\\angle C A D = 9 0 ^ { \\circ }$ , tentukan besar $\\angle A C D$   \nc. panjang CD",
+        "bbox": [
+            201,
+            451,
+            616,
+            523
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/4af593f7108c41cebc399a80d08f25c8889916aca9e9335068433f2fbaae9bff.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            532,
+            273,
+            581
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kreatif",
+        "text_level": 2,
+        "bbox": [
+            282,
+            545,
+            449,
+            566
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jelaskan cara memanfaatkan alat gambar teknik berbentuk T ini untuk menentukan letak titik pusat piring.",
+        "bbox": [
+            201,
+            590,
+            768,
+            633
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/4b12b5b5e8947044d64b739059fc4d7da536af1340a458794c50adbaab4c1906.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            594,
+            580,
+            856,
+            703
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "8.",
+        "bbox": [
+            168,
+            692,
+            188,
+            711
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/aa9721299af9e1ea211ab3ffdf0f70190e97e410f5f11835852eacc3c22add60.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            694,
+            273,
+            743
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kritis",
+        "text_level": 2,
+        "bbox": [
+            282,
+            707,
+            436,
+            728
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pada gambar berikut, titik P dan titik Q adalah mercusuar. Daerah dengan karang berbahaya telah dipetakan dan lingkaran menyatakan daerah berbahaya tersebut. Kapal diharapkan tidak memasuki daerah lingkaran untuk menghindari kemungkinan kandas.",
+        "bbox": [
+            201,
+            753,
+            858,
+            837
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "59",
+        "bbox": [
+            820,
+            915,
+            851,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/5d866816ef6e5c848c4c382dd2cee9dbd7dd9b6502aad7e433631580cc7f45e4.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            144,
+            104,
+            411,
+            245
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Pelajari sudut yang dibentuk antara cahaya dari kedua mercusuar $( \\angle P C Q )$ jika kapal berada di luar lingkaran/pada lingkaran/di dalam lingkaran. Menurutmu, informasi apa yang perlu diketahui kapten kapal tentang lokasi ini untuk memastikan kapalnya tidak kandas?",
+        "bbox": [
+            425,
+            101,
+            833,
+            226
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Rangkuman",
+        "text_level": 2,
+        "bbox": [
+            141,
+            284,
+            322,
+            311
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Sifat-sifat sudut pada lingkaran:",
+        "bbox": [
+            141,
+            319,
+            405,
+            339
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Sudut keliling yang menghadap pada busur yang sama, besarnya sama.",
+        "bbox": [
+            141,
+            347,
+            754,
+            366
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/94426a0262545a09e061545d5879a25610fa2ae1b3ec6197a0828aca57353d44.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            381,
+            373,
+            565,
+            507
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Sudut pusat besarnya dua kali sudut keliling yang menghadap pada busur yang sama.",
+        "bbox": [
+            141,
+            523,
+            831,
+            561
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/11c29956e02a913e96bd3a559cb0c1b96368c6b4f25026cbbb760a63896600c5.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            396,
+            560,
+            594,
+            686
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Sudut keliling yang menghadap pada diameter lingkaran, adalah sudut siku-siku.",
+        "bbox": [
+            141,
+            698,
+            829,
+            717
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/4ffe7b10ccb941de7b3b4f0a07fd155c2da514b8192aa463c470eb35073ee6bb.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            387,
+            732,
+            570,
+            847
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "60",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah saya memahami hubungan sudut keliling dan busur lingkaran?",
+        "bbox": [
+            187,
+            164,
+            805,
+            182
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Apakah saya memahami hubungan sudut keliling dan sudut pusat?",
+        "bbox": [
+            187,
+            188,
+            772,
+            207
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3. Apakah saya bisa mengerjakan soal-soal yang terkait dengan sudut keliling dan sudut pusat lingkaran?",
+        "bbox": [
+            187,
+            211,
+            836,
+            251
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "B. Lingkaran dan Garis Singgung",
+        "text_level": 2,
+        "bbox": [
+            168,
+            319,
+            658,
+            347
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/244e7a1cc4d4e69a3eaaf3a27632c2c4987a9f9a47a9d7467af69c3a5658ec09.jpg",
+        "image_caption": [
+            "Gambar 2.4 Roda Kereta Api"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            170,
+            357,
+            504,
+            500
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Roda kereta api menyentuh rel kereta di satu titik. Secara matematis dikatakan bahwa rel adalah garis singgung roda dan titik sentuhnya disebut sebagai titik singgung.",
+        "bbox": [
+            519,
+            354,
+            858,
+            458
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi 2.2",
+        "text_level": 2,
+        "bbox": [
+            177,
+            564,
+            339,
+            585
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/b0a61755bb9332cffba82e96391e1f7424dc8fe6ff9077c316745f53b0afe0cb.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            609,
+            227,
+            651
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Bereksplorasi",
+        "text_level": 2,
+        "bbox": [
+            238,
+            621,
+            372,
+            638
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Dalam tugasnya, seorang navigator pada kapal laut perlu menghitung jarak pelabuhan yang berada pada cakrawala.",
+        "bbox": [
+            166,
+            667,
+            855,
+            707
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/80973505c7b4dd2c6a7f4d32cb11d09cd50d7ea0f17eed7c9052e6b3b5184af6.jpg",
+        "image_caption": [
+            "Gambar 2.5 Cakrawala"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            262,
+            717,
+            561,
+            855
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/132ef667338e6e1194c0e98d0577cdfee3f070e1b35e22b9ec3a115d03f70d6a.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            581,
+            732,
+            759,
+            841
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "header",
+        "text": "",
+        "bbox": [
+            168,
+            105,
+            236,
+            153
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "header",
+        "text": "Ayo Berefleksi",
+        "bbox": [
+            247,
+            120,
+            368,
+            139
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            916,
+            794,
+            932
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "61",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 2
+    }
+]

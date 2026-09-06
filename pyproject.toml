@@ -9,6 +9,12 @@ dependencies = [
     "openai>=2.54.0",
     "torch==2.8.0",
     "torchvision==0.23.0",
+    "pypdf>=5.0.0",
+    "python-dotenv>=1.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-multipart>=0.0.12",
+    "psycopg[binary]>=3.2.0",
 ]
 
 # Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.

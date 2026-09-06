@@ -28,7 +28,7 @@ class Annotated:
 def annotate(content_list_path) -> list[Annotated]:
     """Konversi seluruh blok MinerU menjadi konten siap-talkback, terurut baca."""
     blocks = preprocess(content_list_path)
-    workers = max(1, min(config.MAX_WORKERS, len(blocks)))
+    workers = max(1, min(config.LLM_MAX_WORKERS, len(blocks)))
     if workers == 1:
         return [annotate_block(block, blocks, i) for i, block in enumerate(blocks)]
     with ThreadPoolExecutor(max_workers=workers) as pool:
