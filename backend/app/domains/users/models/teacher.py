@@ -9,6 +9,16 @@ class Teacher(Base):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"),unique=True, nullable=False)
 
+    school_id: Mapped[int] = mapped_column(ForeignKey("schools.id"), nullable=True, index=True)
+
     user: Mapped["User"] = relationship(
         back_populates="teacher"
+    )
+
+    classrooms: Mapped[list["Classroom"]] = relationship(
+        back_populates="teacher"
+    )
+
+    school: Mapped["School"] = relationship(
+        back_populates="teachers"
     )

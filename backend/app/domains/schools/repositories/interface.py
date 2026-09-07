@@ -7,5 +7,13 @@ class SchoolRepositoryInterface(ABC):
     async def create_school(self, dto:SchoolCreate) -> School:
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_list_school(self, city_id: int) -> list[School]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_school_by_id(self, school_id: int, teacher_id) -> School:
+        raise NotImplementedError
+
 
 

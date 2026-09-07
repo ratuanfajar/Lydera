@@ -34,6 +34,10 @@ class TimestampMixin:
         server_default=func.now(),
         onupdate=func.now(),
     )
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        nullable=True,
+        default=None
+    )
 
 class Base(DeclarativeBase, TimestampMixin):
     pass

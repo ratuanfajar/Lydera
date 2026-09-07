@@ -16,4 +16,4 @@ class CityRepository(CityRepositoryInterface):
 
     async def get_list_city(self) -> list[City]:
         result = await self.db.execute(select(City))
-        return list(result.scalars().all())
+        return result.scalars().all()

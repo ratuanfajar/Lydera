@@ -1,5 +1,6 @@
 from fastapi import APIRouter, FastAPI, Request
 import logging
+import app.core.model_registry
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -42,7 +43,7 @@ async def app_exception_handler(
     return JSONResponse(
         status_code=exc.status_code,
         content={
-            "detail": exc.message,
+            "detail": exc.detail,
             "errors": exc.errors,
         },
     )

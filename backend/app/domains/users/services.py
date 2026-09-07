@@ -1,5 +1,5 @@
 from app.utils.payload import Payload
-from app.utils.role import Role
+from app.utils.role import AllowedRole, Role
 from app.core.response import set_response_message
 from app.domains.users.models.teacher import Teacher
 from app.domains.users.repositories.repository import TeacherRepositoryInterface, StudentRepositoryInterface, UserRepositoryInterface
@@ -27,6 +27,10 @@ class UserService:
         
         if not is_verify:
             raise ValidationException("Email or password is invalid")
+        
+        if (dto.role == AllowedRole.TEACHER and not user.teacher) or (dto.role == AllowedRole.STUDENT and not user.student):
+            raise ValidationException("Role invalid")
+    
         if user.teacher:
             profile_id = user.teacher.id
             role = Role.TEACHER  

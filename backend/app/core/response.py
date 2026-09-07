@@ -31,11 +31,11 @@ class ValidationErrorResponse(BaseModel):
 COMMON_AUTH_RESPONSES = {
     CredentialException.status_code: {
         "model": ErrorResponse,
-        "description": CredentialException.message,
+        "description": CredentialException.detail,
     },
     ForbiddenException.status_code: {
         "model": ErrorResponse,
-        "description": ForbiddenException.message,
+        "description": ForbiddenException.detail,
     },
     422: {
         "model": ValidationErrorResponse,
@@ -47,5 +47,12 @@ COMMON_VALIDATION_RESPONSES = {
     422: {
         "model": ValidationErrorResponse,
         "description": "Validation failed",
+    },
+}
+
+COMMON_FORBIDDEN_RESPONSE = {
+    ForbiddenException.status_code: {
+        "model": ErrorResponse,
+        "description": ForbiddenException.detail,
     },
 }

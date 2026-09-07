@@ -1,33 +1,33 @@
 class AppException(Exception):
     status_code = 400
-    message = "Bad request"
+    detail = "Bad request"
 
     def __init__(
         self,
-        message: str | None = None,
+        detail: str | None = None,
         errors: list | None = None,
     ):
-        self.message = message
+        self.detail = detail if detail is not None else self.__class__.detail
         self.errors = errors
 
-        super().__init__(self.message)
+        super().__init__(self.detail)
 
 
 class NotFoundException(AppException):
     status_code = 404
-    message = "Resource not found"
+    detail = "Resource not found"
 
 
 class ForbiddenException(AppException):
     status_code = 403
-    message = "Forbidden"
+    detail = "Forbidden"
 
 
 class CredentialException(AppException):
     status_code = 401
-    message = "Unauthorized"
+    detail = "Unauthorized"
 
 
 class ValidationException(AppException):
     status_code = 422
-    message = "Validation failed"
+    detail = "Validation failed"

@@ -5,7 +5,7 @@ from app.core.route import WrappedRoute
 from typing import Annotated
 from app.domains.cities.depedencies import get_city_service
 from app.domains.cities.services import CityService
-from app.core.response import COMMON_VALIDATION_RESPONSES, Response
+from app.core.response import COMMON_VALIDATION_RESPONSES, Response, get_response_message
 from app.domains.cities.schemas import CityResponse, CityCreate
 
 router = APIRouter(prefix="/cities", tags=["cities"], route_class=WrappedRoute)
@@ -13,12 +13,16 @@ router = APIRouter(prefix="/cities", tags=["cities"], route_class=WrappedRoute)
 
 @router.get(
     "",
-    description="Requires the ADMIN role.",
+    description="Requires the TEACHER role.",
     response_model=Response[list[CityResponse]])
 async def get_cities(
-     current_user: Roles(Role.ADMIN),
+     _: Roles(Role.TEACHER),
      service: CityService = Depends(get_city_service)):
-    return await service.get_list_city()
+    cities = await service.get_list_city()
+    return Response(
+        message=get_response_message(),
+        data=cities
+    )
 
 
 @router.post(
