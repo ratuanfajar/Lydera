@@ -1,8 +1,8 @@
 from fastapi import Depends
 from pydantic import ValidationError
 
-from utils.role import Role
-from utils.payload import Payload
+from app.utils.role import Role
+from app.utils.payload import Payload
 from app.core.config import settings
 from pwdlib import PasswordHash
 from datetime import datetime, timedelta, timezone

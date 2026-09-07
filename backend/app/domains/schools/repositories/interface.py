@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from domains.schools.models.school import School
-from domains.schools.schemas import SchoolCreate
+from app.domains.schools.models.school import School
+from app.domains.schools.schemas import SchoolCreate
 
 class SchoolRepositoryInterface(ABC):
     @abstractmethod

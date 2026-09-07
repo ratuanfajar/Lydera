@@ -1,8 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_db
-from domains.cities.repositories.repository import CityRepository
-from domains.cities.services import CityService
+from app.domains.cities.repositories.repository import CityRepository
+from app.domains.cities.services import CityService
 
 def get_city_repository(db: AsyncSession = Depends(get_db)) -> CityRepository:
     return CityRepository(db)

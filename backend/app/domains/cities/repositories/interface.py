@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from domains.cities.models.city import City 
+from app.domains.cities.models.city import City 
 
 class CityRepositoryInterface(ABC):
     @abstractmethod

@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from domains.cities.repositories.interface import CityRepositoryInterface
-from domains.cities.models.city import City
+from app.domains.cities.repositories.interface import CityRepositoryInterface
+from app.domains.cities.models.city import City
 
 
 class CityRepository(CityRepositoryInterface):

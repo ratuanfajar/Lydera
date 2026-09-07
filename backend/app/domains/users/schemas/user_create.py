@@ -1,4 +1,4 @@
-from utils.role import Role
+from app.utils.role import Role
 from pydantic import BaseModel, EmailStr, Field
 
 class UserCredentials(BaseModel):

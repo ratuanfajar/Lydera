@@ -1,7 +1,7 @@
 from app.core.response import set_response_message
-from domains.schools.repositories.repository import SchoolRepositoryInterface
-from domains.schools.models.school import School
-from domains.schools.schemas import SchoolCreate
+from app.domains.schools.repositories.repository import SchoolRepositoryInterface
+from app.domains.schools.models.school import School
+from app.domains.schools.schemas import SchoolCreate
 from app.core.db import AsyncSession
 
 class SchoolService:

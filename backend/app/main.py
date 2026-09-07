@@ -5,9 +5,9 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from app.core.exceptions import AppException
 from app.core.response import Response
-from domains.cities.router import router as router_city
-from domains.schools.router import router as router_school
-from domains.users.router import router_user, router_student, router_teacher
+from app.domains.cities.router import router as router_city
+from app.domains.schools.router import router as router_school
+from app.domains.users.router import router_user, router_student, router_teacher
 
 
 

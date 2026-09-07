@@ -1,7 +1,7 @@
 
 
 from pydantic import BaseModel
-from utils.role import Role
+from app.utils.role import Role
 
 class Payload(BaseModel):
     sub: int

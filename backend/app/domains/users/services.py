@@ -1,9 +1,9 @@
-from utils.payload import Payload
-from utils.role import Role
+from app.utils.payload import Payload
+from app.utils.role import Role
 from app.core.response import set_response_message
-from domains.users.models.teacher import Teacher
-from domains.users.repositories.repository import TeacherRepositoryInterface, StudentRepositoryInterface, UserRepositoryInterface
-from domains.users.schemas import TeacherCreate, StudentCreate, Login, ProfileResponse
+from app.domains.users.models.teacher import Teacher
+from app.domains.users.repositories.repository import TeacherRepositoryInterface, StudentRepositoryInterface, UserRepositoryInterface
+from app.domains.users.schemas import TeacherCreate, StudentCreate, Login, ProfileResponse
 from app.core.db import AsyncSession
 from app.core.exceptions import ValidationException, NotFoundException
 from app.core.security import create_access_token, hash_password, verify_password

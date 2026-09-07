@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, status, Body
-from utils.role import Role
+from app.utils.role import Role
 from app.core.security import Roles
 from app.core.route import WrappedRoute
 from typing import Annotated
-from domains.cities.depedencies import get_city_service
-from domains.cities.services import CityService
+from app.domains.cities.depedencies import get_city_service
+from app.domains.cities.services import CityService
 from app.core.response import COMMON_VALIDATION_RESPONSES, Response
-from domains.cities.schemas import CityResponse, CityCreate
+from app.domains.cities.schemas import CityResponse, CityCreate
 
 router = APIRouter(prefix="/cities", tags=["cities"], route_class=WrappedRoute)
 

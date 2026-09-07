@@ -1,8 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.db import get_db
-from domains.users.repositories.repository import UserRepository, TeacherRepository, StudentRepository
-from domains.users.services import UserService, TeacherService, StudentService
+from app.domains.users.repositories.repository import UserRepository, TeacherRepository, StudentRepository
+from app.domains.users.services import UserService, TeacherService, StudentService
 
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     return UserRepository(db)

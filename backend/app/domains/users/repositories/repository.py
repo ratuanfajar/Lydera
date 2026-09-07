@@ -1,11 +1,11 @@
 from pydantic import EmailStr
 from sqlalchemy import select
 from sqlalchemy.orm import joinedload, selectinload
-from domains.users.repositories.interface import UserRepositoryInterface, TeacherRepositoryInterface, StudentRepositoryInterface
-from domains.users.schemas import UserCredentials
-from domains.users.models.user import User
-from domains.users.models.teacher import Teacher
-from domains.users.models.student import Student
+from app.domains.users.repositories.interface import UserRepositoryInterface, TeacherRepositoryInterface, StudentRepositoryInterface
+from app.domains.users.schemas import UserCredentials
+from app.domains.users.models.user import User
+from app.domains.users.models.teacher import Teacher
+from app.domains.users.models.student import Student
 from app.core.db import AsyncSession
 
 

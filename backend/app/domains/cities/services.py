@@ -1,7 +1,7 @@
 from app.core.response import set_response_message
-from domains.cities.repositories.repository import CityRepositoryInterface, City
-from domains.cities.models.city import City
-from domains.cities.schemas import CityCreate
+from app.domains.cities.repositories.repository import CityRepositoryInterface, City
+from app.domains.cities.models.city import City
+from app.domains.cities.schemas import CityCreate
 from app.core.db import AsyncSession
 
 class CityService:

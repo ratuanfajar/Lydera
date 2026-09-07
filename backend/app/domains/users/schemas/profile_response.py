@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
-from domains.users.schemas.teacher_response import TeacherResponse
-from domains.users.schemas.student_response import StudentResponse
+from app.domains.users.schemas.teacher_response import TeacherResponse
+from app.domains.users.schemas.student_response import StudentResponse
 
 class ProfileResponse(BaseModel):
     user_id: int

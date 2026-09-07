@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
 from pydantic import EmailStr
-from domains.users.schemas import StudentCreate, TeacherCreate, UserCredentials
-from domains.users.models.teacher import Teacher
-from domains.users.models.user import User
-from domains.users.models.student import Student
+from app.domains.users.schemas import StudentCreate, TeacherCreate, UserCredentials
+from app.domains.users.models.teacher import Teacher
+from app.domains.users.models.user import User
+from app.domains.users.models.student import Student
 
 class UserRepositoryInterface(ABC):
     @abstractmethod
