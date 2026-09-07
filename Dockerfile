@@ -15,9 +15,9 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 COPY backend/ ./backend/
-COPY ai-service/ ./ai-service/
+COPY ai-services/ ./ai-services/
 
-ENV PYTHONPATH="/app/ai-service:${PYTHONPATH}"
+ENV PYTHONPATH="/app/ai-services:${PYTHONPATH}"
 
 WORKDIR /app/backend
 
