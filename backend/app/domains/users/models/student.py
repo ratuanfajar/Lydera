@@ -8,13 +8,13 @@ class Student(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),unique=True, nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"),unique=True, nullable=False, index=True)
     
-    nis: Mapped[str] = mapped_column(String(255))
+    nis: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    nisn: Mapped[str] = mapped_column(String(255))
+    nisn: Mapped[str] = mapped_column(String(255), nullable=True)
 
-    grade: Mapped[int] = mapped_column(SmallInteger)
+    grade: Mapped[int] = mapped_column(SmallInteger, nullable=True)
 
     user: Mapped["User"] = relationship(
         back_populates="student"

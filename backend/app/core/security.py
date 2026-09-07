@@ -44,7 +44,8 @@ def decode_access_token(token : str) -> Payload:
     try:
         payload_dict = jwt.decode(token, settings.APP_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         return Payload.model_validate(payload_dict)
-    except (InvalidTokenError, ValidationError):
+    except Exception as e:
+        print(f"ERROR JWT DECODE: {repr(e)}")
         raise CredentialException
 
 def verify_token(

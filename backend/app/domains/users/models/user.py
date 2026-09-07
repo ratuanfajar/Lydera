@@ -13,11 +13,13 @@ class User(Base):
     password: Mapped[str] = mapped_column(String(255), nullable=False)
 
     teacher: Mapped["Teacher | None"] = relationship(
-        back_populates="user"
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
 
     student: Mapped["Student | None"] = relationship(
-        back_populates="user"
+        back_populates="user",
+        cascade="all, delete-orphan"
     )
 
 

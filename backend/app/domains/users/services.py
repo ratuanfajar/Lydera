@@ -37,11 +37,11 @@ class UserService:
             raise ValidationException("User profile does not exist")
         
         payload = Payload(
-            sub=user.id,
+            sub=str(user.id),
             profile_id=profile_id,
             role=role
         )
-        return create_access_token(payload.model_dump())
+        return create_access_token(payload.model_dump(mode="json"))
 
     async def get_profile(self, user_id) -> ProfileResponse:
         profile = await self.user_repo.get_profile(user_id)
@@ -52,7 +52,7 @@ class UserService:
         return ProfileResponse.model_validate(
             profile,
             from_attributes=True,
-        ).model_dump()
+        )
 
 class TeacherService:
     def __init__(
@@ -91,5 +91,5 @@ class StudentService:
             student = await self.student_repo.create_student(
                 user_id=user.id,
             )
-            set_response_message("Berhasil membuat akun guru")
+            set_response_message("Berhasil membuat akun murid")
         return student

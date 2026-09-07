@@ -3,6 +3,7 @@ import logging
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.core.exceptions import AppException
 from app.core.response import Response
 from app.domains.cities.router import router as router_city
@@ -22,6 +23,16 @@ api_router.include_router(router_teacher)
 app = FastAPI()
 
 app.include_router(api_router)
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "errors": None,
+        },
+    )
 
 @app.exception_handler(AppException)
 async def app_exception_handler(
@@ -56,7 +67,10 @@ async def global_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled exception occurred")
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error"},
+        content={
+            "detail": "Internal server error",
+            "errors": None,
+        },
     )
 
 @app.get("/health",response_model=Response[bool])

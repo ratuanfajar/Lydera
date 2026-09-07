@@ -4,7 +4,7 @@ from app.core.route import WrappedRoute
 from typing import Annotated
 from app.domains.users.depedencies import get_user_service, get_teacher_service, get_student_service
 from app.domains.users.services import UserService, TeacherService, StudentService
-from app.core.response import COMMON_AUTH_RESPONSES, COMMON_VALIDATION_RESPONSES, Response
+from app.core.response import COMMON_AUTH_RESPONSES, COMMON_VALIDATION_RESPONSES, Response, get_response_message
 from app.domains.users.schemas import Login, TeacherCreate, StudentCreate, TeacherResponse, StudentResponse, ProfileResponse
 
 router_user = APIRouter(prefix="/users", tags=["users"], route_class=WrappedRoute)
@@ -22,7 +22,11 @@ router_user = APIRouter(prefix="/users", tags=["users"], route_class=WrappedRout
 async def login(
      dto: Annotated[Login, Body()], 
      service: UserService = Depends(get_user_service)):
-    return await service.login(dto)
+    token = await service.login(dto)
+    return Response(
+        message=get_response_message(),
+        data=token
+    )
 
 @router_user.get(
     "/profile",
@@ -33,7 +37,12 @@ async def login(
 async def profile(
      current_user: CurrentUser,
      service: UserService = Depends(get_user_service)):
-    return await service.get_profile(current_user.sub)
+    user_id = int(current_user.sub)
+    profile = await service.get_profile(user_id)
+    return Response(
+        message=get_response_message(),
+        data=profile
+    )
 
 
 router_teacher = APIRouter(prefix="/teachers", tags=["teachers"], route_class=WrappedRoute)
@@ -47,7 +56,11 @@ router_teacher = APIRouter(prefix="/teachers", tags=["teachers"], route_class=Wr
 async def register_teacher(
      dto: Annotated[TeacherCreate, Body()], 
      service: TeacherService = Depends(get_teacher_service)):
-    return await service.create_teacher(dto)
+    teacher = await service.create_teacher(dto)
+    return Response(
+        message=get_response_message(),
+        data=teacher
+    )
 
 router_student = APIRouter(prefix="/students", tags=["students"], route_class=WrappedRoute)
 
@@ -60,4 +73,8 @@ router_student = APIRouter(prefix="/students", tags=["students"], route_class=Wr
 async def register_student(
      dto: Annotated[StudentCreate, Body()], 
      service: StudentService = Depends(get_student_service)):
-    return await service.create_student(dto)
+    student = await service.create_student(dto)
+    return Response(
+        message=get_response_message(),
+        data=student
+    )

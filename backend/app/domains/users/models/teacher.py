@@ -7,7 +7,7 @@ class Teacher(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"),unique=True, nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"),unique=True, nullable=False)
 
     user: Mapped["User"] = relationship(
         back_populates="teacher"
