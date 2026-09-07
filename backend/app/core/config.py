@@ -6,7 +6,7 @@ env_file = ".env.test" if os.getenv("APP_ENV") == "test" else ".env"
 load_dotenv(env_file)
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file="backend/.env", env_file_encoding="utf-8", extra="ignore")
 
     # Application
     APP_NAME: str = "Lydera"
@@ -38,7 +38,7 @@ class Settings(BaseSettings):
 
     @property
     def DATABASE_URL(self) -> str:
-        if os.getenv("TESTING") == "True" or os.getenv("APP_ENV") == "testing":
+        if os.getenv("APP_ENV") == "testing":
             return os.getenv("DB_URL")
         return self.DB_URL
 settings = Settings()

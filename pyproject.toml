@@ -20,11 +20,15 @@ dependencies = [
 # Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.
 # Tanpa ini, resolusi default mengambil wheel CPU (torch ...+cpu).
 [[tool.uv.index]]
-name = "pytorch-cu126"
-url = "https://download.pytorch.org/whl/cu126"
+# name = "pytorch-cu126"
+# url = "https://download.pytorch.org/whl/cu126"
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
 [tool.uv.sources]
-torch = { index = "pytorch-cu126" }
-torchvision = { index = "pytorch-cu126" }
+# torch = { index = "pytorch-cu126" }
+# torchvision = { index = "pytorch-cu126" }
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
 
