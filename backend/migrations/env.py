@@ -17,8 +17,11 @@ from app.core.db import Base
 from app.core.config import settings
 
 # Import every domain's models so Base.metadata knows about all tables
-# from domains.user.models import User          # noqa
-# from domains.order.models import Order        # noqa
+from app.domains.users.models.user import User          # noqa
+from app.domains.users.models.student import Student          # noqa
+from app.domains.users.models.teacher import Teacher          # noqa
+from app.domains.schools.models.school import School
+from app.domains.cities.models.city import City          # noqa
 # add every new domain's models import here
 
 config = context.config
