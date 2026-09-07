@@ -1,0 +1,90 @@
+[
+  {
+    "block_type": "text",
+    "reading_order": 0,
+    "page": 0,
+    "readable_text": "6. Segiempat BDCE adalah segiempat tali busur, O adalah titik pusat lingkaran, dan besar sudut BOC sama dengan seratus tiga puluh derajat. Tentukan besar sudut B E C",
+    "review_priority": "low",
+    "heading_level": null,
+    "source_markup": "6. Segiempat BDCE adalah segiempat tali busur, O adalah titik pusat lingkaran, dan besar $\\angle B O C = 1 3 0 ^ { \\circ }$ . Tentukan besar $\\angle B E C$",
+    "caption": "",
+    "image_file": ""
+  },
+  {
+    "block_type": "image",
+    "reading_order": 1,
+    "page": 0,
+    "readable_text": "Gambar ini menampilkan sebuah lingkaran dengan titik pusat O dan empat titik pada kelilingnya yang diberi label B, D, C, serta E. Titik-titik tersebut membentuk segiempat BDCE yang merupakan segiempat tali busur. Terdapat garis radius dari pusat O ke titik B dan titik C, yang membentuk sudut pusat $\\angle BOC$ dengan nilai 130 derajat, ditandai dengan arc hijau kecil. Selain itu, terdapat garis penghubung antara titik B ke D, D ke C, B ke E, dan E ke C, membentuk dua segitiga inscribed yaitu $\\triangle BDC$ dan $\\triangle BEC$ yang berbagi sisi BC sebagai tali busur bersama. Hubungan utama yang ditunjukkan adalah keterkaitan antara sudut pusat ($\\angle BOC$) dan sudut keliling ($\\angle BEC$) yang menghadap busur yang sama, yaitu busur BC.",
+    "review_priority": "high",
+    "heading_level": null,
+    "source_markup": "",
+    "caption": "",
+    "image_file": "81b76c1098c73b239f2f6705c5041666ad557d6da9463ab6ba8e657a4af0b56e.jpg"
+  },
+  {
+    "block_type": "heading",
+    "reading_order": 2,
+    "page": 0,
+    "readable_text": "Pengayaan",
+    "review_priority": "low",
+    "heading_level": 2,
+    "source_markup": "",
+    "caption": "",
+    "image_file": ""
+  },
+  {
+    "block_type": "text",
+    "reading_order": 3,
+    "page": 0,
+    "readable_text": "Gambar 2.8 menunjukkan segitiga sama sisi. Titik P terletak pada lingkaran luar segitiga ABC. Titik P dihubungkan dengan setiap titik sudut segitiga ABC.",
+    "review_priority": "low",
+    "heading_level": null,
+    "source_markup": "Gambar 2.8 menunjukkan segitiga sama sisi. Titik P terletak pada lingkaran luar segitiga ABC. Titik P dihubungkan dengan setiap titik sudut segitiga ABC.",
+    "caption": "",
+    "image_file": ""
+  },
+  {
+    "block_type": "text",
+    "reading_order": 4,
+    "page": 0,
+    "readable_text": "Jika AP lebih panjang daripada B P dan C P buktikan bahwa:",
+    "review_priority": "low",
+    "heading_level": null,
+    "source_markup": "Jika AP lebih panjang daripada $B P$ dan $C P ,$ buktikan bahwa:",
+    "caption": "",
+    "image_file": ""
+  },
+  {
+    "block_type": "formula",
+    "reading_order": 5,
+    "page": 0,
+    "readable_text": "A P sama dengan B P ditambah C P",
+    "review_priority": "normal",
+    "heading_level": null,
+    "source_markup": "A P = B P + C P",
+    "caption": "",
+    "image_file": ""
+  },
+  {
+    "block_type": "image",
+    "reading_order": 6,
+    "page": 0,
+    "readable_text": "Sebuah lingkaran dengan titik sudut segitiga sama sisi ABC yang digambarkan dengan garis merah, di mana ketiga sisinya memiliki panjang yang sama. Titik P terletak pada busur kecil lingkaran antara titik B dan C. Garis biru menghubungkan titik P ke ketiga sudut segitiga tersebut, yaitu PA, PB, dan PC. Diagram ini menggambarkan hubungan geometris dalam Teorema van Schooten, yang menyatakan bahwa panjang garis dari titik P ke salah satu sudut segitiga (PA) sama dengan jumlah panjang garis dari titik P ke dua sudut lainnya (PB ditambah PC).",
+    "review_priority": "normal",
+    "heading_level": null,
+    "source_markup": "",
+    "caption": "Gambar 2.8 Segitiga Sama Sisi ABC",
+    "image_file": "b74f33eff1b13e99a6733bfff7b4273ec91a9de065fc8467478c5c8c6ecb1aea.jpg"
+  },
+  {
+    "block_type": "text",
+    "reading_order": 7,
+    "page": 0,
+    "readable_text": "Sifat ini pertama kali ditemukan oleh matematikawan Belanda bernama Frans van Schooten, karena itu disebut sebagai Teorema van Schooten.",
+    "review_priority": "low",
+    "heading_level": null,
+    "source_markup": "Sifat ini pertama kali ditemukan oleh matematikawan Belanda bernama Frans van Schooten, karena itu disebut sebagai Teorema van Schooten.",
+    "caption": "",
+    "image_file": ""
+  }
+]

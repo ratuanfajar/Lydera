@@ -1,0 +1,539 @@
+[
+    {
+        "type": "text",
+        "text": "8. BD dan $\\overline { { C D } }$ adalah garis singgung pada lingkaran A.",
+        "bbox": [
+            166,
+            103,
+            658,
+            125
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/a61f4c9b0c39dac5dd496724b787c99930712504e225744cd4a27cdb639a0c0f.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            388,
+            132,
+            669,
+            304
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. Apakah segiempat ABCD merupakan segiempat tali busur? Buktikan.",
+        "bbox": [
+            201,
+            321,
+            825,
+            341
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Jika segiempat ABCD merupakan segiempat tali busur, di manakah pusat lingkaran luar segiempat ABCD?",
+        "bbox": [
+            201,
+            345,
+            856,
+            386
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "9. Segiempat ABCD adalah persegi panjang yang semua titik sudutnya terletak pada lingkaran.",
+        "bbox": [
+            166,
+            390,
+            856,
+            431
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/4799ecef95561ca6a6f28fef489ecfe2d335e29db715892db916d0da06c0e4a0.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            440,
+            437,
+            616,
+            560
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. Apakah ABCD merupakan segiempat tali busur? Buktikan.",
+        "bbox": [
+            201,
+            566,
+            739,
+            585
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Jika kalian menerapkan Teorema Ptolemeus pada segiempat ABCD, apakah yang kalian dapatkan?",
+        "bbox": [
+            203,
+            590,
+            855,
+            630
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "c. Apakah nama teorema tersebut?",
+        "bbox": [
+            203,
+            635,
+            508,
+            655
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "10.",
+        "bbox": [
+            170,
+            660,
+            198,
+            676
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/f5494bb8a05a1ab20085748c09838b24f5e865be2c9c7a8c3c87f3716ffba509.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            663,
+            273,
+            711
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kreatif",
+        "text_level": 2,
+        "bbox": [
+            282,
+            678,
+            449,
+            698
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Goras ingin menyajikan pizza yang dibelinya di atas piring. Sayangnya, piring yang tersedia diameternya lebih kecil daripada diameter pizza. Ia memotong pizzanya dengan cara tertentu, mengambil sebagian, lalu menyusun sisa pizza sehingga terlihat sebagai pizza utuh.",
+        "bbox": [
+            201,
+            721,
+            858,
+            803
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. Ambillah selembar kertas berbentuk lingkaran. Cobalah melakukan hal yang dikerjakan Goras.",
+        "bbox": [
+            201,
+            807,
+            856,
+            847
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Apakah pizza kedua sama dengan pizza awal? Jelaskan.",
+        "bbox": [
+            201,
+            852,
+            689,
+            872
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "75",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Rangkuman",
+        "text_level": 2,
+        "bbox": [
+            141,
+            103,
+            324,
+            131
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Pada segiempat tali busur berlaku:",
+        "bbox": [
+            141,
+            139,
+            427,
+            157
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Sudut-sudut yang berhadapan saling berpelurus.",
+        "bbox": [
+            141,
+            166,
+            577,
+            186
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Hasil kali diagonal sama besarnya dengan jumlah dari hasil kali sisi yang berhadapan.",
+        "bbox": [
+            139,
+            190,
+            831,
+            230
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Refleksi",
+        "text_level": 2,
+        "bbox": [
+            143,
+            258,
+            266,
+            283
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah saya dapat menerapkan teorema-teorema tentang lingkaran?",
+        "bbox": [
+            141,
+            294,
+            739,
+            313
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Apakah saya dapat membuktikan teorema-teorema terkait lingkaran?",
+        "bbox": [
+            141,
+            317,
+            743,
+            337
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Apakah saya mengerti sifat-sifat garis singgung?",
+        "bbox": [
+            141,
+            343,
+            574,
+            362
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. Apakah saya mengerti sifat-sifat segiempat tali busur?",
+        "bbox": [
+            141,
+            366,
+            618,
+            386
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Uji Kompetensi",
+        "text_level": 2,
+        "bbox": [
+            141,
+            413,
+            374,
+            441
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Jika $\\alpha = 4 8 ^ { \\circ }$ , tentukan besarnya",
+        "bbox": [
+            141,
+            447,
+            453,
+            468
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/d4c098db75aedcd10dbd1d412afba9c06e640ec735ff312c7fe040f553ebc3fb.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            383,
+            474,
+            583,
+            615
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. $\\angle C D E$",
+        "bbox": [
+            177,
+            622,
+            291,
+            642
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "c. $\\angle D A E$",
+        "bbox": [
+            530,
+            623,
+            642,
+            643
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. $\\angle D E A$",
+        "bbox": [
+            177,
+            647,
+            291,
+            667
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "d. $\\angle D F E$",
+        "bbox": [
+            530,
+            647,
+            644,
+            667
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Segiempat POST keempat sisinya menyinggung lingkaran. Jika panjang $\\overline { { T S } } = 1 2$ cm dan panjang ${ \\overline { { P C } } } = 1 4 { \\mathrm { c m } }$ , tentukan keliling POST.",
+        "bbox": [
+            139,
+            676,
+            831,
+            716
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/1d29db7bf480ac5a1b6a582fb0c55afc3c74e0c4c7fbef08f8ef29853654848f.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            368,
+            724,
+            598,
+            875
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "76",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Pada lingkaran A yang berjari-jari 5 cm terdapat tali busur $\\overline { { B C } }$ sepanjang 8 cm. Tentukan panjang apotemanya.",
+        "bbox": [
+            166,
+            104,
+            856,
+            145
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/f622fa4a7901780bd015543654d2f4677464c1fa55935a014157bfccf66b6516.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            414,
+            150,
+            603,
+            290
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "4. Dua tali busur, $\\overline { { A C } }$ dan BD pada lingkaran dengan pusat O, berpotongan tegak lurus pada titik P. Panjang AB sama dengan jari-jari lingkaran.",
+        "bbox": [
+            166,
+            300,
+            856,
+            341
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Berapa besar $\\widehat { A B } \\ ?$",
+        "bbox": [
+            203,
+            343,
+            403,
+            365
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Apa nilai perbandingan ${ \\frac { D C } { A B } } { \\mathrm { i } }$ ? Jelaskan bagaimana kamu mendapatkan jawabannya.",
+        "bbox": [
+            201,
+            362,
+            856,
+            410
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/cb478e897e22eea39d690b88de081e4bb8699d1e65efa180f54f49aba9929f7b.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            405,
+            418,
+            614,
+            573
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "5. Berapa panjang dari tali busur AC? a. $\\textstyle { \\frac { 1 6 { \\sqrt { 1 7 } } } { 1 7 } }$ c. $\\sqrt { 3 2 }$ b. $\\sqrt { 6 8 }$ d. $\\frac { \\sqrt { 3 2 } } { 6 8 }$",
+        "bbox": [
+            166,
+            586,
+            636,
+            666
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/5dbd1f1e7e3549a354c84e43cf1f29fde9511ca4cbb87f1f0b7b05092cc100f1.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            418,
+            688,
+            611,
+            856
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "77",
+        "bbox": [
+            822,
+            916,
+            851,
+            932
+        ],
+        "page_idx": 2
+    }
+]

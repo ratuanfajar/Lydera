@@ -1,0 +1,433 @@
+[
+    {
+        "type": "chart",
+        "img_path": "images/29d4521e6c704a80fedb64d92332f389ad519f4cf5cf340d79ebfeb7e02dc579.jpg",
+        "content": "",
+        "chart_caption": [
+            "Gambar 1.11 Jarak Tempuh Terhadap Jumlah Bahan Bakar"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            284,
+            108,
+            744,
+            304
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jika x adalah jumlah bahan bakar dalam galon maka bahan bakar dapat dituliskan $0 ~ \\leq ~ x ~ \\leq ~ 9$ . Domain dari jumlah bahan bakar yang dinyatakan dalam himpunan adalah $\\{ x \\mid 0 \\leq x \\leq 9 , x \\in \\mathbb { R } \\}$ , dengan $\\mathbb { R }$ merupakan himpunan bilangan riil. Domain ini dapat juga dituliskan dalam bentuk [0,9].",
+        "bbox": [
+            166,
+            344,
+            856,
+            425
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jarak tempuh dituliskan sebagai $0 ~ \\leq ~ y ~ \\leq ~ 2 5 0$ . Range dari jarak tempuh adalah $\\{ y | 0 \\le \\ y \\le 2 5 0 , \\ y \\in \\mathbb { R } \\}$ , dengan <sup>R</sup> merupakan himpunan bilangan bulat positif. Range dapat juga dituliskan dalam bentuk [0,250].",
+        "bbox": [
+            166,
+            433,
+            856,
+            495
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jika diberikan grafik maka penentuan domain dan range dari suatu fungsi ditunjukkan masing-masing oleh nilai yang digunakan pada sumbu x dan sumbu y.",
+        "bbox": [
+            166,
+            503,
+            855,
+            543
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "chart",
+        "img_path": "images/2b13716abbcce23afc8c7cae8f1e88ed2ded6997a30b0d5d7865579bc5becbb0.jpg",
+        "content": "",
+        "chart_caption": [
+            "Gambar 1.12 Domain dan Range dari Fungsi"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            332,
+            561,
+            695,
+            715
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/baeb02ac80ed7eff5f7c327ad0e94ba8b610e97a8ae346318b044310dccc721b.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            766,
+            236,
+            814
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berkomunikasi",
+        "text_level": 2,
+        "bbox": [
+            247,
+            781,
+            409,
+            800
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jelaskan pengertian domain dan range fungsi dengan menggunakan katakatamu sendiri.",
+        "bbox": [
+            187,
+            823,
+            834,
+            862
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "13",
+        "bbox": [
+            822,
+            916,
+            851,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pengertian domain, kodomain, dan range dapat dilihat secara utuh dalam gambar di bawah ini.",
+        "bbox": [
+            141,
+            103,
+            831,
+            141
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/af89f323f4b8c690ac44ae002516cae26958b148c4245deee6767e77fa86f2de.jpg",
+        "image_caption": [
+            "Gambar 1.13 Domain, Kodomain, dan Range"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            315,
+            149,
+            656,
+            263
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/bb6bf6cc3e027dd711286c79c579411264780e7d7a9cb217bbe7bb2e42acb43d.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            312,
+            209,
+            360
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kritis",
+        "text_level": 2,
+        "bbox": [
+            220,
+            327,
+            374,
+            345
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Kalian sudah memahami penggunaan domain, kodomain, dan range dalam kehidupan sehari-hari. Berikan contoh lain dalam kehidupan nyata yang membedakan pengertian kodomain dan range.",
+        "bbox": [
+            159,
+            370,
+            812,
+            431
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Masalah Ketiga",
+        "text_level": 2,
+        "bbox": [
+            141,
+            474,
+            280,
+            492
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Bagaimana menentukan domain, kodomain, dan range dari suatu fungsi jika diberikan dalam bentuk aljabar?",
+        "bbox": [
+            141,
+            503,
+            831,
+            541
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Perhatikan kedua grafik di bawah ini.",
+        "bbox": [
+            148,
+            550,
+            491,
+            569
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/2ed413e6df2c1320a969a6dccd3befb1d7fa730ffd83ea9e93740ac0acc45258.jpg",
+        "image_caption": [
+            "Gambar 1.14 Dua Fungsi Akar Berbeda"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            185,
+            581,
+            829,
+            810
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Tuliskan domain dan range dari kedua grafik dalam notasi himpunan.",
+        "bbox": [
+            177,
+            847,
+            746,
+            866
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "14",
+        "bbox": [
+            141,
+            916,
+            170,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b.",
+        "bbox": [
+            166,
+            116,
+            190,
+            135
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/4bdee6621438fc64abf7941b9260270427ef93ca00b33e9ad9d3d05ce8c0c7f2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            201,
+            103,
+            269,
+            152
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berteknologi",
+        "text_level": 2,
+        "bbox": [
+            278,
+            119,
+            425,
+            136
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Gunakan Microsoft Excel atau Geogebra untuk menggambar $\\textstyle f \\left( x \\right) = { \\frac { x ^ { 2 } - 1 } { x } }$ , dan tentukan domain dan range-nya.",
+        "bbox": [
+            200,
+            154,
+            856,
+            198
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Latihan",
+        "text_level": 2,
+        "bbox": [
+            177,
+            234,
+            260,
+            254
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1.",
+        "bbox": [
+            168,
+            298,
+            190,
+            313
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/616d3133a0efa5c59bcf4b968de301ef1859d80db5c2bdef760f874c607af774.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            283,
+            273,
+            331
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berteknologi",
+        "text_level": 2,
+        "bbox": [
+            282,
+            298,
+            429,
+            315
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Gunakan Geogebra untuk menggambar fungsi-fungsi di bawah ini jika memungkinkan. Gambarkan dan tentukan domain dan range dari fungsi-fungsi berikut:   \na. $f \\left( x \\right) = x ^ { 2 } - 1$   \nb. $\\textstyle f ( x ) = { \\frac { x + 1 } { 2 - x } }$   \nc. $f \\left( x \\right) = \\sqrt { x - 3 } + 4$",
+        "bbox": [
+            201,
+            337,
+            856,
+            472
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Tentukan domain dan range dari setiap fungsi di bawah ini.",
+        "bbox": [
+            166,
+            476,
+            689,
+            495
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a.",
+        "bbox": [
+            203,
+            504,
+            225,
+            519
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "table",
+        "img_path": "images/d2eb959d310779ace58bfe0b73a6a3a11911b2242732e8c5cb5e283cae4cdd70.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>0</td><td rowspan=1 colspan=1>T</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>8</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>0  1</td><td rowspan=1 colspan=1>1  1</td><td rowspan=1 colspan=1>2  1</td><td rowspan=1 colspan=1>3</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1>7</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr></table>",
+        "bbox": [
+            244,
+            501,
+            783,
+            794
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "15",
+        "bbox": [
+            822,
+            916,
+            851,
+            932
+        ],
+        "page_idx": 2
+    }
+]

@@ -1,0 +1,464 @@
+[
+    {
+        "type": "text",
+        "text": "Fungsi seperti apa yang memiliki kebalikan atau invers? Secara umum tidak semua fungsi memiliki fungsi invers. Hanya fungsi bijektif (injektif dan surjektif) saja yang memiliki invers.",
+        "bbox": [
+            141,
+            103,
+            831,
+            162
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/50cd775343424fff210bb2cb2687714507da8897c04faa4a0eb76bd145f40627.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            182,
+            209,
+            230
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berkomunikasi",
+        "text_level": 2,
+        "bbox": [
+            220,
+            197,
+            383,
+            215
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Mengapa hanya fungsi bijektif saja yang dapat memiliki invers? Pikirkanlah dengan teman-temanmu.",
+        "bbox": [
+            161,
+            241,
+            811,
+            280
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sebuah fungsi bisa dibuat bijektif dengan cara memodifikasi range-nya. Sebelum kalian berdiskusi tentang ini lebih jauh, coba jawab pertanyaan berikut ini. Bagaimana hubungan antara domain dan range dari fungsi asli dan fungsi invers-nya (jika ada)?",
+        "bbox": [
+            161,
+            290,
+            811,
+            370
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi",
+        "text_level": 2,
+        "bbox": [
+            152,
+            419,
+            256,
+            438
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1.6",
+        "bbox": [
+            277,
+            421,
+            313,
+            439
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Kalian akan menyelidiki fungsi yang merupakan kebalikan dari suatu fungsi dengan memecahkan dua masalah di bawah ini.",
+        "bbox": [
+            141,
+            458,
+            829,
+            498
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Masalah Pertama",
+        "text_level": 2,
+        "bbox": [
+            141,
+            521,
+            295,
+            539
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan tabel harga baju kaos di bawah ini.",
+        "bbox": [
+            141,
+            549,
+            517,
+            568
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "table",
+        "img_path": "images/cae10d4ad35c9fadd408862b18b9a4882c3232af26ec343099388687e412991b.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Jumlah Baju Kaos(Masukan)</td><td rowspan=1 colspan=1>Harga Baju Kaos(Keluaran)</td></tr><tr><td rowspan=1 colspan=1>1</td><td rowspan=1 colspan=1>55.000</td></tr><tr><td rowspan=1 colspan=1>3</td><td rowspan=1 colspan=1>165.000</td></tr><tr><td rowspan=1 colspan=1>5</td><td rowspan=1 colspan=1>275.000</td></tr><tr><td rowspan=1 colspan=1>10</td><td rowspan=1 colspan=1>550.000</td></tr></table>",
+        "bbox": [
+            277,
+            580,
+            695,
+            744
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Buatlah tabel dengan membalikkan keluaran menjadi masukan dan masukan menjadi keluaran.",
+        "bbox": [
+            141,
+            760,
+            829,
+            800
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Buatlah grafik jumlah baju kaos terhadap harga baju kaos dan grafik harga baju kaos terhadap jumlah baju kaos. Jelaskan hasil yang kamu peroleh.",
+        "bbox": [
+            141,
+            805,
+            831,
+            845
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Tentukan domain dan range dari kedua grafik yang dihasilkan di nomor (2).",
+        "bbox": [
+            141,
+            850,
+            796,
+            870
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "34",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "4. Buatlah diagram panah yang menunjukkan fungsi asal.",
+        "bbox": [
+            166,
+            101,
+            655,
+            121
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "5. Buatlah diagram panah yang menunjukkan fungsi yang berkebalikan dari fungsi asalnya.",
+        "bbox": [
+            166,
+            127,
+            858,
+            166
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Apa yang kalian peroleh dari eksplorasi di atas?",
+        "bbox": [
+            166,
+            192,
+            557,
+            211
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Masalah Kedua",
+        "text_level": 2,
+        "bbox": [
+            166,
+            235,
+            308,
+            252
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Harga suatu pakaian setelah mendapatkan diskon 40% dan kemudian diberikan potongan harga Rp15.000,00 adalah Rp45.000,00. Berapa harga awal pakaian?",
+        "bbox": [
+            165,
+            263,
+            856,
+            304
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Gunakan mesin fungsi untuk menyelesaikan masalah ini. Mulai kerjakan dari fungsi kedua yang dilanjutkan dengan fungsi pertama. Kerjakan secara terbalik.",
+        "bbox": [
+            166,
+            311,
+            858,
+            352
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/356654a73a2135594f2c9deb2c259c0266c90d7d4146ad4619aeff74fa51bbe1.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            166,
+            354,
+            818,
+            492
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "3. Jika harga awal pakaian adalah x dan hasil akhirnya adalah y maka buatlah fungsi kebalikannya yaitu x adalah fungsi dari y.",
+        "bbox": [
+            166,
+            504,
+            856,
+            545
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Fungsi yang berkebalikan operasinya dari fungsi asalnya disebut sebagai fungsi invers. Fungsi ini memetakan anggota yang ada di range fungsi asal ke anggota yang ada di domain fungsi asal. Fungsi invers dituliskan sebagai $f ^ { - 1 }$ . Kalian perhatikan bahwa −1 di sini bukan merupakan suatu pangkat.",
+        "bbox": [
+            166,
+            569,
+            858,
+            651
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Dari definisi fungsi invers yang baru dijelaskan sebelumnya, hubungan antara domain dan range dari fungsi asal dan fungsi invers dapat dipahami melalui diagram panah berikut.",
+        "bbox": [
+            166,
+            659,
+            858,
+            720
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/77fdeb5969f9eb8086e842f6fc96a6c1e035dcffa9bae0236000133a7df71f21.jpg",
+        "image_caption": [
+            "Gambar 1.26 Domain dan Range dari Fungsi Asal dan Fungsi Invers"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            321,
+            725,
+            704,
+            846
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "35",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Secara konsep, menentukan fungsi invers dari fungsi asal dengan diagram panah memang lebih intuitif; dengan membalik arah panah. Namun, sering kali dijumpai bahwa fungsi asal dituliskan dalam bentuk persamaan matematis. Dalam kasus ini, cara untuk menemukan persamaan fungsi invers dari fungsi asal dapat dilakukan dengan cara berikut:",
+        "bbox": [
+            139,
+            101,
+            833,
+            203
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Ubah $y = f \\left( x \\right)$ menjadi bentuk $x = f ( y )$",
+        "bbox": [
+            141,
+            211,
+            533,
+            231
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Ubah persamaan $x = f ( y )$ menjadi bentuk $y = . . . .$",
+        "bbox": [
+            141,
+            237,
+            616,
+            255
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3. Ubahlah variabel y dengan $f ^ { - 1 } ( x )$ sehingga diperoleh rumus fungsi invers $f ^ { - 1 } ( x )$",
+        "bbox": [
+            141,
+            260,
+            741,
+            300
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan gambar yang menunjukkan fungsi dan fungsi invers-nya. Gunakan langkah-langkah di atas untuk menemukan fungsi invers dari $f .$",
+        "bbox": [
+            139,
+            325,
+            829,
+            366
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/c62132c64b08f9a5198e461fa11c15323ef13f47899d6841ddb3875f644291bf.jpg",
+        "image_caption": [
+            "Gambar 1.27 Domain dan Range dari $y = x - 2$ dan $x = y + 2$"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            222,
+            389,
+            779,
+            585
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/55be52c9ec7dff9f2dad1bdd8b1d65bbab73acbc19e195670176bdd58be9b4e9.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            634,
+            209,
+            682
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berkomunikasi",
+        "text_level": 2,
+        "bbox": [
+            220,
+            647,
+            383,
+            667
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Sejauh ini, ketika menjelaskan fungsi invers dari fungsi asal, selalu diasumsikan bahwa fungsi asal memiliki invers. Secara umum, “Apakah benar semua fungsi selalu mempunyai invers? Kalau tidak, apa syarat untuk sebuah fungsi memiliki invers?”",
+        "bbox": [
+            159,
+            691,
+            811,
+            772
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "36",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 2
+    }
+]

@@ -1,0 +1,67 @@
+from fastapi import APIRouter, FastAPI, Request
+import logging
+from fastapi.encoders import jsonable_encoder
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from core.exceptions import AppException
+from core.response import Response
+from domains.cities.router import router as router_city
+from domains.schools.router import router as router_school
+from domains.users.router import router_user, router_student, router_teacher
+
+
+
+api_router = APIRouter(prefix="/api")
+
+api_router.include_router(router_city)
+api_router.include_router(router_school)
+api_router.include_router(router_user)
+api_router.include_router(router_student)
+api_router.include_router(router_teacher)
+
+app = FastAPI()
+
+app.include_router(api_router)
+
+@app.exception_handler(AppException)
+async def app_exception_handler(
+    request: Request,
+    exc: AppException,
+):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.message,
+            "errors": exc.errors,
+        },
+    )
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(
+    request: Request,
+    exc: RequestValidationError,
+):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "detail": "Validation failed",
+            "errors": jsonable_encoder(exc.errors()),
+        },
+    )
+
+logger = logging.getLogger(__name__)
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled exception occurred")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"},
+    )
+
+@app.get("/health",response_model=Response[bool])
+def health():
+    return {
+        "message": "Sehat",
+        "data": True
+        }
