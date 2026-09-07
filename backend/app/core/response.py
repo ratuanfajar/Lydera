@@ -1,7 +1,7 @@
 from typing import Generic, TypeVar, Any
 from contextvars import ContextVar
 from pydantic import BaseModel, Field
-from core.exceptions import CredentialException, ForbiddenException
+from app.core.exceptions import CredentialException, ForbiddenException
 
 T = TypeVar("T")
 

@@ -3,12 +3,12 @@ from pydantic import ValidationError
 
 from utils.role import Role
 from utils.payload import Payload
-from core.config import settings
+from app.core.config import settings
 from pwdlib import PasswordHash
 from datetime import datetime, timedelta, timezone
 from typing import Annotated
 import jwt
-from core.exceptions import CredentialException, ForbiddenException
+from app.core.exceptions import CredentialException, ForbiddenException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt.exceptions import InvalidTokenError
 

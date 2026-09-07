@@ -6,7 +6,7 @@ from domains.users.schemas import UserCredentials
 from domains.users.models.user import User
 from domains.users.models.teacher import Teacher
 from domains.users.models.student import Student
-from core.db import AsyncSession
+from app.core.db import AsyncSession
 
 
 class UserRepository(UserRepositoryInterface):

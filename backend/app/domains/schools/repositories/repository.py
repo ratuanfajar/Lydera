@@ -1,7 +1,7 @@
 from domains.schools.repositories.interface import SchoolRepositoryInterface
 from domains.schools.schemas import SchoolCreate
 from domains.schools.models.school import School
-from core.db import AsyncSession
+from app.core.db import AsyncSession
 
 
 class SchoolRepository(SchoolRepositoryInterface):

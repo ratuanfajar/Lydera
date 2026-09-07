@@ -1,6 +1,6 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from core.db import get_db
+from app.core.db import get_db
 from domains.schools.repositories.repository import SchoolRepository
 from domains.schools.services import SchoolService
 

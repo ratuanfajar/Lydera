@@ -5,7 +5,7 @@ from fastapi import Request, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
-from core.response import get_response_message, _response_message
+from app.core.response import get_response_message, _response_message
 
 
 class WrappedRoute(APIRoute):

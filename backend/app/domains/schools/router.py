@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, status, Body
 from utils.role import Role
-from core.route import WrappedRoute
+from app.core.route import WrappedRoute
 from typing import Annotated
-from core.security import Roles
+from app.core.security import Roles
 from domains.schools.depedencies import get_school_service
 from domains.schools.services import SchoolService
-from core.response import Response, COMMON_VALIDATION_RESPONSES
+from app.core.response import Response, COMMON_VALIDATION_RESPONSES
 from domains.schools.schemas import SchoolResponse, SchoolCreate
 
 router = APIRouter(prefix="/schools", tags=["schools"], route_class=WrappedRoute)

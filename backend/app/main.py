@@ -3,8 +3,8 @@ import logging
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from core.exceptions import AppException
-from core.response import Response
+from app.core.exceptions import AppException
+from app.core.response import Response
 from domains.cities.router import router as router_city
 from domains.schools.router import router as router_school
 from domains.users.router import router_user, router_student, router_teacher
