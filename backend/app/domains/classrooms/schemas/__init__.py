@@ -1,0 +1,3 @@
+from app.domains.classrooms.schemas.classroom_type_response import ClassroomTypeResponse
+from app.domains.classrooms.schemas.classroom_response import ClassroomResponse
+from app.domains.classrooms.schemas.classroom_create import ClassroomCreate

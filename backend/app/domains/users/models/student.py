@@ -1,6 +1,13 @@
 from app.core.db import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, String, SmallInteger
+from sqlalchemy import Column, ForeignKey, String, SmallInteger, Table
+
+student_classrooms = Table(
+    "student_classrooms",
+    Base.metadata,
+    Column("student_id", ForeignKey("students.id", ondelete="CASCADE"), primary_key=True),
+    Column("classroom_id", ForeignKey("classrooms.id", ondelete="CASCADE"), primary_key=True),
+)
 
 
 class Student(Base):
@@ -18,6 +25,11 @@ class Student(Base):
 
     user: Mapped["User"] = relationship(
         back_populates="student"
+    )
+
+    classrooms: Mapped[list["Classroom"]] = relationship(
+        secondary=student_classrooms,
+        back_populates="students"
     )
 
 

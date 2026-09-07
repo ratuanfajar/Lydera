@@ -10,6 +10,7 @@ from app.core.response import Response
 from app.domains.cities.router import router as router_city
 from app.domains.schools.router import router as router_school
 from app.domains.users.router import router_user, router_student, router_teacher
+from app.domains.classrooms.router import router_classrooms, router_classrooms_types
 
 
 
@@ -20,6 +21,8 @@ api_router.include_router(router_school)
 api_router.include_router(router_user)
 api_router.include_router(router_student)
 api_router.include_router(router_teacher)
+api_router.include_router(router_classrooms_types)
+api_router.include_router(router_classrooms)
 
 app = FastAPI()
 

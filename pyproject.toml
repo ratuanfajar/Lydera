@@ -15,6 +15,7 @@ dependencies = [
     "pwdlib[argon2]>=0.3.1",
     "pyjwt>=2.13.0",
     "sqlalchemy>=2.0.52",
+    "nanoid>=2.0.0",
 ]
 
 # Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.

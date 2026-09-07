@@ -22,6 +22,10 @@ class School(Base):
         back_populates="schools"
     )
 
+    classrooms: Mapped[list["Classroom"]] = relationship(
+        back_populates="school"
+    )
+
     teachers: Mapped[list["Teacher"]] = relationship(
         back_populates="school"
     )

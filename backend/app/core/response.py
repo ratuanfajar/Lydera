@@ -9,7 +9,7 @@ class Response(BaseModel, Generic[T]):
     message: str
     data: T
 
-_response_message: ContextVar[str] = ContextVar("_response_message", default="success")
+_response_message: ContextVar[str] = ContextVar("_response_message", default="Success")
 
 def set_response_message(message: str) -> None:
     _response_message.set(message)
