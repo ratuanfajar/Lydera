@@ -18,8 +18,8 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: "Docker image tag untuk testing"
-        required: true
+        description: "Docker image tag untuk build baru (kosongkan kalau mau rollback)"
+        required: false
         default: "test"
 
       deploy:
@@ -27,6 +27,11 @@ on:
         required: true
         type: boolean
         default: false
+
+      rollback_tag:
+        description: "ISI INI KALAU MAU ROLLBACK (contoh: 1.0.0). Kosongkan untuk build normal."
+        required: false
+        default: ""
 
 env:
   REGISTRY: ghcr.io
@@ -148,3 +153,29 @@ jobs:
           GHCR_USER: ${{ secrets.GHCR_USER }}
           GHCR_PAT: ${{ secrets.GHCR_PAT }}
           IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+
+
+  # ============================================================
+  # JOB 3: ROLLBACK — TIDAK build sama sekali, langsung pull
+  # image versi lama yang SUDAH ADA di GHCR
+  # ============================================================
+  rollback:
+    if: github.event_name == 'workflow_dispatch' && inputs.rollback_tag != ''
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: SSH dan jalankan deploy.sh dengan tag LAMA
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          envs: GHCR_USER,GHCR_PAT,IMAGE_TAG
+          script: |
+            echo "==> ROLLBACK ke versi ${IMAGE_TAG}, TIDAK ada build baru"
+            bash /opt/lydera/deploy.sh "$IMAGE_TAG"
+        env:
+          GHCR_USER: ${{ secrets.GHCR_USER }}
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+          IMAGE_TAG: ${{ inputs.rollback_tag }}
+ 
