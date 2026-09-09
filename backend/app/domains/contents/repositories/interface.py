@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from typing import Sequence
-from app.domains.contents.models import Block, Module, Fase,Cp,Chapter
+from app.domains.contents.models import Block, Module, Fase, Cp, Chapter, ModuleStatus
 
 class ContentRepositoryInterface(ABC):
     @abstractmethod
@@ -15,7 +15,7 @@ class ContentRepositoryInterface(ABC):
     @abstractmethod
     async def get_module_by_id(self, module_id: int) -> Module | None: pass
     @abstractmethod
-    async def create_module(self, title: str, fase_id: int | None) -> Module: pass
+    async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, fase_id: int | None) -> Module:pass
     @abstractmethod
     async def get_cps_by_fase_id(self, fase_id: int) -> Sequence[Cp]: pass
     @abstractmethod

@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Sequence
-from app.domains.contents.models import Block, Fase, Module, Chapter, Cp
+from app.domains.contents.models import Block, Fase, Module, Chapter, Cp, ModuleStatus
 from app.domains.contents.repositories.interface import ContentRepositoryInterface
 from app.core.exceptions import BadRequestException, NotFoundException
 
@@ -40,11 +40,12 @@ class ContentService:
 
 
     # --- WRITE OPERATIONS (Butuh commit/rollback) ---
-    async def create_module(self, title: str, fase_id: int | None) -> int:
+    async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, fase_id: int | None) -> Module:
         try:
-            module = await self.repo.create_module(title, fase_id)
+            module = await self.repo.create_module(title, description, status, classroom_id, fase_id)
             await self.db.commit()
-            return module.id
+            await self.db.refresh(module)
+            return module
         except Exception as e:
             await self.db.rollback()
             raise e

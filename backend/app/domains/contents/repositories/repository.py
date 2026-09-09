@@ -1,6 +1,6 @@
 from sqlalchemy import func, select
 from typing import Sequence
-from app.domains.contents.models import Block, Module, Chapter, Fase, Cp
+from app.domains.contents.models import Block, Module, Chapter, Fase, Cp, ModuleStatus
 from app.domains.contents.repositories.interface import ContentRepositoryInterface
 from app.core.db import AsyncSession
 
@@ -29,8 +29,8 @@ class ContentRepository(ContentRepositoryInterface):
     async def get_module_by_id(self, module_id: int) -> Module | None:
         return await self.db.get(Module, module_id)
 
-    async def create_module(self, title: str, fase_id: int | None) -> Module:
-        new_module = Module(title=title, fase_id=fase_id)
+    async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, fase_id: int | None) -> Module:
+        new_module = Module(title=title, description=description, status=status.name, classroom_id=classroom_id, fase_id=fase_id)
         self.db.add(new_module)
         await self.db.flush()
         return new_module

@@ -40,6 +40,10 @@ class Classroom(Base):
     school: Mapped["School"] = relationship(
         back_populates="classrooms"
     )
+
+    modules: Mapped[list["Module"]] = relationship(
+        back_populates="classroom"
+    )
     
     teacher: Mapped["Teacher"] = relationship(
         back_populates="classrooms"

@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy import func
+from sqlalchemy import DateTime, func
 from datetime import datetime
 from .config import settings
 from typing import AsyncGenerator
@@ -28,13 +28,16 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         
 class TimestampMixin:
     created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
         server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
         server_default=func.now(),
         onupdate=func.now(),
     )
     deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
         nullable=True,
         default=None
     )

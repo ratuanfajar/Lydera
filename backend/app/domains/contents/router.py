@@ -8,8 +8,9 @@ from fastapi import APIRouter, HTTPException, File, Form, UploadFile, Depends, s
 # Asumsikan import base response ini sudah Anda miliki di project
 from app.core.response import Response, get_response_message, COMMON_VALIDATION_RESPONSES
 from app.core.route import WrappedRoute
-
+from app.core.security import Roles
 from app.utils import paths
+from app.utils.role import Role
 paths.setup()
 from app.domains.contents.schemas.chapter_create import ChapterCreate
 import regenerate
@@ -87,15 +88,19 @@ router_fases = APIRouter(prefix="/fases", tags=["fases"], route_class=WrappedRou
 
 @router_fases.get(
     "",
+    description="Requires the TEACHER role.",
     response_model=Response[list[FaseResponse]],
     status_code=status.HTTP_200_OK
 )
-async def list_fase(service: ContentService = Depends(get_content_service)):
-    fases = await service.get_all_fases()
-    return Response(
-        message=get_response_message(),
-        data=fases
-    )
+async def list_fase(
+    _: Roles(Role.TEACHER),
+    service: ContentService = Depends(get_content_service)
+    ):
+        fases = await service.get_all_fases()
+        return Response(
+            message=get_response_message(),
+            data=fases
+        )
 
 
 # ==========================================
@@ -105,17 +110,18 @@ router_modules = APIRouter(prefix="/modules", tags=["modules"], route_class=Wrap
 
 @router_modules.post(
     "",
+    description="Requires the TEACHER role.",
     response_model=Response[ModuleResponse],
     status_code=status.HTTP_201_CREATED,
     responses=COMMON_VALIDATION_RESPONSES
 )
 async def create_module(
+    _: Roles(Role.TEACHER),
     payload: Annotated[ModuleCreate, Body()], 
     service: ContentService = Depends(get_content_service)
 ):
     try:
-        module_id = await service.create_module(payload.title, payload.fase_id)
-        module = await service.get_module_by_id(module_id)
+        module = await service.create_module(payload.title, payload.description, payload.status, payload.classroom_id, payload.fase_id)
         return Response(
             message=get_response_message(),
             data=module
@@ -126,34 +132,38 @@ async def create_module(
 
 @router_modules.get(
     "",
+    description="Requires the ADMIN role.",
     response_model=Response[list[ModuleResponse]],
     status_code=status.HTTP_200_OK
 )
-async def list_modules(service: ContentService = Depends(get_content_service)):
-    modules = await service.get_all_modules()
-    return Response(
-        message=get_response_message(),
-        data=modules
-    )
-
-
-@router_modules.get(
-    "/{module_id}/cp",
-    response_model=Response[list[CpResponse]],
-    status_code=status.HTTP_200_OK
-)
-async def list_module_cp(
-    module_id: Annotated[int, FastAPIPath(title="The ID of the module")], 
+async def list_modules(
+    _: Roles(Role.ADMIN),
     service: ContentService = Depends(get_content_service)
-):
-    try:
-        cps = await service.get_cps_by_module_id(module_id)
+    ):
+        modules = await service.get_all_modules()
         return Response(
             message=get_response_message(),
-            data=cps
+            data=modules
         )
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+
+
+# @router_modules.get(
+#     "/{module_id}/cp",
+#     response_model=Response[list[CpResponse]],
+#     status_code=status.HTTP_200_OK
+# )
+# async def list_module_cp(
+#     module_id: Annotated[int, FastAPIPath(title="The ID of the module")], 
+#     service: ContentService = Depends(get_content_service)
+# ):
+#     try:
+#         cps = await service.get_cps_by_module_id(module_id)
+#         return Response(
+#             message=get_response_message(),
+#             data=cps
+#         )
+#     except ValueError as e:
+#         raise HTTPException(status_code=404, detail=str(e))
 
 
 # ==========================================
@@ -163,11 +173,13 @@ router_chapters = APIRouter(prefix="/chapters", tags=["chapters"], route_class=W
 
 @router_chapters.post(
     "",
+    description="Requires the TEACHER role.",
     response_model=Response[ChapterCreateResponse],
     status_code=status.HTTP_201_CREATED,
     responses=COMMON_VALIDATION_RESPONSES
 )
 async def create_chapter(
+    _: Roles(Role.TEACHER),
     data: Annotated[ChapterCreate, Depends()],
     file: Annotated[UploadFile, File(...)],
     content_service: ContentService = Depends(get_content_service),

@@ -28,6 +28,8 @@ from app.domains.contents.models.block import Block
 from app.domains.contents.models.chapter import Chapter
 from app.domains.contents.models.cp import Cp
 from app.domains.contents.models.fase import Fase
+from app.domains.contents.models.module_progress import ModuleProgress
+from app.domains.contents.models.chapter_progress import ChapterProgress
 from app.domains.jobs.models.job import Job
 from app.domains.quizz.models.quiz_request import QuizRequest
 from app.domains.quizz.models.quiz_request_chapter import QuizRequestChapter
