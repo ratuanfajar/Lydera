@@ -23,6 +23,18 @@ from app.domains.users.models.teacher import Teacher          # noqa
 from app.domains.schools.models.school import School
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.cities.models.city import City          # noqa
+from app.domains.contents.models.module import Module
+from app.domains.contents.models.block import Block
+from app.domains.contents.models.chapter import Chapter
+from app.domains.contents.models.cp import Cp
+from app.domains.contents.models.fase import Fase
+from app.domains.jobs.models.job import Job
+from app.domains.quizz.models.quiz_request import QuizRequest
+from app.domains.quizz.models.quiz_request_chapter import QuizRequestChapter
+from app.domains.quizz.models.soal import Soal
+from app.domains.quizz.models.soal_langkah import SoalLangkah
+from app.domains.quizz.models.soal_opsi import SoalOpsi
+from app.domains.quizz.models.soal_stimulus import SoalStimulus
 # add every new domain's models import here
 
 config = context.config

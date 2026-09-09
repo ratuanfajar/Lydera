@@ -1,0 +1,386 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/888e129da357cff4dec7d75e731fa540f23c47b3345115bc6e1782e41ef88734.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            383,
+            104,
+            583,
+            238
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Bagian dari lingkaran disebut busur lingkaran. Busur yang lebih kecil disebut busur minor (pada gambar berwarna biru) dan bagian yang lebih besar disebut busur mayor (berwarna merah).",
+        "bbox": [
+            139,
+            252,
+            831,
+            313
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jika hanya disebutkan kata busur, maka yang dimaksud adalah busur minor.",
+        "bbox": [
+            141,
+            316,
+            761,
+            335
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Busur BC dituliskan $\\widehat { B C }$ . Besarnya $\\widehat { B C }$ ditentukan oleh besarnya $\\angle B A C = \\alpha$ (Titik A adalah pusat lingkaran).",
+        "bbox": [
+            141,
+            340,
+            831,
+            382
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Dalam matematika,",
+        "bbox": [
+            141,
+            392,
+            308,
+            410
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Sudut α disebut sudut pusat yang menghadap pada $\\widehat { B C }$",
+        "bbox": [
+            141,
+            418,
+            645,
+            438
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sudut pusat adalah sudut yang titik sudutnya terletak pada pusat lingkaran dan kaki-kaki sudutnya adalah jari-jari lingkaran.",
+        "bbox": [
+            146,
+            441,
+            829,
+            480
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/5e332682594bbbd6760e0539c1282915b9c0d445d4ed957f046d4fbaa2751d24.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            383,
+            488,
+            587,
+            619
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "• Sudut <sup>θ</sup> disebut sudut keliling yang menghadap pada $\\widehat { B C }$",
+        "bbox": [
+            141,
+            634,
+            662,
+            655
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sudut keliling adalah sudut yang titik sudutnya terletak pada lingkaran dan kaki-kaki sudutnya berupa tali busur.",
+        "bbox": [
+            150,
+            656,
+            831,
+            696
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Apakah kalian ingat apa yang dimaksud tali busur? Tali busur adalah ruas garis yang menghubungkan dua titik pada lingkaran.",
+        "bbox": [
+            176,
+            698,
+            831,
+            739
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "50",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/79734c53daa2bb646e62eeb182c10435ecf8c054994a184acae1da8675ae79d4.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            156,
+            227,
+            198
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ayo Bereksplorasi",
+        "bbox": [
+            238,
+            169,
+            374,
+            186
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/818ce45371c7dbaa07391a921b7214fff9a695e684a4aaf9196dc0d13309984e.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            166,
+            226,
+            853,
+            500
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Sebuah kolam berbentuk lingkaran. Pada salah satu bagian kolam ada perosotan. Pengelola ingin meletakkan lampu sehingga daerah perosotan selalu terang. Jika daerah yang ingin diterangi ditampilkan sebagai busur lingkaran berwarna biru. Busur lingkaran tersebut besarnya α.",
+        "bbox": [
+            166,
+            516,
+            858,
+            598
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/4597817e982fc027deb9910275d676b6bdad4243e50890f7e4f1889e830e3fe2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            429,
+            598,
+            590,
+            708
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Setiap lampu yang diproduksi oleh pabrik Q dapat menyinari daerah dengan jarak tertentu dan sudut penyinaran tertentu (β).",
+        "bbox": [
+            165,
+            716,
+            856,
+            757
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/e0cb2a2a9d6bcc03036eb1f0252fa7f8c8e2c3a63a738ea91f7521a6232e215d.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            455,
+            766,
+            565,
+            871
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "header",
+        "text": "Eksplorasi 2.1",
+        "bbox": [
+            176,
+            109,
+            339,
+            133
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "51",
+        "bbox": [
+            820,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Jika semua lampu yang ada dalam gudang pengelola kolam dapat menyinari jarak yang dibutuhkan, bantulah pengelola taman memilih sudut penyinaran yang tepat.",
+        "bbox": [
+            139,
+            101,
+            831,
+            144
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Lampu taman dengan sudut penyinaran $3 0 ^ { \\circ }$ diletakkan pada titik M dan dapat menerangi perosotan pada $\\widehat { B C }$ Di mana saja pengelola dapat memasang lampu yang sama dan tetap menyinari perosotan pada $\\widehat { B C } ?$",
+        "bbox": [
+            141,
+            150,
+            831,
+            213
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/88afcd95fcc7d3fb33028485ba21e6b48ec0278af68155552858a5375e3ef832.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            388,
+            221,
+            579,
+            344
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Jika lampu diletakkan di pusat kolam dan ingin menyorot $\\widehat { B C }$ , apakah lampu dengan sudut penyinaran $3 0 ^ { \\circ }$ dapat digunakan? Jika tidak, berapa sudut yang dibutuhkan?",
+        "bbox": [
+            139,
+            357,
+            831,
+            418
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/ad6fdf7686184f0013135606d4a533182e119ac6723e546229b2505c16f934e0.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            388,
+            417,
+            579,
+            540
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3. Jika ukuran perosotan berubah $( \\widehat { B C } )$ bagaimana pengaruhnya terhadap perubahan sudut penyinaran yang dibutuhkan?",
+        "bbox": [
+            141,
+            553,
+            831,
+            596
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/d6007fb873c38c30582f76123ad344e299b9cc1b7e103a59cbb008e4e69def8b.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            388,
+            601,
+            579,
+            725
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "table",
+        "img_path": "images/d01591ce313e07613c0fe8cac2b02143a6d441c3457dc82742224024121e871d.jpg",
+        "table_caption": [],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>α</td><td rowspan=1 colspan=1>θ</td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr></table>",
+        "bbox": [
+            181,
+            741,
+            829,
+            859
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "52",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 2
+    }
+]

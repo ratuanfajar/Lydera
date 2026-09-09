@@ -1,9 +1,14 @@
+from pathlib import Path
+
 from dotenv import load_dotenv
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 env_file = ".env.test" if os.getenv("APP_ENV") == "test" else ".env"
 load_dotenv(env_file)
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+DEFAULT_AI_OUTPUT_DIR = PROJECT_ROOT / "ai-services" / "annotation" / "output"
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file="backend/.env", env_file_encoding="utf-8", extra="ignore")
@@ -35,6 +40,10 @@ class Settings(BaseSettings):
 
     # Prometheus
     PROMETHEUS_ENABLED: bool = False
+
+    # --- AI SERVICES INTEGRATION ---
+    # Will use the .env variable if provided, otherwise defaults to the physical folder
+    OUTPUT_DIR: str = os.getenv("OUTPUT_DIR", str(DEFAULT_AI_OUTPUT_DIR))
 
     @property
     def DATABASE_URL(self) -> str:

@@ -1,0 +1,1 @@
+from app.domains.jobs.models.job import Job

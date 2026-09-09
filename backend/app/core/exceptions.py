@@ -17,6 +17,10 @@ class NotFoundException(AppException):
     status_code = 404
     detail = "Resource not found"
 
+class BadRequestException(AppException):
+    status_code = 400
+    detail = "Bad Request"
+
 
 class ForbiddenException(AppException):
     status_code = 403
