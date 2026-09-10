@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import DateTime, ForeignKey, Index, UniqueConstraint
 from app.core.db import Base
 from datetime import datetime
 
@@ -18,7 +18,7 @@ class ChapterProgress(Base):
     )
 
     __table_args__ = (
-        UniqueConstraint("student_id", "chapter_id", name="uq_student_chapter_progress"),
+        Index("ix_chapter_progress_user_chapter", "student_id", "chapter_id", unique=True),
     )
 
     # Relationships

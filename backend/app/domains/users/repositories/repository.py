@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import joinedload, selectinload
 from app.core.security import hash_password
 from app.domains.users.repositories.interface import UserRepositoryInterface, TeacherRepositoryInterface, StudentRepositoryInterface
@@ -8,6 +8,8 @@ from app.domains.users.models.user import User
 from app.domains.users.models.teacher import Teacher
 from app.domains.users.models.student import Student
 from app.core.db import AsyncSession
+from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
+from app.domains.contents.models import Module, ModuleProgress, ModuleStatus
 
 
 class UserRepository(UserRepositoryInterface):
@@ -72,3 +74,27 @@ class StudentRepository(StudentRepositoryInterface):
         self.db.add(student)
         await self.db.flush()
         return student
+
+    async def get_task_counts(self, classroom_id: int, student_id: int) -> dict[str, int]:
+        stmt = (
+            select(func.count(Module.id))
+            .outerjoin(
+                ModuleProgress,
+                (ModuleProgress.module_id == Module.id) & (ModuleProgress.student_id == student_id)
+            )
+            .where(
+                Module.classroom_id == classroom_id,
+                Module.status == ModuleStatus.PUBLISH,
+                or_(
+                    ModuleProgress.id.is_(None),
+                    ModuleProgress.is_done == False,
+                ),
+            )
+        )
+
+        modules_not_done = await self.db.scalar(stmt) or 0
+
+        return {
+            "modules_not_done":modules_not_done,
+            "exam_not_done":0, 
+        }

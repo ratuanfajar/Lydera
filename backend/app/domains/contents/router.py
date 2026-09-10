@@ -12,7 +12,7 @@ from app.core.security import Roles
 from app.utils import paths
 from app.utils.role import Role
 paths.setup()
-from app.domains.contents.schemas.chapter_create import ChapterCreate
+from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
 import regenerate
 
 from app.domains.contents.schemas import (
@@ -232,61 +232,61 @@ async def create_chapter(
     )
 
 
-@router_chapters.get(
-    "/{chapter_id}",
-    response_model=Response[ChapterResponse],
-    status_code=status.HTTP_200_OK
-)
-async def get_chapter(
-    chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
-    service: ContentService = Depends(get_content_service)
-):
-    chapter = await service.get_chapter_by_id(chapter_id)
-    if chapter is None:
-        raise HTTPException(status_code=404, detail="bab tidak ditemukan")
+# @router_chapters.get(
+#     "/{chapter_id}",
+#     response_model=Response[ChapterResponse],
+#     status_code=status.HTTP_200_OK
+# )
+# async def get_chapter(
+#     chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
+#     service: ContentService = Depends(get_content_service)
+# ):
+#     chapter = await service.get_chapter_by_id(chapter_id)
+#     if chapter is None:
+#         raise HTTPException(status_code=404, detail="bab tidak ditemukan")
     
-    return Response(
-        message=get_response_message(),
-        data=chapter
-    )
+#     return Response(
+#         message=get_response_message(),
+#         data=chapter
+#     )
 
 
-@router_chapters.get(
-    "/{chapter_id}/blocks",
-    response_model=Response[list[BlockResponse]],
-    status_code=status.HTTP_200_OK
-)
-async def list_blocks(
-    chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
-    service: ContentService = Depends(get_content_service)
-):
-    blocks = await service.get_blocks_by_chapter(chapter_id)
-    return Response(
-        message=get_response_message(),
-        data=blocks
-    )
+# @router_chapters.get(
+#     "/{chapter_id}/blocks",
+#     response_model=Response[list[BlockResponse]],
+#     status_code=status.HTTP_200_OK
+# )
+# async def list_blocks(
+#     chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
+#     service: ContentService = Depends(get_content_service)
+# ):
+#     blocks = await service.get_blocks_by_chapter(chapter_id)
+#     return Response(
+#         message=get_response_message(),
+#         data=blocks
+#     )
 
 
-@router_chapters.get(
-    "/{chapter_id}/status",
-    response_model=Response[JobStatus],
-    status_code=status.HTTP_200_OK
-)
-async def get_status(
-    chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
-    job_service: JobService = Depends(get_job_service)
-):
-    job = await job_service.get_latest_job_for_chapter(chapter_id)
-    if job is None:
-        raise HTTPException(status_code=404, detail="belum ada proses untuk bab ini")
+# @router_chapters.get(
+#     "/{chapter_id}/status",
+#     response_model=Response[JobStatus],
+#     status_code=status.HTTP_200_OK
+# )
+# async def get_status(
+#     chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
+#     job_service: JobService = Depends(get_job_service)
+# ):
+#     job = await job_service.get_latest_job_for_chapter(chapter_id)
+#     if job is None:
+#         raise HTTPException(status_code=404, detail="belum ada proses untuk bab ini")
     
-    return Response(
-        message=get_response_message(),
-        data={
-            "chapter_id": chapter_id,
-            "job_id": job.id,
-            "status": job.status,
-            "error": job.error,
-            "blocks_total": job.blocks_total,
-        }
-    )
+#     return Response(
+#         message=get_response_message(),
+#         data={
+#             "chapter_id": chapter_id,
+#             "job_id": job.id,
+#             "status": job.status,
+#             "error": job.error,
+#             "blocks_total": job.blocks_total,
+#         }
+#     )

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from pydantic import EmailStr
 from app.domains.users.schemas import StudentCreate, TeacherCreate, UserCredentials
+from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.domains.users.models.teacher import Teacher
 from app.domains.users.models.user import User
 from app.domains.users.models.student import Student
@@ -27,4 +28,8 @@ class TeacherRepositoryInterface(ABC):
 class StudentRepositoryInterface(ABC):
     @abstractmethod
     async def create_student(self, dto:StudentCreate) -> Student:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_task_counts(self, classroom_id:int , student_id: int) -> dict[str, int]:
         raise NotImplementedError

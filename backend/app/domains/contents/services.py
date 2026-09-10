@@ -38,8 +38,6 @@ class ContentService:
             return []
         return await self.repo.get_cps_by_fase_id(module.fase_id)
 
-
-    # --- WRITE OPERATIONS (Butuh commit/rollback) ---
     async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, fase_id: int | None) -> Module:
         try:
             module = await self.repo.create_module(title, description, status, classroom_id, fase_id)

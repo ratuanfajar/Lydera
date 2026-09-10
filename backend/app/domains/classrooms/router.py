@@ -68,7 +68,7 @@ async def get_classroom(
 @router_classrooms.post(
     "/join",
     description="Join a classroom using a code. Requires the STUDENT role.",
-    response_model=Response[None],
+    response_model=Response[bool],
     status_code=status.HTTP_200_OK,
     responses=COMMON_VALIDATION_RESPONSES
 )

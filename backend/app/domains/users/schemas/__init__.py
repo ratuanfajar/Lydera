@@ -5,3 +5,6 @@ from app.domains.users.schemas.user_create import UserCredentials
 from app.domains.users.schemas.student_response import StudentResponse
 from app.domains.users.schemas.teacher_response import TeacherResponse
 from app.domains.users.schemas.profile_response import ProfileResponse
+from app.domains.users.schemas.student_dashboard_request import StudentDashboardRequest
+from app.domains.users.schemas.student_dashboard_response import StudentDashboardResponse
+from app.domains.users.schemas.student_tasks_response import StudentTaskResponse

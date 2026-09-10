@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 env_file = ".env.test" if os.getenv("APP_ENV") == "test" else ".env"
 load_dotenv(env_file)
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_AI_OUTPUT_DIR = PROJECT_ROOT / "ai-services" / "annotation" / "output"
 
 class Settings(BaseSettings):

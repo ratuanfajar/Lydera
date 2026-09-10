@@ -29,17 +29,20 @@ class Module(Base):
 
     __table_args__ = (
         Index(
-            "ix_modules_published_classroom",
+            "ix_modules_classroom_status_updated",
             "classroom_id",
-            postgresql_where=(status == ModuleStatus.PUBLISH),
+            "status",
+            "updated_at",
         ),
     )
+    
 
     # Relationships
     classroom: Mapped["Classroom"] = relationship(back_populates="modules")
     fase: Mapped[Optional["Fase"]] = relationship(back_populates="modules")
     chapters: Mapped[List["Chapter"]] = relationship(back_populates="module", cascade="all, delete-orphan")
     quiz_requests: Mapped[List["QuizRequest"]] = relationship(back_populates="module", cascade="all, delete-orphan")
-    module_progress: Mapped["ModuleProgress"] = relationship(
-        back_populates="module"
+    module_progress: Mapped[Optional["ModuleProgress"]] = relationship(
+        back_populates="module",
+        uselist=False 
     )

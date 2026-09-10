@@ -22,7 +22,7 @@ class Chapter(Base):
 
     # Relationships
     module: Mapped["Module"] = relationship(back_populates="chapters")
-    chapter_progress: Mapped["Chapter"] = relationship(back_populates="chapter")
+    chapter_progress: Mapped["ChapterProgress"] = relationship(back_populates="chapter")
     cp: Mapped[Optional["Cp"]] = relationship(back_populates="chapters")
     blocks: Mapped[List["Block"]] = relationship(back_populates="chapter", cascade="all, delete-orphan")
     jobs: Mapped[List["Job"]] = relationship(back_populates="chapter", cascade="all, delete-orphan")

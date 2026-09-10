@@ -2,8 +2,8 @@
 from app.domains.classrooms.models.classroom_type import ClassroomType
 from app.domains.classrooms.models.classroom import Classroom
 from app.utils.role import Role
-from app.domains.classrooms.schemas.classroom_create import ClassroomCreate
-from app.domains.classrooms.repositories.interface import ClassroomRepositorInterface, ClassroomTypeRepositorInterface
+from app.domains.classrooms.schemas import ClassroomCreate, ClassroomStudentResponse
+from app.domains.classrooms.repositories.interface import ClassroomRepositoryInterface, ClassroomTypeRepositorInterface
 from app.core.db import AsyncSession
 from app.domains.users.models.student import student_classrooms
 import string
@@ -11,8 +11,9 @@ from nanoid import generate
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import insert, select
 from sqlalchemy.orm import joinedload
+from app.domains.schools.models.school import School
 
-class ClassroomRepository(ClassroomRepositorInterface):
+class ClassroomRepository(ClassroomRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
 
@@ -79,6 +80,34 @@ class ClassroomRepository(ClassroomRepositorInterface):
         await self.db.execute(stmt_insert)
         
         return True
+
+    async def get_classroom_student(self, classroom_id: int, student_id: int) -> ClassroomStudentResponse | None:
+        stmt = (
+            select(
+                School.name.label("school_name"),
+                Classroom.grade.label("grade_class"),
+                ClassroomType.name.label("classroom_type"),
+            )
+            .select_from(Classroom)
+            .join(School, Classroom.school_id == School.id)
+            .join(ClassroomType, Classroom.classroom_type_id == ClassroomType.id)
+            .join(
+                student_classrooms, 
+                student_classrooms.c.classroom_id == Classroom.id
+            )
+            .where(
+                Classroom.id == classroom_id,
+                student_classrooms.c.student_id == student_id,
+            )
+        )
+
+        result = await self.db.execute(stmt)
+        row = result.mappings().one_or_none()
+
+        if not row:
+            return None
+
+        return ClassroomStudentResponse.model_validate(row)
 
 class ClassroomTypeRepository(ClassroomTypeRepositorInterface):
     def __init__(self, db: AsyncSession):

@@ -1,6 +1,6 @@
 from app.core.db import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, SmallInteger, ForeignKey, Table
+from sqlalchemy import Index, String, SmallInteger, ForeignKey, Table
 from app.domains.users.models.student import student_classrooms
 
 class Classroom(Base):

@@ -1,15 +1,15 @@
 from app.utils.role import Role
 from app.core.exceptions import ForbiddenException, NotFoundException
 from app.core.response import set_response_message
-from app.domains.classrooms.repositories.repository import ClassroomRepositorInterface, ClassroomTypeRepositorInterface
+from app.domains.classrooms.repositories.repository import ClassroomRepositoryInterface, ClassroomTypeRepositorInterface
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.classrooms.models.classroom_type import ClassroomType
-from app.domains.classrooms.schemas import ClassroomCreate, ClassroomTypeResponse, ClassroomResponse
+from app.domains.classrooms.schemas import ClassroomCreate, ClassroomTypeResponse, ClassroomResponse, ClassroomStudentResponse
 from app.core.db import AsyncSession
 
 class ClassroomService:
     def __init__(self,
-                 repo: ClassroomRepositorInterface,
+                 repo: ClassroomRepositoryInterface,
                  db: AsyncSession
                  ):
         self.repo = repo
