@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Sequence
 from app.domains.contents.models import Block, Fase, Module, Chapter, Cp, ModuleStatus
 from app.domains.contents.repositories.interface import ContentRepositoryInterface
-from app.core.exceptions import BadRequestException, NotFoundException
+from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 
 class ContentService:
     def __init__(self, repo: ContentRepositoryInterface, db: AsyncSession):
@@ -38,9 +38,11 @@ class ContentService:
             return []
         return await self.repo.get_cps_by_fase_id(module.fase_id)
 
-    async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, fase_id: int | None) -> Module:
+    async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, teacher_id:int, fase_id: int | None) -> Module:
+        module = await self.repo.create_module_teacher(title, description, status, classroom_id, teacher_id, fase_id)
+        if not module:
+            raise ForbiddenException(detail="Kelas tidak ditemukan atau Anda tidak memiliki akses.")
         try:
-            module = await self.repo.create_module(title, description, status, classroom_id, fase_id)
             await self.db.commit()
             await self.db.refresh(module)
             return module

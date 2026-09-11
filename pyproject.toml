@@ -22,7 +22,8 @@ dependencies = [
     "uvicorn[standard]>=0.32.0",
     "python-multipart>=0.0.12",
     "psycopg[binary]>=3.2.0",
-    
+    "taskiq[reload]>=0.12.6",
+    "taskiq-redis>=1.2.3",
 ]
 
 # Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.

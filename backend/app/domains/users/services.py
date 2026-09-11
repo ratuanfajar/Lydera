@@ -18,6 +18,10 @@ from app.domains.contents.schemas.module.student_module_detail_request import St
 from app.domains.contents.schemas.blocks.block_response import BlockResponse
 from app.domains.contents.schemas.chapters.student_chapter_detail_response import StudentChapterDetailResponse
 from app.domains.contents.models.chapter import Chapter
+from app.domains.users.schemas.taecher_dashboard_request import TeacherDashboardRequest
+from app.domains.users.schemas.taecher_dashboard_response import TeacherDashboardResponse
+from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
+from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse
 
 class UserService:
     def __init__(
@@ -73,11 +77,15 @@ class TeacherService:
     def __init__(
         self,
         user_repo: UserRepositoryInterface,
+        classroom_repo: ClassroomRepositoryInterface,
         teacher_repo: TeacherRepositoryInterface,
+        content_repo: ContentRepositoryInterface,
         db: AsyncSession,
     ):
         self.user_repo = user_repo
         self.teacher_repo = teacher_repo
+        self.classroom_repo = classroom_repo
+        self.content_repo = content_repo
         self.db = db
 
     async def create_teacher(self, dto: TeacherCreate) -> Teacher:
@@ -88,6 +96,37 @@ class TeacherService:
             )
             set_response_message("Berhasil membuat akun guru")
         return teacher
+    
+    async def dashboard_teacher(self, dto: TeacherDashboardRequest, teacher_id:int, user_id:int) -> TeacherDashboardResponse:
+        try:
+            classroom_info = await self.classroom_repo.get_classroom_info(dto.classroom_id, teacher_id, Role.TEACHER)
+            dashboard_raw = await self.teacher_repo.get_dashboard(dto.classroom_id, dto.limit)
+            profile = await self.user_repo.get_profile(user_id)
+
+            if not profile or not profile.teacher:
+                raise NotFoundException("User tidak ditemukan")
+            
+            if not classroom_info:
+                raise NotFoundException("User tidak punya kelas ini")
+            
+
+            await self.db.commit()
+            return TeacherDashboardResponse(
+                classroom_info=classroom_info,
+                teacher_email=profile.email,
+                **dashboard_raw
+            )
+        
+        except Exception as e:
+            raise e
+
+    async def get_teacher_modules(self, dto: TeacherModuleRequest, teacher_id: int) -> list[TeacherModuleResponse]:
+            try:
+                raw_modules = await self.content_repo.get_all_modules_teachers(dto.classroom_id, teacher_id, dto.status, dto.search)
+                modules = [TeacherModuleResponse.model_validate(m) for m in raw_modules]
+                return modules
+            except Exception as e:
+                raise e
 
 class StudentService:
     def __init__(
@@ -116,7 +155,7 @@ class StudentService:
     async def dashboard_student(self, dto: StudentDashboardRequest, student_id: int, user_id:int) -> StudentDashboardResponse:
         # Kasih Redis
         try:
-            classroom_info = await self.classroom_repo.get_classroom_student(dto.classroom_id, student_id)
+            classroom_info = await self.classroom_repo.get_classroom_info(dto.classroom_id, student_id, Role.STUDENT)
             tasks = await self.student_repo.get_task_counts(dto.classroom_id, student_id)
             profile = await self.user_repo.get_profile(user_id)
 

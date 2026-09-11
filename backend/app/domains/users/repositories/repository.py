@@ -10,6 +10,8 @@ from app.domains.users.models.student import Student
 from app.core.db import AsyncSession
 from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.domains.contents.models import Module, ModuleProgress, ModuleStatus
+from app.domains.classrooms.models.classroom import Classroom
+from app.domains.users.models.student import student_classrooms
 
 
 class UserRepository(UserRepositoryInterface):
@@ -62,6 +64,53 @@ class TeacherRepository(TeacherRepositoryInterface):
         self.db.add(teacher)
         await self.db.flush()
         return teacher
+    
+    async def get_dashboard(self, classroom_id:int, limit:int) -> dict:
+        modules_count = (
+            select(func.count(Module.id))
+            .where(Module.classroom_id == classroom_id, Module.status == ModuleStatus.PUBLISH, Module.deleted_at.is_(None))
+            .scalar_subquery()
+        )
+
+        # exams_count = 0
+
+        students_count = (
+            select(func.count(student_classrooms.c.student_id))
+            .where(student_classrooms.c.classroom_id == classroom_id)
+            .scalar_subquery()
+        )
+
+        summary_stmt = select(
+            modules_count.label("total_modules"),
+            # exams_count.label("total_exams"),
+            students_count.label("total_students"),
+        ).where(Classroom.id == classroom_id)
+
+        summary_res = (await self.db.execute(summary_stmt)).one_or_none()
+        if not summary_res:
+            return None
+
+        modules_stmt = (
+            select(Module)
+            .where(
+                Module.classroom_id == classroom_id,
+                Module.status == ModuleStatus.PUBLISH,
+                Module.deleted_at.is_(None)
+            )
+            .order_by(Module.created_at.desc())
+            .limit(limit)
+        )
+        newest_modules = (await self.db.scalars(modules_stmt)).all()
+
+        newest_exams = []
+
+        return {
+            "total_modules": summary_res.total_modules,
+            "total_exams": 0,
+            "total_students": summary_res.total_students,
+            "newest_modules": newest_modules,
+            "newest_exams": newest_exams,
+        }
 
 class StudentRepository(StudentRepositoryInterface):
     def __init__(self, db: AsyncSession):

@@ -11,6 +11,7 @@ from app.domains.contents.models.chapter_progress import ChapterProgress
 from app.core.exceptions import ForbiddenException
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.users.models.student import student_classrooms
+from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleStatus
 class ContentRepository(ContentRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -118,11 +119,41 @@ class ContentRepository(ContentRepositoryInterface):
         result = await self.db.scalars(stmt)
         return result.all()
 
+    async def get_all_modules_teachers(self, classroom_id:int, teacher_id:int, status: TeacherModuleStatus, search: str | None) -> Sequence[Module]: 
+        stmt = (
+            select(Module)
+            .join(Classroom, Classroom.id == Module.classroom_id)
+            .where(
+                Module.classroom_id == classroom_id,
+                Classroom.teacher_id == teacher_id,
+                )
+            )
+        
+        if status != TeacherModuleStatus.ALL:
+            stmt = stmt.where(Module.status == status)
+
+        if search:
+            stmt = stmt.where(Module.title.ilike(f"%{search.strip()}%"))
+
+        stmt = stmt.order_by(Module.id)
+        result = await self.db.scalars(stmt)
+        return result.all()
+    
     async def get_module_by_id(self, module_id: int) -> Module | None:
         return await self.db.get(Module, module_id)
 
-    async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, fase_id: int | None) -> Module:
-        new_module = Module(title=title, description=description, status=status.name, classroom_id=classroom_id, fase_id=fase_id)
+    async def create_module_teacher(self, title: str, description: str, status: ModuleStatus, classroom_id: int, teacher_id:int, fase_id: int | None) -> Module | None:
+        is_owner = await self.db.scalar(
+            select(
+                exists().where(
+                    Classroom.id == classroom_id,
+                    Classroom.teacher_id == teacher_id,
+                )
+            )
+        )
+        if not is_owner:
+            return None
+        new_module = Module(title=title, description=description, status=status.value, classroom_id=classroom_id, fase_id=fase_id)
         self.db.add(new_module)
         await self.db.flush()
         return new_module

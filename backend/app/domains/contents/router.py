@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 from pathlib import Path
 from typing import Annotated
-
+import json
 from fastapi import APIRouter, HTTPException, File, Form, UploadFile, Depends, status, Body, Path as FastAPIPath
+from fastapi.responses import StreamingResponse
+from redis.asyncio import Redis
 
 # Asumsikan import base response ini sudah Anda miliki di project
 from app.core.response import Response, get_response_message, COMMON_VALIDATION_RESPONSES
@@ -11,6 +14,8 @@ from app.core.route import WrappedRoute
 from app.core.security import Roles
 from app.utils import paths
 from app.utils.role import Role
+from app.tasks.mineru_tasks import process_mineru_job_task
+from app.core.exceptions import BadRequestException
 paths.setup()
 from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
 import regenerate
@@ -116,12 +121,12 @@ router_modules = APIRouter(prefix="/modules", tags=["modules"], route_class=Wrap
     responses=COMMON_VALIDATION_RESPONSES
 )
 async def create_module(
-    _: Roles(Role.TEACHER),
+    teacher : Roles(Role.TEACHER),
     payload: Annotated[ModuleCreate, Body()], 
     service: ContentService = Depends(get_content_service)
 ):
     try:
-        module = await service.create_module(payload.title, payload.description, payload.status, payload.classroom_id, payload.fase_id)
+        module = await service.create_module(payload.title, payload.description, payload.status, payload.classroom_id, teacher.profile_id, payload.fase_id)
         return Response(
             message=get_response_message(),
             data=module
@@ -147,25 +152,6 @@ async def list_modules(
         )
 
 
-# @router_modules.get(
-#     "/{module_id}/cp",
-#     response_model=Response[list[CpResponse]],
-#     status_code=status.HTTP_200_OK
-# )
-# async def list_module_cp(
-#     module_id: Annotated[int, FastAPIPath(title="The ID of the module")], 
-#     service: ContentService = Depends(get_content_service)
-# ):
-#     try:
-#         cps = await service.get_cps_by_module_id(module_id)
-#         return Response(
-#             message=get_response_message(),
-#             data=cps
-#         )
-#     except ValueError as e:
-#         raise HTTPException(status_code=404, detail=str(e))
-
-
 # ==========================================
 # CHAPTER ROUTER
 # ==========================================
@@ -181,14 +167,20 @@ router_chapters = APIRouter(prefix="/chapters", tags=["chapters"], route_class=W
 async def create_chapter(
     _: Roles(Role.TEACHER),
     data: Annotated[ChapterCreate, Depends()],
-    file: Annotated[UploadFile, File(...)],
+    file: Annotated[UploadFile, File(description="Single PDF file required")],
     content_service: ContentService = Depends(get_content_service),
     job_service: JobService = Depends(get_job_service)
 ):
-    # if start_page < 0 or end_page < start_page:
-    #     raise HTTPException(status_code=400, detail="rentang halaman tidak valid")
-
     try:
+        if not file.filename or file.filename.strip() == "":
+            raise BadRequestException(
+                detail="A file must be selected."
+            )
+        if file.content_type != "application/pdf":
+            raise BadRequestException(
+                detail="Only PDF files are allowed."
+            )
+        
         chapter_id = await content_service.validate_and_create_chapter(
             module_id=data.module_id, 
             cp_id=data.cp_id, 
@@ -197,21 +189,13 @@ async def create_chapter(
             source_file=file.filename
         )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise BadRequestException(status_code=400, detail=str(e))
 
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
     raw_path = UPLOAD_DIR / f"raw-{chapter_id}.pdf"
     
     content = await file.read()
     raw_path.write_bytes(content)
-
-    # cut_path = UPLOAD_DIR / f"{chapter_id}.pdf"
-    # try:
-        # pdf_cut.cut(raw_path, cut_path, start_page, end_page)
-    # except ValueError as exc:
-    #     raise HTTPException(status_code=400, detail=str(exc)) from exc
-    # finally:
-    #     raw_path.unlink(missing_ok=True)
 
     out_dir = Path(settings.OUTPUT_DIR) / str(chapter_id) 
     if out_dir.exists() and any(out_dir.iterdir()):
@@ -225,68 +209,76 @@ async def create_chapter(
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail="Gagal memasukkan job ke antrean")
+    
+    await process_mineru_job_task.kiq(
+        job_id=job_id,
+        pdf_path=str(raw_path),
+        out_dir=str(out_dir),
+        chapter_id=chapter_id
+    )
 
     return Response(
         message=get_response_message(),
         data={"chapter_id": chapter_id, "job_id": job_id, "status": "queued"}
     )
 
+@router_chapters.get(""
+"/jobs/{job_id}/stream",
+response_class=StreamingResponse,
+    summary="Stream job progress updates via SSE",
+    responses={
+        200: {
+            "description": "Server-Sent Events (SSE) real-time event stream",
+            "content": {
+                "text/event-stream": {
+                    "schema": {
+                        "type": "string",
+                        "example": '{"job_id": "09f9ed63", "status": "running", "progress": 50, "message": "Processing batch 1"}\n\n'
+                    }
+                }
+            }
+        }
+    }
+)
+async def stream_job_progress(job_id: int):
+    """Real-time SSE stream for monitoring MinerU job progress."""
+    async def event_generator():
+        redis = Redis.from_url(
+            settings.REDIS_URL,
+            decode_responses=True,
+            socket_keepalive=True
+        )
+        pubsub = redis.pubsub()
+        channel_name = f"job_progress:{job_id}"
+        
+        await pubsub.subscribe(channel_name)
 
-# @router_chapters.get(
-#     "/{chapter_id}",
-#     response_model=Response[ChapterResponse],
-#     status_code=status.HTTP_200_OK
-# )
-# async def get_chapter(
-#     chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
-#     service: ContentService = Depends(get_content_service)
-# ):
-#     chapter = await service.get_chapter_by_id(chapter_id)
-#     if chapter is None:
-#         raise HTTPException(status_code=404, detail="bab tidak ditemukan")
-    
-#     return Response(
-#         message=get_response_message(),
-#         data=chapter
-#     )
+        try:
+            while True:
+                # Listen for messages with a timeout to allow heartbeat checks
+                message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
+                if message and message["type"] == "message":
+                    data = message["data"]
+                    yield f"data: {data}\n\n"
 
+                    # Parse message to stop streaming when complete or failed
+                    parsed = json.loads(data)
+                    if parsed.get("status") in ("done", "failed"):
+                        break
 
-# @router_chapters.get(
-#     "/{chapter_id}/blocks",
-#     response_model=Response[list[BlockResponse]],
-#     status_code=status.HTTP_200_OK
-# )
-# async def list_blocks(
-#     chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
-#     service: ContentService = Depends(get_content_service)
-# ):
-#     blocks = await service.get_blocks_by_chapter(chapter_id)
-#     return Response(
-#         message=get_response_message(),
-#         data=blocks
-#     )
+                # Heartbeat to keep HTTP connection alive
+                yield ": ping\n\n"
+        finally:
+            await pubsub.unsubscribe(channel_name)
+            await pubsub.close()
+            await redis.aclose()
 
-
-# @router_chapters.get(
-#     "/{chapter_id}/status",
-#     response_model=Response[JobStatus],
-#     status_code=status.HTTP_200_OK
-# )
-# async def get_status(
-#     chapter_id: Annotated[int, FastAPIPath(title="The ID of the chapter")], 
-#     job_service: JobService = Depends(get_job_service)
-# ):
-#     job = await job_service.get_latest_job_for_chapter(chapter_id)
-#     if job is None:
-#         raise HTTPException(status_code=404, detail="belum ada proses untuk bab ini")
-    
-#     return Response(
-#         message=get_response_message(),
-#         data={
-#             "chapter_id": chapter_id,
-#             "job_id": job.id,
-#             "status": job.status,
-#             "error": job.error,
-#             "blocks_total": job.blocks_total,
-#         }
-#     )
+    return StreamingResponse(
+        event_generator(), 
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disables proxy buffering (NGINX)
+        }
+    )

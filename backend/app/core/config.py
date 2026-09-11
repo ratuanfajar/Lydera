@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 env_file = ".env.test" if os.getenv("APP_ENV") == "test" else ".env"
 load_dotenv(env_file)
 
-PROJECT_ROOT = Path(__file__).resolve().parents[4]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_AI_OUTPUT_DIR = PROJECT_ROOT / "ai-services" / "annotation" / "output"
 
 class Settings(BaseSettings):
@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     DB_USER: str = os.getenv("DB_USER")
     DB_PASSWORD: str = os.getenv("DB_PASSWORD")
     DB_URL: str = os.getenv("DB_URL")
+
+    # Redis
+    REDIS_URL: str = os.getenv("REDIS_URL")
 
     # JWT
     ACCESS_TOKEN_EXPIRE_DAY: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_DAY", 1))

@@ -34,6 +34,17 @@ class Module(Base):
             "status",
             "updated_at",
         ),
+        Index(
+            "ix_modules_classroom_status",
+            "classroom_id",
+            "status"
+        ),
+        Index(
+            "idx_modules_title_trgm",
+            "title",
+            postgresql_using="gin",
+            postgresql_ops={"title": "gin_trgm_ops"},
+        ),
     )
     
 

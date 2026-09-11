@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 
 from app.domains.classrooms.models.classroom_type import ClassroomType
 from app.domains.classrooms.models.classroom import Classroom
-from app.utils.role import Role
-from app.domains.classrooms.schemas import ClassroomCreate, ClassroomStudentResponse
+from app.utils.role import AllowedRole, Role
+from app.domains.classrooms.schemas import ClassroomCreate, ClassroomInfoResponse
 
 class ClassroomRepositoryInterface(ABC):
     @abstractmethod
@@ -23,7 +23,11 @@ class ClassroomRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_classroom_student(self, classroom_id: str, student_id: int) -> ClassroomStudentResponse:
+    async def get_classroom_info(self, classroom_id: str, student_id: int, role:Role) -> ClassroomInfoResponse | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def has_access(self, classroom_id: str, profile_id: int, role:AllowedRole) -> bool:
         raise NotImplementedError
 
 class ClassroomTypeRepositorInterface(ABC):

@@ -16,7 +16,7 @@ class Job(Base):
     blocks_total: Mapped[Optional[int]] = mapped_column(Integer)
 
     __table_args__ = (
-        CheckConstraint("status IN ('queued', 'running', 'done', 'failed')", name="check_job_status"),
+        CheckConstraint("status IN ('queued', 'running', 'retrying', 'done', 'failed')", name="check_job_status"),
         Index("ix_job_status", "status", "id"),
         Index("ix_job_chapter", "chapter_id", "id"),
     )

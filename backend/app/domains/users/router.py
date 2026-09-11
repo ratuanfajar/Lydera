@@ -15,6 +15,10 @@ from app.domains.contents.schemas.module.student_module_request import StudentMo
 from app.domains.contents.schemas.module.student_module_response import StudentModuleResponse
 from app.domains.contents.schemas.module.student_module_detail_request import StudentModuleDetailRequest
 from app.domains.contents.schemas.chapters.student_chapter_detail_response import StudentChapterDetailResponse
+from app.domains.users.schemas.taecher_dashboard_request import TeacherDashboardRequest
+from app.domains.users.schemas.taecher_dashboard_response import TeacherDashboardResponse
+from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
+from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse
 
 router_user = APIRouter(prefix="/users", tags=["users"], route_class=WrappedRoute)
 
@@ -71,6 +75,47 @@ async def register_teacher(
         data=teacher
     )
 
+
+@router_teacher.get(
+    "/dashboard",
+    response_model=Response[TeacherDashboardResponse],
+    description="Requires the STUDENT role.",
+)
+async def get_teacher_dashboard(
+    query: Annotated[TeacherDashboardRequest, Depends()],
+    teacher: Roles(Role.TEACHER),
+    service: TeacherService = Depends(get_teacher_service),
+):
+    result = await service.dashboard_teacher(
+        query,
+        teacher_id=teacher.profile_id,
+        user_id=int(teacher.sub)
+    )
+    return Response(
+        message="Berhasil mendapatkan dashboard",
+        data=result
+    )
+
+@router_teacher.get(
+    "/modules",
+    response_model=Response[list[TeacherModuleResponse]],
+    description="Requires the Teacher role.",
+)
+async def get_all_modules_teacher(
+    query: Annotated[TeacherModuleRequest, Depends()],
+    teacher: Roles(Role.TEACHER),
+    service: TeacherService = Depends(get_teacher_service),
+):    
+    result = await service.get_teacher_modules(
+        query,
+        teacher_id=teacher.profile_id
+    )
+    return Response(
+        message="Berhasil mendapatkan data modules",
+        data=result
+    )
+
+# Student
 router_student = APIRouter(prefix="/students", tags=["students"], route_class=WrappedRoute)
 
 @router_student.post(
@@ -184,7 +229,7 @@ async def get_detail_chapter_student(
         chapter_id=chapter_id
     )
     return Response(
-        message="Berhasil mendapatkan data detial chapter",
+        message="Berhasil mendapatkan data detail chapter",
         data=result
     )
 

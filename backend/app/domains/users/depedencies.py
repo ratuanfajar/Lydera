@@ -20,9 +20,11 @@ def get_teacher_repository(db: AsyncSession = Depends(get_db)) -> TeacherReposit
 def get_teacher_service(
     repo: TeacherRepository = Depends(get_teacher_repository),
     user_repo: UserRepository = Depends(get_user_repository),
+    classroom_repo: ClassroomRepository = Depends(get_classroom_repository),
+    content_repo: ContentRepository = Depends(get_content_repository),
     db: AsyncSession = Depends(get_db),
 ) -> TeacherService:
-    return TeacherService(user_repo, repo, db)
+    return TeacherService(user_repo, classroom_repo, repo, content_repo, db)
 
 def get_student_repository(db: AsyncSession = Depends(get_db)) -> StudentRepository:
     return StudentRepository(db)

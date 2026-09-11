@@ -24,6 +24,9 @@ class TeacherRepositoryInterface(ABC):
     @abstractmethod
     async def create_teacher(self, dto:TeacherCreate) -> Teacher:
         raise NotImplementedError
+    @abstractmethod
+    async def get_dashboard(self, classroom_id:int, limit:int) -> dict:
+        raise NotImplementedError
 
 class StudentRepositoryInterface(ABC):
     @abstractmethod

@@ -4,7 +4,7 @@ from app.core.response import set_response_message
 from app.domains.classrooms.repositories.repository import ClassroomRepositoryInterface, ClassroomTypeRepositorInterface
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.classrooms.models.classroom_type import ClassroomType
-from app.domains.classrooms.schemas import ClassroomCreate, ClassroomTypeResponse, ClassroomResponse, ClassroomStudentResponse
+from app.domains.classrooms.schemas import ClassroomCreate, ClassroomTypeResponse, ClassroomResponse, ClassroomInfoResponse
 from app.core.db import AsyncSession
 
 class ClassroomService:

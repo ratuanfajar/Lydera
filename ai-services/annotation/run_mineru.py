@@ -52,6 +52,93 @@ def build_command(pdf: Path, out: Path, *, backend: str, method: str, lang: str 
         cmd += ["-e", str(end)]
     return cmd
 
+import asyncio
+import re
+import sys
+from pathlib import Path
+
+# Add this async runner function to run_mineru.py:
+async def run_async(pdf: Path, out: Path, *, backend="pipeline", method="auto", lang=None,
+    start=None, end=None, no_formula=False, no_table=False,
+    device="auto", vram=None, keep_debug=False,
+    progress_callback=None
+) -> int:
+    """Jalankan MinerU secara asynchronous dengan SSE progress stream; bersihkan file debug; kembalikan return code."""
+    pdf = Path(pdf).resolve()
+    out = Path(out).resolve()
+    if not pdf.exists():
+        print(f"[ERROR] PDF tidak ditemukan: {pdf}", file=sys.stderr)
+        return 2
+    out.mkdir(parents=True, exist_ok=True)
+
+    resolved = resolve_device(device)
+    env = os.environ.copy()
+    env["MINERU_DEVICE_MODE"] = resolved
+    if vram is not None:
+        env["MINERU_VIRTUAL_VRAM_SIZE"] = str(vram)
+    if resolved.startswith("cuda") and not torch_sees_gpu():
+        print("[WARN] CUDA diminta tapi torch tidak melihat GPU; proses jatuh ke CPU.", file=sys.stderr)
+
+    cmd = build_command(pdf, out, backend=backend, method=method, lang=lang,
+                        start=None, end=None, no_formula=no_formula, no_table=no_table)
+    print(f"[INFO] device : {resolved}")
+    print(f"[INFO] jalan  : {' '.join(cmd)}")
+
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *cmd,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            env=env
+        )
+    except FileNotFoundError:
+        print("[ERROR] modul mineru tidak ditemukan. Jalankan lewat `uv run`.", file=sys.stderr)
+        return 127
+    
+    # Read stderr in real-time to capture tqdm output for SSE streaming
+    async for line_bytes in proc.stderr:
+        line = line_bytes.decode("utf-8", errors="ignore").strip()
+        if not line:
+            continue
+        print(line)
+        if not progress_callback:
+            continue
+
+        # Map MinerU pipeline stages to overall progress (5% to 70%)
+        if "Layout Predict:" in line:
+            if match := re.search(r"(\d+)%", line):
+                pct = int(match.group(1))
+                overall = 5 + int(pct * 0.25)  # Range: 5% -> 30%
+                await progress_callback(overall, f"Layout Predict: {pct}%")
+
+        elif "MFR Predict:" in line:
+            if match := re.search(r"(\d+)%", line):
+                pct = int(match.group(1))
+                overall = 30 + int(pct * 0.20)  # Range: 30% -> 50%
+                await progress_callback(overall, f"Formula Recognition: {pct}%")
+
+        elif "Processing pages:" in line or "OCR-det" in line:
+            if match := re.search(r"(\d+)%", line):
+                pct = int(match.group(1))
+                overall = 50 + int(pct * 0.20)  # Range: 50% -> 70%
+                await progress_callback(overall, f"Extracting Pages: {pct}%")
+
+    await proc.wait()
+
+    if proc.returncode != 0:
+        print(f"[ERROR] MinerU keluar dengan kode {proc.returncode}", file=sys.stderr)
+        return proc.returncode
+    
+    if not keep_debug:
+        removed = remove_debug_files(out, pdf.stem)
+        if removed:
+            print(f"[INFO] file debug dihapus: {len(removed)}")
+
+    for key, paths in find_kept_outputs(out, pdf.stem).items():
+        target = paths[0] if paths else None
+        print(f"[OK] {key}: {target if target else '(tidak ditemukan)'}")
+
+    return 0
 
 def run(pdf: Path, out: Path, *, backend="pipeline", method="auto", lang=None,
         start=None, end=None, no_formula=False, no_table=False,
