@@ -1,8 +1,8 @@
-"""fix name table module progress
+"""update blocks
 
-Revision ID: 9c8d3a181ca6
+Revision ID: 7064988515c2
 Revises: 
-Create Date: 2026-09-10 19:46:37.485383
+Create Date: 2026-09-12 15:12:08.797343
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9c8d3a181ca6'
+revision: str = '7064988515c2'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -140,8 +140,10 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['fase_id'], ['fase.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_index('idx_modules_title_trgm', 'modules', ['title'], unique=False, postgresql_using='gin', postgresql_ops={'title': 'gin_trgm_ops'})
     op.create_index(op.f('ix_modules_classroom_id'), 'modules', ['classroom_id'], unique=False)
-    op.create_index('ix_modules_published_classroom', 'modules', ['classroom_id'], unique=False, postgresql_where=sa.text("status = 'PUBLISH'"))
+    op.create_index('ix_modules_classroom_status', 'modules', ['classroom_id', 'status'], unique=False)
+    op.create_index('ix_modules_classroom_status_updated', 'modules', ['classroom_id', 'status', 'updated_at'], unique=False)
     op.create_table('student_classrooms',
     sa.Column('student_id', sa.Integer(), nullable=False),
     sa.Column('classroom_id', sa.Integer(), nullable=False),
@@ -149,7 +151,6 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['student_id'], ['students.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('student_id', 'classroom_id')
     )
-    op.create_index('idx_student_classrooms_student_classroom', 'student_classrooms', ['student_id', 'classroom_id'], unique=False)
     op.create_table('chapters',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('module_id', sa.Integer(), nullable=False),
@@ -165,6 +166,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_chapter_module', 'chapters', ['module_id', 'number'], unique=False)
+    op.create_index(op.f('ix_chapters_module_id'), 'chapters', ['module_id'], unique=False)
     op.create_table('modules_progress',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
@@ -175,7 +177,7 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['module_id'], ['modules.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['student_id'], ['users.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['student_id'], ['students.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('student_id', 'module_id', name='uq_student_module_progress')
     )
@@ -202,6 +204,7 @@ def upgrade() -> None:
     op.create_table('blocks',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('chapter_id', sa.Integer(), nullable=False),
+    sa.Column('previous_text', sa.Text(), nullable=True),
     sa.Column('reading_order', sa.Integer(), nullable=False),
     sa.Column('block_type', sa.Text(), nullable=False),
     sa.Column('readable_text', sa.Text(), nullable=False),
@@ -230,9 +233,9 @@ def upgrade() -> None:
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['chapter_id'], ['chapters.id'], ),
     sa.ForeignKeyConstraint(['student_id'], ['students.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('student_id', 'chapter_id', name='uq_student_chapter_progress')
+    sa.PrimaryKeyConstraint('id')
     )
+    op.create_index('ix_chapter_progress_user_chapter', 'chapters_progress', ['student_id', 'chapter_id'], unique=True)
     op.create_table('jobs',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('chapter_id', sa.Integer(), nullable=False),
@@ -244,7 +247,7 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
-    sa.CheckConstraint("status IN ('queued', 'running', 'done', 'failed')", name='check_job_status'),
+    sa.CheckConstraint("status IN ('queued', 'running', 'retrying', 'done', 'failed')", name='check_job_status'),
     sa.ForeignKeyConstraint(['chapter_id'], ['chapters.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -356,6 +359,7 @@ def downgrade() -> None:
     op.drop_index('ix_job_status', table_name='jobs')
     op.drop_index('ix_job_chapter', table_name='jobs')
     op.drop_table('jobs')
+    op.drop_index('ix_chapter_progress_user_chapter', table_name='chapters_progress')
     op.drop_table('chapters_progress')
     op.drop_index('ix_block_chapter_order', table_name='blocks')
     op.drop_table('blocks')
@@ -365,12 +369,14 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_modules_progress_student_id'), table_name='modules_progress')
     op.drop_index(op.f('ix_modules_progress_module_id'), table_name='modules_progress')
     op.drop_table('modules_progress')
+    op.drop_index(op.f('ix_chapters_module_id'), table_name='chapters')
     op.drop_index('ix_chapter_module', table_name='chapters')
     op.drop_table('chapters')
-    op.drop_index('idx_student_classrooms_student_classroom', table_name='student_classrooms')
     op.drop_table('student_classrooms')
-    op.drop_index('ix_modules_published_classroom', table_name='modules', postgresql_where=sa.text("status = 'PUBLISH'"))
+    op.drop_index('ix_modules_classroom_status_updated', table_name='modules')
+    op.drop_index('ix_modules_classroom_status', table_name='modules')
     op.drop_index(op.f('ix_modules_classroom_id'), table_name='modules')
+    op.drop_index('idx_modules_title_trgm', table_name='modules', postgresql_using='gin', postgresql_ops={'title': 'gin_trgm_ops'})
     op.drop_table('modules')
     op.drop_index(op.f('ix_classrooms_teacher_id'), table_name='classrooms')
     op.drop_index(op.f('ix_classrooms_code'), table_name='classrooms')
