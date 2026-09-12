@@ -4,7 +4,7 @@ import asyncio
 from pathlib import Path
 from typing import Annotated
 import json
-from fastapi import APIRouter, HTTPException, File, Form, UploadFile, Depends, status, Body, Path as FastAPIPath
+from fastapi import APIRouter, HTTPException, File, Form, Query, UploadFile, Depends, status, Body, Path as FastAPIPath
 from fastapi.responses import StreamingResponse
 from redis.asyncio import Redis
 
@@ -16,6 +16,9 @@ from app.utils import paths
 from app.utils.role import Role
 from app.tasks.mineru_tasks import process_mineru_job_task
 from app.core.exceptions import BadRequestException
+from app.domains.contents.schemas.blocks.block_review_response import BlockPreviewResponse
+from app.domains.contents.schemas.chapters.ingest_annonated_request import IngestAnnotatedRequest
+from app.tasks.progress_tasks import enqueue_module_progress_job
 paths.setup()
 from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
 import regenerate
@@ -62,8 +65,9 @@ async def regenerate_block(
     block = await content_service.get_block_by_id(block_id)
     if not block:
         raise HTTPException(status_code=404, detail="blok tidak ditemukan")
+    
     if block.block_type not in ("formula", "table", "image"):
-        raise HTTPException(status_code=400, detail=f"regenerasi tidak berlaku untuk block_type={block.block_type}")
+        await content_service.update_block_text(block_id, payload.feedback)
 
     image_path = None
     if block.image_file:
@@ -134,23 +138,22 @@ async def create_module(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
-@router_modules.get(
-    "",
-    description="Requires the ADMIN role.",
-    response_model=Response[list[ModuleResponse]],
+@router_modules.post(
+    "/publish/{module_id}",
+    description="Requires the TEACHER role",
+    response_model=Response[bool],
     status_code=status.HTTP_200_OK
 )
-async def list_modules(
-    _: Roles(Role.ADMIN),
-    service: ContentService = Depends(get_content_service)
-    ):
-        modules = await service.get_all_modules()
-        return Response(
-            message=get_response_message(),
-            data=modules
-        )
-
+async def publish_module(
+    module_id: int,
+    teacher: Roles(Role.TEACHER),
+    service: ContentService = Depends(get_content_service),
+):
+    result = await service.publish_module(module_id, teacher.profile_id)
+    return Response(
+        message="Berhasil publish",
+        data=result
+    )
 
 # ==========================================
 # CHAPTER ROUTER
@@ -216,11 +219,60 @@ async def create_chapter(
         out_dir=str(out_dir),
         chapter_id=chapter_id
     )
-
+    await enqueue_module_progress_job(data.module_id)
     return Response(
         message=get_response_message(),
         data={"chapter_id": chapter_id, "job_id": job_id, "status": "queued"}
     )
+
+# Sementara
+@router_chapters.get(
+    "/preview",
+    description="Requires the TEACHER role.",
+    response_model=Response[list[BlockPreviewResponse]],
+    status_code=status.HTTP_201_CREATED,
+    responses=COMMON_VALIDATION_RESPONSES
+)
+async def preview_chapter(
+    annotation_path: Annotated[
+        str,
+        Query(
+            description="Relative path to the annotated JSON file",
+            examples=["16/raw-16/auto/annotated.json"],
+        ),
+    ],
+    _: Roles(Role.TEACHER),
+    content_service: ContentService = Depends(get_content_service),
+):
+    return Response(
+        message="Chapter preview loaded successfully",
+        data=content_service.load_preview(annotation_path)
+        )
+
+@router_chapters.post(
+    "/confirm/{chapter_id}",
+    description="Requires the TEACHER role.",
+    response_model=Response[int],
+    status_code=status.HTTP_201_CREATED,
+    responses=COMMON_VALIDATION_RESPONSES
+)
+async def confirm_chapter(
+    annotation_path: Annotated[
+        IngestAnnotatedRequest,
+        Body(
+            description="Relative path to the annotated JSON file",
+            examples=["16/raw-16/auto/annotated.json"],
+        ),
+    ],
+    chapter_id: int,
+    teacher: Roles(Role.TEACHER),
+    content_service: ContentService = Depends(get_content_service),
+):
+    result = await content_service.ingest_annotated_json(annotation_path.annotation_path, chapter_id, teacher.profile_id)
+    return Response(
+        message="Chapter berhasil disimpan di module",
+        data=result
+)
 
 @router_chapters.get(""
 "/jobs/{job_id}/stream",

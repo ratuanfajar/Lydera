@@ -35,7 +35,6 @@ def run(outputs_dir) -> list[Path]:
         
     return annotated_files
 
-
 def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description="Annotate semua window satu bab (tanpa ingest ke DB).")
     ap.add_argument("--outputs", required=True, help="folder output batch untuk satu bab")

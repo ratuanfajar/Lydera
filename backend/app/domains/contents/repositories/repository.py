@@ -1,7 +1,11 @@
-from sqlalchemy import exists, func, insert, or_, select, update
-from typing import Sequence
+from datetime import datetime, timezone
 
-from sqlalchemy.orm import contains_eager
+from sqlalchemy import exists, func, or_, select, update
+from typing import Sequence
+from sqlalchemy.dialects.postgresql import insert
+
+from app.tasks.progress_tasks import enqueue_module_progress_job
+from sqlalchemy.orm import contains_eager, selectinload
 from app.domains.contents.models import Block, Module, Chapter, Fase, Cp, ModuleStatus
 from app.domains.contents.repositories.interface import ContentRepositoryInterface
 from app.core.db import AsyncSession
@@ -27,7 +31,7 @@ class ContentRepository(ContentRepositoryInterface):
         await self.db.flush()
 
     async def student_get_blocks_by_chapter_id(self, chapter_id: int, student_id:int) -> Chapter | None:
-        has_access = await self.repo.validate_student_chapter_access(chapter_id, student_id)
+        has_access = await self.validate_student_chapter_access(chapter_id, student_id)
         if not has_access:
             raise ForbiddenException(
                 detail="Anda tidak memiliki akses ke chapter ini."
@@ -43,7 +47,6 @@ class ContentRepository(ContentRepositoryInterface):
             )
             .order_by(Block.reading_order)
         )
-
         result = await self.db.scalars(stmt)
         return result.unique().first()
 
@@ -57,24 +60,35 @@ class ContentRepository(ContentRepositoryInterface):
         return result.all()
 
     # Module
-    async def get_all_modules_student(self, classroom_id: int, student_id: int, status:StudentModuleStatus = StudentModuleStatus.NOT_DONE) -> Sequence[Module]:
+    async def get_all_modules_student(
+    self,
+    classroom_id: int,
+    student_id: int,
+    status: StudentModuleStatus = StudentModuleStatus.NOT_DONE,
+    ) -> Sequence[Module]:
         stmt = (
             select(Module)
             .outerjoin(
                 ModuleProgress,
-                (ModuleProgress.module_id == Module.id) & (ModuleProgress.student_id == student_id),
+                (ModuleProgress.module_id == Module.id)
+                & (ModuleProgress.student_id == student_id),
             )
-            .options(contains_eager(Module.module_progress))
+            .options(
+                contains_eager(Module.module_progress),
+            )
             .where(
                 Module.classroom_id == classroom_id,
-                Module.status == ModuleStatus.PUBLISH
+                Module.status == ModuleStatus.PUBLISH,
             )
             .order_by(Module.updated_at)
         )
 
         match status:
             case StudentModuleStatus.DONE:
-                stmt = stmt.where(ModuleProgress.is_done.is_(True))
+                stmt = stmt.where(
+                    ModuleProgress.is_done.is_(True)
+                )
+
             case StudentModuleStatus.NOT_DONE:
                 stmt = stmt.where(
                     or_(
@@ -82,15 +96,20 @@ class ContentRepository(ContentRepositoryInterface):
                         ModuleProgress.is_done.is_(False),
                     )
                 )
+
             case StudentModuleStatus.ALL:
                 pass
-    
+
         result = await self.db.scalars(stmt)
+
         return result.unique().all()
 
     async def get_detail_module_student(self, module_id:int, classroom_id: int, student_id: int) -> Module | None: 
         stmt = (
             select(Module)
+            .options(
+                selectinload(Module.module_progress)
+            )       
             .outerjoin(Module.chapters)
             .outerjoin(
                 ChapterProgress,
@@ -114,11 +133,6 @@ class ContentRepository(ContentRepositoryInterface):
     async def get_module_by_id(self, module_id: int) -> Module | None:
         return await self.db.get(Module, module_id)
     
-    async def get_all_modules(self) -> Sequence[Module]:
-        stmt = select(Module).order_by(Module.id)
-        result = await self.db.scalars(stmt)
-        return result.all()
-
     async def get_all_modules_teachers(self, classroom_id:int, teacher_id:int, status: TeacherModuleStatus, search: str | None) -> Sequence[Module]: 
         stmt = (
             select(Module)
@@ -138,6 +152,26 @@ class ContentRepository(ContentRepositoryInterface):
         stmt = stmt.order_by(Module.id)
         result = await self.db.scalars(stmt)
         return result.all()
+
+    async def get_detail_module_teacher(self, module_id:int, classroom_id: int, teacher_id: int) -> Module | None: 
+        stmt = (
+                select(Module)    
+                .join(Classroom, Module.classroom_id == Classroom.id)
+                .outerjoin(Module.chapters)
+                .options(
+                    contains_eager(Module.chapters)
+                )
+                .where(
+                    Module.id == module_id,
+                    Module.classroom_id == classroom_id,
+                    Classroom.teacher_id == teacher_id,
+                )
+                .order_by(Chapter.number) 
+            )
+        
+        result = await self.db.scalars(stmt)
+        module = result.unique().first()
+        return module
     
     async def get_module_by_id(self, module_id: int) -> Module | None:
         return await self.db.get(Module, module_id)
@@ -158,6 +192,43 @@ class ContentRepository(ContentRepositoryInterface):
         await self.db.flush()
         return new_module
 
+    async def publish_module(self, module_id:int, teacher_id:int) -> True: 
+        ownership_stmt = (
+            select(Module)
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(
+                Module.id == module_id,
+                Classroom.teacher_id == teacher_id
+            )
+        )
+        result = await self.db.execute(ownership_stmt)
+        module = result.scalar_one_or_none()
+        if not module:
+            return False
+        module.status = ModuleStatus.PUBLISH
+        await self.db.commit()
+
+        return True
+
+    async def verify_chapter_teacher(
+        self,
+        chapter_id: int,
+        teacher_id: int,
+    ) -> bool:
+        stmt = (
+            select(Chapter.id)
+            .join(Module, Module.id == Chapter.module_id)
+            .join(Classroom, Classroom.id == Module.classroom_id)
+            .where(
+                Chapter.id == chapter_id,
+                Classroom.teacher_id == teacher_id,
+            )
+        )
+
+        result = await self.db.execute(stmt)
+
+        return result.scalar_one_or_none() is not None
+
     # Cps
     async def get_cps_by_fase_id(self, fase_id: int) -> Sequence[Cp]:
         stmt = select(Cp).where(Cp.fase_id == fase_id).order_by(Cp.domain)
@@ -169,16 +240,16 @@ class ContentRepository(ContentRepositoryInterface):
 
     # Chapter
     async def student_upsert_chapter_progress(self, student_id: int, chapter_id: int) -> bool:
+        completed_at = datetime.now(timezone.utc)
         stmt = (
             insert(ChapterProgress)
             .values(
                 student_id=student_id,
                 chapter_id=chapter_id,
-                is_done=False
+                is_done=True,
+                completed_at=datetime.now(timezone.utc),
             )
-            .on_conflict_do_nothing(
-                index_elements=["student_id", "chapter_id"]
-            )
+            .on_conflict_do_update( index_elements=["student_id", "chapter_id"], set_={ "is_done": True, "completed_at": completed_at, }, )
             .returning(ChapterProgress.id) 
         )
     
@@ -198,8 +269,22 @@ class ContentRepository(ContentRepositoryInterface):
         await self.db.flush()
         return new_chapter.id
 
-    async def get_chapter_by_id(self, chapter_id: int) -> Chapter | None:
-        return await self.db.get(Chapter, chapter_id)
+    async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> Chapter | None:
+        stmt = (
+            select(Chapter)
+            .join(Module, Chapter.module_id == Module.id)
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(
+                Chapter.id == chapter_id,
+                Classroom.teacher_id == teacher_id,
+            )
+            .options(
+                selectinload(Chapter.blocks)
+            )
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+        
 
     async def student_update_chapter_progress(self, chapter_id: int, student_id:int) -> bool:
         stmt = (
@@ -215,9 +300,54 @@ class ContentRepository(ContentRepositoryInterface):
             .returning(ChapterProgress.id)
         ) 
         result = await self.db.execute(stmt)
-        updated_id = result.scalar_one_or_none()
+        chapter_progress_id = result.scalar_one_or_none()
+        if chapter_progress_id is None: 
+            return False
+        module_stmt = ( select(Chapter.module_id) .where(Chapter.id == chapter_id) )
+        module_id = await self.db.scalar(module_stmt) 
+        if module_id is None: 
+            return False 
+
+        total_chapters_stmt = (
+            select(func.count(Chapter.id))
+            .where(
+                Chapter.module_id == module_id
+            )
+        )
+        total_chapters = await self.db.scalar( 
+            total_chapters_stmt
+        ) or 0
+        completed_chapters_stmt = ( 
+            select(func.count(ChapterProgress.id)) 
+            .join( Chapter, Chapter.id == ChapterProgress.chapter_id, ) 
+            .where( 
+                Chapter.module_id == module_id, ChapterProgress.student_id == student_id, ChapterProgress.is_done.is_(True), 
+            ) 
+        ) 
+        completed_chapters = await self.db.scalar( completed_chapters_stmt ) or 0 
+    
+        if total_chapters == 0: 
+            progress_percentage = 0 
+            is_done = False 
+
+        else:
+            progress_percentage = round(
+             (completed_chapters / total_chapters) * 100 
+            ) 
+            is_done = completed_chapters >= total_chapters 
         
-        return updated_id is not None
+        module_progress_stmt = ( 
+            insert(ModuleProgress) 
+            .values( 
+                student_id=student_id, module_id=module_id, progress_percentage=progress_percentage, is_done=is_done, 
+                ) 
+                .on_conflict_do_update( 
+                    index_elements=[ "student_id", "module_id", ], set_={ "progress_percentage": progress_percentage, "is_done": is_done, }, 
+                    ) 
+                ) 
+        await self.db.execute(module_progress_stmt) 
+
+        return True
         
     
     async def validate_student_chapter_access(

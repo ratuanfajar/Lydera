@@ -23,7 +23,7 @@ MAX_RETRIES = 3
 
 _last_progress_map: dict[int, int] = {}
 
-async def publish_progress(redis: Redis, job_id: int, status: str, progress:int, message: str):
+async def publish_progress(redis: Redis, job_id: int, status: str, progress:int, message: str, annotation_paths: list[str] = []):
     """Helper to publish real-time progress events to Redis Pub/Sub with monotonic progress safeguard."""
     global _last_progress_map
 
@@ -40,7 +40,8 @@ async def publish_progress(redis: Redis, job_id: int, status: str, progress:int,
         "job_id": job_id,
         "status": status,
         "progress": progress,
-        "message": message
+        "message": message,
+        "annotation_paths":annotation_paths
     })
 
     await redis.publish(f"job_progress:{job_id}", payload)
@@ -67,64 +68,69 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
         try:
             # All in One
             # 1. Real-time progress callback for MinerU execution
-            # async def report_progress(percent: int, message: str):
-            #     await publish_progress(redis, job_id, "running", percent, message)
+            async def report_progress(percent: int, message: str):
+                await publish_progress(redis, job_id, "running", percent, message)
 
-            # rc = await run_mineru.run_async(
-            #     pdf=pdf_path,
-            #     out=out_dir,
-            #     progress_callback=report_progress
-            # )
-            # if rc != 0:
-            #     raise RuntimeError(f"MinerU extraction failed with return code {rc}")
-
-            windows = batch.plan(Path(pdf_path), Path(out_dir), batch.DEFAULT_MAX_PAGES)
-            total_windows = len(windows)
+            rc = await run_mineru.run_async(
+                pdf=pdf_path,
+                out=out_dir,
+                progress_callback=report_progress
+            )
+            if rc != 0:
+                raise RuntimeError(f"MinerU extraction failed with return code {rc}")
 
             # Batch using run
-            for idx, w in enumerate(windows):
-                # Execute blocking run() in a separate thread pool
-                rc = await asyncio.to_thread(
-                    run_mineru.run,
-                    pdf=pdf_path,
-                    out=w.out_dir,
-                    start=w.start_page,
-                    end=w.end_page
-                )
+            # windows = batch.plan(Path(pdf_path), Path(out_dir), batch.DEFAULT_MAX_PAGES)
+            # total_windows = len(windows)
+            # for idx, w in enumerate(windows):
+            #     # Execute blocking run() in a separate thread pool
+            #     rc = await asyncio.to_thread(
+            #         run_mineru.run,
+            #         pdf=pdf_path,
+            #         out=w.out_dir,
+            #         start=w.start_page,
+            #         end=w.end_page
+            #     )
 
-                if rc != 0:
-                    raise RuntimeError(f"MinerU extraction failed on batch window {w.label} (code {rc})")
+            #     if rc != 0:
+            #         raise RuntimeError(f"MinerU extraction failed on batch window {w.label} (code {rc})")
 
-            # Publish progress step AFTER each batch completes
-                window_span = 70.0 / total_windows
-                overall_progress = 5 + int((idx + 1) * window_span)
-                await publish_progress(
-                    redis, 
-                    job_id, 
-                    "running", 
-                    overall_progress, 
-                    f"Completed batch {idx + 1}/{total_windows} (Pages {w.start_page}–{w.end_page})"
-                )
+            # # Publish progress step AFTER each batch completes
+            #     window_span = 70.0 / total_windows
+            #     overall_progress = 5 + int((idx + 1) * window_span)
+            #     await publish_progress(
+            #         redis, 
+            #         job_id, 
+            #         "running", 
+            #         overall_progress, 
+            #         f"Completed batch {idx + 1}/{total_windows} (Pages {w.start_page}–{w.end_page})"
+            #     )
     
             # 2. Run Pipeline aggregation
             await publish_progress(redis, job_id, "running", 75, "Aggregating extracted output...")
             list_json_paths = await asyncio.to_thread(pipeline.run, out_dir)
 
-            # 3. Database Ingestion
-            await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
-            content_repo = ContentRepository(db)
-            content_service = ContentService(content_repo, db)
+            # # 3. Database Ingestion
+            # await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
+            # content_repo = ContentRepository(db)
+            # content_service = ContentService(content_repo, db)
 
             total_blocks = 0
             for json_path in list_json_paths:
-                blocks_inserted = await content_service.ingest_annotated_json(json_path, chapter_id)
-                total_blocks += blocks_inserted
+                # blocks_inserted = await content_service.ingest_annotated_json(json_path, chapter_id)
+                # total_blocks += blocks_inserted
+                total_blocks += 1
+            annotation_output_dir = Path(out_dir).parent
+            relative_json_paths = [
+                Path(path).relative_to(Path(annotation_output_dir)).as_posix()
+                for path in list_json_paths
+            ]
 
             # 4. Success
+            annotation_paths = [str(path) for path in list_json_paths]
             await repo.update_job_status(job, "done", blocks_total=total_blocks)
             await db.commit()
-            await publish_progress(redis, job_id, "done", 100, f"Successfully processed {total_blocks} blocks.")
-
+            await publish_progress(redis, job_id, "done", 100, f"Successfully processed {total_blocks} blocks.", relative_json_paths)
                 
         except Exception as exc:
             traceback.print_exc()

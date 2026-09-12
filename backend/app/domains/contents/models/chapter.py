@@ -10,7 +10,7 @@ class Chapter(Base):
     __tablename__ = "chapters"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    module_id: Mapped[int] = mapped_column(ForeignKey("modules.id", ondelete="CASCADE"), nullable=False)
+    module_id: Mapped[int] = mapped_column(ForeignKey("modules.id", ondelete="CASCADE"), nullable=False, index=True)
     number: Mapped[Optional[int]] = mapped_column(Integer)
     title: Mapped[Optional[str]] = mapped_column(Text)
     source_file: Mapped[Optional[str]] = mapped_column(Text)

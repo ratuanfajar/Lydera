@@ -25,4 +25,3 @@ class ModuleProgress(Base):
     student: Mapped["Student"] = relationship(
             back_populates="module_progress"
     )
-

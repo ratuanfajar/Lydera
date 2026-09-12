@@ -12,13 +12,16 @@ from app.utils.role import Role
 from app.domains.users.schemas.student_tasks_request import StudentTaskRequest
 from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.domains.contents.schemas.module.student_module_request import StudentModuleRequest
-from app.domains.contents.schemas.module.student_module_response import StudentModuleResponse
+from app.domains.contents.schemas.module.student_module_response import StudentModuleResponse, StudentModuleWithoutChaptersResponse
 from app.domains.contents.schemas.module.student_module_detail_request import StudentModuleDetailRequest
 from app.domains.contents.schemas.chapters.student_chapter_detail_response import StudentChapterDetailResponse
 from app.domains.users.schemas.taecher_dashboard_request import TeacherDashboardRequest
 from app.domains.users.schemas.taecher_dashboard_response import TeacherDashboardResponse
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
 from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse
+from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
+from app.domains.contents.schemas.blocks.block_response import BlockResponse
+from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
 
 router_user = APIRouter(prefix="/users", tags=["users"], route_class=WrappedRoute)
 
@@ -115,6 +118,45 @@ async def get_all_modules_teacher(
         data=result
     )
 
+@router_teacher.get(
+    "/modules/{module_id}",
+    response_model=Response[TeacherModuleResponse],
+    description="Requires the Teacher role.",
+)
+async def get_module_teacher(
+    query: Annotated[TeacherModuleDetailRequest, Depends()],
+    teacher: Roles(Role.TEACHER),
+    module_id:int,
+    service: TeacherService = Depends(get_teacher_service),
+):    
+    result = await service.get_teacher_module(
+        query,
+        module_id,
+        teacher_id=teacher.profile_id
+    )
+    return Response(
+        message="Berhasil mendapatkan data modules",
+        data=result
+    )
+
+@router_teacher.get(
+    "/chapters/{chapter_id}",
+    description="Requires the TEACHER role.",
+    response_model=Response[ChapterDetailResponse],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES
+)
+async def get_chapter_by_id(
+    chapter_id: int,
+    teacher: Roles(Role.TEACHER),
+    teacher_service: TeacherService = Depends(get_teacher_service),
+):
+    result = await teacher_service.get_chapter_by_id(chapter_id, teacher.profile_id)
+    return Response(
+        message="Chapter berhasil didapat",
+        data=result
+)
+
 # Student
 router_student = APIRouter(prefix="/students", tags=["students"], route_class=WrappedRoute)
 
@@ -176,7 +218,7 @@ async def get_student_dashboard_task(
 
 @router_student.get(
     "/modules",
-    response_model=Response[list[StudentModuleResponse]],
+    response_model=Response[list[StudentModuleWithoutChaptersResponse]],
     description="Requires the STUDENT role.",
 )
 async def get_all_modules_student(
@@ -235,7 +277,7 @@ async def get_detail_chapter_student(
 
 @router_student.post(
     "/chapters/{chapter_id}/mark-complete",
-    response_model=Response[StudentModuleResponse],
+    response_model=Response[bool],
     description="Requires the STUDENT role.",
 )
 async def mark_chapter(

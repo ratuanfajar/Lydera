@@ -1,0 +1,425 @@
+[
+    {
+        "type": "text",
+        "text": "3. Komposisi Fungsi",
+        "text_level": 2,
+        "bbox": [
+            166,
+            103,
+            407,
+            125
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Potongan harga dan diskon merupakan hal yang biasa ditemui dalam kehidupan sehari-hari. Misalkan, sebuah toko memberikan penawaran khusus akhir pekan dengan dua pilihan. Pilihan pertama ialah “diskon 20%” terhadap semua barang dengan tambahan potongan harga sebesar Rp25.000,00 setelah diskon 20%. Sedangkan pilihan kedua adalah potongan harga sebesar Rp25.000,00 dilanjutkan diskon 20% setelah potongan harga. Apakah kedua pilihan penawaran tersebut sama? Jika tidak, pilihan mana yang lebih menguntungkan untuk pembeli?",
+        "bbox": [
+            165,
+            135,
+            858,
+            278
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pertanyaan tersebut dapat kalian jawab dengan memahami konsep komposisi fungsi.",
+        "bbox": [
+            166,
+            286,
+            856,
+            305
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "EkSplorasi 1.3",
+        "text_level": 2,
+        "bbox": [
+            176,
+            333,
+            341,
+            354
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Masalah Pertama",
+        "text_level": 2,
+        "bbox": [
+            166,
+            376,
+            322,
+            393
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan gambar di bawah ini. Sebuah toko memberikan diskon 20% dan potongan harga Rp25.000,00 untuk suatu produk tertentu.",
+        "bbox": [
+            166,
+            403,
+            856,
+            443
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/de4e10603ec8c38c242fde742db0a4c3c394ed4b02e810ecf1af5e0dc1409b67.jpg",
+        "image_caption": [
+            "Gambar 1.19 Diskon dalam Persen dan Potongan Harga"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            412,
+            455,
+            612,
+            646
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "table",
+        "img_path": "images/921f6c879e20749ade8513a66ef012f94e784e5efc7cd10f11e2a72c47d21247.jpg",
+        "table_caption": [
+            "a. Lengkapi tabel di bawah ini."
+        ],
+        "table_footnote": [],
+        "table_body": "<table><tr><td rowspan=1 colspan=1>Harga awal</td><td rowspan=1 colspan=1>Diskon20%</td><td rowspan=1 colspan=1>PotonganRp25.000,00</td><td rowspan=1 colspan=1>Hargaakhir</td></tr><tr><td rowspan=1 colspan=1>Rp100.000,00</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>Rp150.000,00</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>Rp200.000,00</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>Rp250.000,00</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr><tr><td rowspan=1 colspan=1>x</td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td><td rowspan=1 colspan=1></td></tr></table>",
+        "bbox": [
+            244,
+            705,
+            752,
+            879
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "25",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Apakah kalian sudah memahami cara menyelesaikan soal tersebut? Coba buatlah pernyataan fungsi untuk masalah serupa di bawah ini. Jika harga awal adalah x dan harga akhir atau nilai fungsi $f ( x ) \\ = \\ y$ , nyatakan y sebagai suatu fungsi yang memodelkan diskon 30% dilanjutkan dengan potongan harga sebesar Rp10.000,00.",
+        "bbox": [
+            141,
+            103,
+            831,
+            205
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Masalah Kedua",
+        "text_level": 2,
+        "bbox": [
+            141,
+            233,
+            280,
+            251
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Toko sering memberikan diskon ganda seperti yang ditunjukkan oleh gambar di bawah ini. Harga suatu produk diberi diskon 50% kemudian diberikan diskon lagi 10%.",
+        "bbox": [
+            141,
+            260,
+            831,
+            320
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/5841e71972470ad8a6ba50b379366838589a8a11a5b0baf246e8dee5aa4c45f5.jpg",
+        "image_caption": [
+            "Gambar 1.20 Diskon Ganda"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            353,
+            337,
+            499
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Gambarkan mesin fungsi yang menunjukkan pemahaman diskon ganda ini dengan x merupakan harga sebelum diskon ganda dan y adalah harga sesudah diskon ganda. Nyatakan fungsi pertama sebagai $f ( x )$ dan fungsi kedua sebagai $g ( x )$ . Tuliskan hasil akhir sebagai dari operasi kedua fungsi terhadap masukan x.",
+        "bbox": [
+            348,
+            331,
+            831,
+            472
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Jika harga barang yang mengalami diskon ganda berkisar dari Rp100.000,00 s.d. Rp1.000.000,00 tentukan domain dan range dari fungsi yang merepresentasikan masalah ini.",
+        "bbox": [
+            350,
+            478,
+            831,
+            558
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Kalian perhatikan bahwa dalam menyelesaikan kedua masalah di atas kalian mengoperasikan fungsi pertama dengan masukan adalah harga awal penjualan kemudian hasil fungsi pertama dioperasikan dalam fungsi kedua untuk mendapatkan harga akhir.",
+        "bbox": [
+            139,
+            564,
+            831,
+            645
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Definisi Komposisi Fungsi",
+        "text_level": 2,
+        "bbox": [
+            141,
+            680,
+            398,
+            699
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Jika $g : A  B$ dan $f : B \\to C$ merupakan dua fungsi maka komposisi keduanya $f \\left( g \\left( x \\right) \\right)$ dinyatakan dengan notasi $( f \\circ g ) ( x )$ adalah fungsi dari domain A ke kodomain C. Komposisi dua fungsi dapat dipahami melalui diagram panah berikut:",
+        "bbox": [
+            139,
+            705,
+            831,
+            766
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "26",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/a3e099489049e9f9290f343df965cad1bb0267a954c1adf477c035697d33855c.jpg",
+        "image_caption": [
+            "Gambar 1.21 Diagram Panah dari Komposisi Fungsi"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            330,
+            101,
+            695,
+            270
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/ffa8d530d0035c909bc03a3f9bd8f8b8c9ee6e23482b805865c20455060fdda9.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            317,
+            236,
+            365
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Mencoba",
+        "text_level": 2,
+        "bbox": [
+            247,
+            333,
+            359,
+            350
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan contoh yang ada kemudian selesaikan soal.",
+        "bbox": [
+            166,
+            376,
+            611,
+            394
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "$f \\left( x \\right) = x + 1$ dan $g \\left( x \\right) = x ^ { 2 }$ maka $h \\left( x \\right) = g \\left( f \\left( x \\right) \\right) = g \\left( x + 1 \\right) = \\left( x + 1 \\right) ^ { 2 }$ Jika $f \\left( x \\right) = x - 2$ dan $g ( x ) \\ = \\ \\sqrt { x }$ tentukan $h \\left( x \\right) = \\ g \\left( f \\left( x \\right) \\right)$",
+        "bbox": [
+            166,
+            403,
+            779,
+            443
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Pertanyaan penting selanjutnya adalah, “Apa syarat agar fungsi f dan g dapat dikomposisikan?”",
+        "bbox": [
+            166,
+            472,
+            856,
+            512
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi",
+        "text_level": 2,
+        "bbox": [
+            177,
+            568,
+            284,
+            586
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Untuk menjawab syarat agar fungsi f dan g dapat dikomposisikan maka lakukan dua eksplorasi masalah di bawah ini.",
+        "bbox": [
+            166,
+            605,
+            856,
+            646
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Masalah Pertama",
+        "text_level": 2,
+        "bbox": [
+            166,
+            675,
+            322,
+            692
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Perhatikan dua grafik f(x) dan $g ( x )$ pada gambar 1.22.",
+        "bbox": [
+            166,
+            703,
+            616,
+            721
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Nyatakan domain dan range dari setiap fungsi dalam bentuk himpunan.",
+        "bbox": [
+            201,
+            731,
+            827,
+            750
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Nyatakan domain dan range jika kedua fungsi dikomposisikan menurut $( f \\circ g ) ( x )$",
+        "bbox": [
+            201,
+            754,
+            856,
+            794
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "c. Nilai-nilai range dari $g ( x )$ yang dapat digunakan untuk komposisi fungsi $( f \\circ g ) ( x )$",
+        "bbox": [
+            201,
+            800,
+            856,
+            839
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "27",
+        "bbox": [
+            820,
+            916,
+            849,
+            931
+        ],
+        "page_idx": 2
+    }
+]
