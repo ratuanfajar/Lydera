@@ -15,6 +15,7 @@ __pycache__/
 # Hasil ekstraksi dan cache MLLM
 # ai-services/annotation/output/
 ai-services/annotation/.cache/
+ai-services/annotation/output/
 
 # Basis data SQLite (peninggalan, sebelum pindah ke PostgreSQL)
 *.db
