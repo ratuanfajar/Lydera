@@ -94,7 +94,6 @@ class TeacherRepository(TeacherRepositoryInterface):
             select(Module)
             .where(
                 Module.classroom_id == classroom_id,
-                Module.status == ModuleStatus.PUBLISH,
                 Module.deleted_at.is_(None)
             )
             .order_by(Module.created_at.desc())

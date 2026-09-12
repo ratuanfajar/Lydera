@@ -105,7 +105,7 @@ uv run python annotation_pipeline.py --outputs OUTPUT_DIR/<stem> \
 ```
 Ganti `--module-title`/`--fase-id` dengan `--module-id N` untuk menambah bab ke modul yang sudah ada. `--fase-id`/`--cp-id` opsional.
 
-**regenerate.py** — titik panggil validasi guru. `regenerate(block_type, feedback, ...)` menghasilkan ulang bacaan satu blok untuk jenis `formula`/`table`/`image` berdasarkan feedback guru. Backend menyimpan hasilnya ke DB — layanan AI tidak menyentuh DB.
+**annotation_regenerate.py** — titik panggil validasi guru. `regenerate(block_type, feedback, ...)` menghasilkan ulang bacaan satu blok untuk jenis `formula`/`table`/`image` berdasarkan feedback guru. Backend menyimpan hasilnya ke DB — layanan AI tidak menyentuh DB.
 ```python
 regenerate(block_type, feedback, *, source_markup="", image_path=None, caption="", context="")
 ```
@@ -122,11 +122,11 @@ regenerate(block_type, feedback, *, source_markup="", image_path=None, caption="
 
 Mencegah loss-in-the-middle di `generate.py`: segmen kecil diberi teks penuh, segmen lain cuma lewat ringkasannya. Bukan RAG — tidak ada vektorisasi atau similarity search; scope materi sudah ditentukan guru.
 
-**generate.py** — `generate_soal(segment, chapter_summary, bloom_level, feedback="") -> dict`. Hasilkan satu soal (JSON: `question_text`, `options`, `correct_option`, `langkah`, `kesimpulan`, `stimulus`) dari satu segmen + ringkasan bab. Tidak dicache. `feedback` diisi saat regenerasi dari koreksi guru (lihat `regenerate.py`). Token budget beda LOTS/HOTS (`LOTS_MAX_TOKENS`/`HOTS_MAX_TOKENS`).
+**generate.py** — `generate_soal(segment, chapter_summary, bloom_level, feedback="") -> dict`. Hasilkan satu soal (JSON: `question_text`, `options`, `correct_option`, `langkah`, `kesimpulan`, `stimulus`) dari satu segmen + ringkasan bab. Tidak dicache. `feedback` diisi saat regenerasi dari koreksi guru (lihat `annotation_regenerate.py`). Token budget beda LOTS/HOTS (`LOTS_MAX_TOKENS`/`HOTS_MAX_TOKENS`).
 
 **validate.py** — `validate_soal(segment, question_text, options, correct_option, stimulus_text="") -> dict`. LLM re-derive jawaban independen dari sumber yang sama (blind ke hasil Generation), kembalikan `{matches, derived_option, derived_langkah}`. Tidak dicache. `matches=False` bukan keputusan otomatis — validator sendiri bisa berhalusinasi, jadi hasil ini jadi sinyal untuk guru (lihat `CONTRACT.md` bagian 5).
 
-**regenerate.py** — `compute_cluster(chapter_id, all_blocks, reading_order_start, reading_order_end, soal_bloom_levels, feedback) -> list[(soal_id, data, hasil_validasi)]`. Dipanggil backend (`QuizService.regenerate_cluster`) saat guru kasih feedback ke soal HOTS: regenerasi ulang seluruh cluster (soal itu + semua soal lain yang berbagi `soal_stimulus` sama). Tidak menyentuh DB -- backend yang membaca block dan menyimpan hasilnya.
+**annotation_regenerate.py** — `compute_cluster(chapter_id, all_blocks, reading_order_start, reading_order_end, soal_bloom_levels, feedback) -> list[(soal_id, data, hasil_validasi)]`. Dipanggil backend (`QuizService.regenerate_cluster`) saat guru kasih feedback ke soal HOTS: regenerasi ulang seluruh cluster (soal itu + semua soal lain yang berbagi `soal_stimulus` sama). Tidak menyentuh DB -- backend yang membaca block dan menyimpan hasilnya.
 
 **quiz_pipeline.py** — `compute_for_chapter(chapter_id, blocks, hots_count, lots_count) -> list[(data, hasil_validasi)]`: segmentasi, ringkas, generate + validate tiap soal. Tidak menyentuh DB. Map (per segmen) dan Generation+Validation (per soal) dijalankan paralel sebesar `LLM_MAX_WORKERS` lewat `ThreadPoolExecutor`; urutan hasil tetap sama seperti sekuensial. Dipanggil backend lewat `backend/app/tasks/quiz_tasks.py` (async, taskiq).
 

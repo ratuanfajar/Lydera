@@ -19,9 +19,8 @@ from app.core.exceptions import BadRequestException
 from app.domains.contents.schemas.blocks.block_review_response import BlockPreviewResponse
 from app.domains.contents.schemas.chapters.ingest_annonated_request import IngestAnnotatedRequest
 from app.tasks.progress_tasks import enqueue_module_progress_job
-paths.setup()
+from app.domains.contents.schemas.blocks.regenerate_response import RegenerateDetailResponse
 from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
-import regenerate
 
 from app.domains.contents.schemas import (
     BlockResponse, RegenerateRequest, RegenerateResponse, 
@@ -34,15 +33,8 @@ from app.domains.contents.services import ContentService
 from app.domains.jobs.depedencies import get_job_service
 from app.domains.jobs.services import JobService
 from app.core.config import settings
-import app.utils.pdf_cut as pdf_cut
 
 UPLOAD_DIR = Path(__file__).resolve().parents[3] / "uploads"
-
-def _find_image(out_dir: Path, image_file: str) -> Path | None:
-    if not out_dir.exists():
-        return None
-    matches = list(out_dir.rglob(image_file))
-    return matches[0] if matches else None
 
 
 # ==========================================
@@ -50,45 +42,25 @@ def _find_image(out_dir: Path, image_file: str) -> Path | None:
 # ==========================================
 router_blocks = APIRouter(prefix="/blocks", tags=["blocks"], route_class=WrappedRoute)
 
-@router_blocks.post(
-    "/{block_id}/regenerate",
-    response_model=Response[RegenerateResponse],
-    status_code=status.HTTP_200_OK,
-    responses=COMMON_VALIDATION_RESPONSES
-)
-async def regenerate_block(
-    block_id: Annotated[int, FastAPIPath(title="The ID of the block")], 
-    payload: Annotated[RegenerateRequest, Body()],
+@router_blocks.post("/bulk-regenerate/text", response_model=Response[RegenerateResponse])
+async def bulk_regenerate_text(
+    payload: RegenerateRequest,
+    teacher: Roles(Role.TEACHER),
+    content_service: ContentService = Depends(get_content_service)
+):
+    result = await content_service.regenerate_text_blocks(payload, teacher.profile_id)
+    return Response(message="Text blocks updated successfully", data=result)
+
+
+@router_blocks.post("/bulk-regenerate/special", response_model=Response[list[RegenerateDetailResponse]])
+async def bulk_regenerate_special(
+    payload: RegenerateRequest,
+    teacher: Roles(Role.TEACHER),
     content_service: ContentService = Depends(get_content_service),
     job_service: JobService = Depends(get_job_service)
 ):
-    block = await content_service.get_block_by_id(block_id)
-    if not block:
-        raise HTTPException(status_code=404, detail="blok tidak ditemukan")
-    
-    if block.block_type not in ("formula", "table", "image"):
-        await content_service.update_block_text(block_id, payload.feedback)
-
-    image_path = None
-    if block.image_file:
-        job = await job_service.get_latest_job_for_chapter(block.chapter_id)
-        if job:
-            image_path = _find_image(Path(job.out_dir), block.image_file)
-
-    new_text = regenerate.regenerate(
-        block.block_type, payload.feedback,
-        source_markup=block.source_markup or "",
-        image_path=image_path,
-        caption=block.caption or "",
-    )
-    
-    await content_service.update_block_text(block_id, new_text)
-    
-    return Response(
-        message=get_response_message(),
-        data={"block_id": block_id, "readable_text": new_text}
-    )
-
+    result = await content_service.regenerate_special_blocks(payload, teacher.profile_id, job_service)
+    return Response(message="Special blocks regenerated via AI", data=result)
 
 # ==========================================
 # FASE ROUTER

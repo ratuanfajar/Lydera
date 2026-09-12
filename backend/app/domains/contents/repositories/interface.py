@@ -4,6 +4,7 @@ from typing import Sequence
 from app.domains.contents.models import Block, Module, Fase, Cp, Chapter, ModuleStatus
 from app.domains.contents.schemas.module.student_module_request import StudentModuleStatus
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleStatus
+from app.domains.contents.schemas.blocks.regenerate_response import RegenerateResponse
 
 class ContentRepositoryInterface(ABC):
     # Block
@@ -12,9 +13,13 @@ class ContentRepositoryInterface(ABC):
         """Retrieves all blocks belonging to a chapter."""
         raise NotImplementedError
     @abstractmethod
+    async def get_teacher_blocks(self, block_ids: list[int], teacher_id: int) -> list[Block]: raise NotImplementedError
+    @abstractmethod
     async def get_block_by_id(self, block_id: int) -> Block | None: raise NotImplementedError
     @abstractmethod
     async def bulk_insert_blocks(self, blocks: list[Block]) -> None: raise NotImplementedError
+    @abstractmethod
+    async def bulk_update_readable_text(self, update_data: list[dict]) -> bool: raise NotImplementedError
 
     # Fase
     @abstractmethod

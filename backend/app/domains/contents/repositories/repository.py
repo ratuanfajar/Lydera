@@ -3,8 +3,7 @@ from datetime import datetime, timezone
 from sqlalchemy import exists, func, or_, select, update
 from typing import Sequence
 from sqlalchemy.dialects.postgresql import insert
-
-from app.tasks.progress_tasks import enqueue_module_progress_job
+from app.tasks.progress_tasks import enqueue_chapter_progress_reset_job, enqueue_module_progress_job
 from sqlalchemy.orm import contains_eager, selectinload
 from app.domains.contents.models import Block, Module, Chapter, Fase, Cp, ModuleStatus
 from app.domains.contents.repositories.interface import ContentRepositoryInterface
@@ -16,6 +15,8 @@ from app.core.exceptions import ForbiddenException
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.users.models.student import student_classrooms
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleStatus
+from app.domains.contents.schemas.blocks.regenerate_response import RegenerateResponse
+
 class ContentRepository(ContentRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -50,6 +51,29 @@ class ContentRepository(ContentRepositoryInterface):
         result = await self.db.scalars(stmt)
         return result.unique().first()
 
+    async def get_teacher_blocks(self, block_ids: list[int], teacher_id: int) -> list[Block]:
+        unique_ids = list(set(block_ids))
+        stmt = (
+            select(Block)
+            .join(Chapter, Block.chapter_id == Chapter.id)
+            .join(Module, Chapter.module_id == Module.id)
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(
+                Block.id.in_(unique_ids),
+                Classroom.teacher_id == teacher_id
+            )
+        )
+        blocks = (await self.db.scalars(stmt)).all()
+        
+        if len(blocks) != len(unique_ids):
+            raise ForbiddenException("Tidak punya akses, beberapa block bukan punya mu.")
+        return blocks
+    
+    async def bulk_update_readable_text(self, update_data: list[dict]) -> bool:
+        await self.db.execute(update(Block), update_data)
+        await self.db.commit()
+        return True
+    
     async def get_block_by_id(self, block_id: int) -> Block | None:
         return await self.db.get(Block, block_id)
 
@@ -285,7 +309,6 @@ class ContentRepository(ContentRepositoryInterface):
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
         
-
     async def student_update_chapter_progress(self, chapter_id: int, student_id:int) -> bool:
         stmt = (
             update(ChapterProgress)
@@ -349,7 +372,6 @@ class ContentRepository(ContentRepositoryInterface):
 
         return True
         
-    
     async def validate_student_chapter_access(
         self, 
         chapter_id: int, 

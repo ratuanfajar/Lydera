@@ -1,7 +1,11 @@
+import re
+
 from fastapi import APIRouter, FastAPI, Request
 import logging
 import sys
 from pathlib import Path
+
+from sqlalchemy.exc import IntegrityError
 import app.utils.paths as paths
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -100,6 +104,34 @@ async def global_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={
             "detail": "Internal server error",
+            "errors": None,
+        },
+    )
+
+@app.exception_handler(IntegrityError)
+async def sqlalchemy_integrity_exception_handler(request: Request, exc: IntegrityError):
+    logger.error(f"Database Integrity Error: {exc.orig}")
+    error_msg = str(exc.orig)
+    if "duplicate key" in error_msg.lower():
+        match = re.search(r"Key \((.+?)\)=", error_msg)
+        
+        if match:
+            field_name = match.group(1)
+            detail_message = f"{field_name} sudah ada. Silahkan ganti {field_name}."
+        else:
+            detail_message = "Data sudah ada. Silahkan ganti."
+
+        return JSONResponse(
+            status_code=409,
+            content={
+                "detail": detail_message,
+                "errors": None,
+            },
+        )
+    return JSONResponse(
+        status_code=400,
+        content={
+            "detail": "Error silahkan check kembali data input.",
             "errors": None,
         },
     )
