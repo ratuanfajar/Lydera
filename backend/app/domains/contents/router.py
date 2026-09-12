@@ -168,7 +168,7 @@ router_chapters = APIRouter(prefix="/chapters", tags=["chapters"], route_class=W
     responses=COMMON_VALIDATION_RESPONSES
 )
 async def create_chapter(
-    _: Roles(Role.TEACHER),
+    current_user: Roles(Role.TEACHER),
     data: Annotated[ChapterCreate, Depends()],
     file: Annotated[UploadFile, File(description="Single PDF file required")],
     content_service: ContentService = Depends(get_content_service),
@@ -217,7 +217,8 @@ async def create_chapter(
         job_id=job_id,
         pdf_path=str(raw_path),
         out_dir=str(out_dir),
-        chapter_id=chapter_id
+        chapter_id=chapter_id,
+        teacher_id=current_user.profile_id
     )
     await enqueue_module_progress_job(data.module_id)
     return Response(

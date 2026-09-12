@@ -29,10 +29,10 @@ def _create(**kwargs):
             delay *= 2
 
 
-def complete_text(system: str, user: str, model: str | None = None) -> str:
+def complete_text(system: str, user: str, model: str | None = None, max_tokens: int | None = None) -> str:
     response = _create(
         model=model or config.TEXT_MODEL,
-        max_tokens=config.TEXT_MAX_TOKENS,
+        max_tokens=max_tokens or config.TEXT_MAX_TOKENS,
         extra_body={"reasoning": {"enabled": False}},
         messages=[
             {"role": "system", "content": system},

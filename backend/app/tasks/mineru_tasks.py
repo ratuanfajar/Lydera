@@ -47,7 +47,7 @@ async def publish_progress(redis: Redis, job_id: int, status: str, progress:int,
     await redis.publish(f"job_progress:{job_id}", payload)
 
 @broker.task
-async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter_id:int, attempt: int = 1) -> None:
+async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter_id:int, teacher_id:int, attempt: int = 1) -> None:
     redis = Redis.from_url(
         settings.REDIS_URL,
         decode_responses=True,
@@ -110,16 +110,15 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
             await publish_progress(redis, job_id, "running", 75, "Aggregating extracted output...")
             list_json_paths = await asyncio.to_thread(pipeline.run, out_dir)
 
-            # # 3. Database Ingestion
-            # await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
-            # content_repo = ContentRepository(db)
-            # content_service = ContentService(content_repo, db)
+            # 3. Database Ingestion
+            await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
+            content_repo = ContentRepository(db)
+            content_service = ContentService(content_repo, db)
 
             total_blocks = 0
             for json_path in list_json_paths:
-                # blocks_inserted = await content_service.ingest_annotated_json(json_path, chapter_id)
-                # total_blocks += blocks_inserted
-                total_blocks += 1
+                blocks_inserted = await content_service.ingest_annotated_json(json_path, chapter_id, teacher_id)
+                total_blocks += blocks_inserted
             annotation_output_dir = Path(out_dir).parent
             relative_json_paths = [
                 Path(path).relative_to(Path(annotation_output_dir)).as_posix()
@@ -143,6 +142,7 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
                     pdf_path=pdf_path,
                     out_dir=out_dir,
                     chapter_id=chapter_id,
+                    teacher_id=teacher_id,
                     attempt=attempt + 1
                 )
             else:

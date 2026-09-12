@@ -148,7 +148,7 @@ class ContentService:
                 await enqueue_module_progress_job(chapter.module_id)
                 await enqueue_chapter_progress_reset_job(chapter_id)
 
-            return chapter_id
+            return len(blocks_to_insert)
         except Exception as e:
             await self.db.rollback()
             raise e

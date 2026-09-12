@@ -1,7 +1,6 @@
 from fastapi import APIRouter, FastAPI, Request
 import logging
 import sys
-from contextlib import asynccontextmanager
 from pathlib import Path
 import app.utils.paths as paths
 from fastapi import FastAPI
@@ -18,6 +17,7 @@ from app.domains.schools.router import router as router_school
 from app.domains.users.router import router_user, router_student, router_teacher
 from app.domains.classrooms.router import router_classrooms, router_classrooms_types
 from app.domains.contents.router import router_blocks, router_chapters, router_fases, router_modules
+from app.domains.quizz.router import router_quiz_requests, router_soal
 
 
 
@@ -33,6 +33,8 @@ api_router.include_router(router_blocks)
 api_router.include_router(router_modules)
 api_router.include_router(router_chapters)
 api_router.include_router(router_fases)
+api_router.include_router(router_quiz_requests)
+api_router.include_router(router_soal)
 
 
 
@@ -52,7 +54,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):

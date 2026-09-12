@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import os
-import subprocess
+import re
 import sys
 from pathlib import Path
 
@@ -52,18 +53,21 @@ def build_command(pdf: Path, out: Path, *, backend: str, method: str, lang: str 
         cmd += ["-e", str(end)]
     return cmd
 
-import asyncio
-import re
-import sys
-from pathlib import Path
 
-# Add this async runner function to run_mineru.py:
 async def run_async(pdf: Path, out: Path, *, backend="pipeline", method="auto", lang=None,
     start=None, end=None, no_formula=False, no_table=False,
     device="auto", vram=None, keep_debug=False,
     progress_callback=None
 ) -> int:
-    """Jalankan MinerU secara asynchronous dengan SSE progress stream; bersihkan file debug; kembalikan return code."""
+    """Jalankan MinerU secara asynchronous dengan progress stream, lewat subprocess CLI.
+
+    Catatan: beda dari `run()` di bawah, fungsi ini masih memanggil `python -m mineru.cli.client`
+    lewat subprocess (bukan `do_parse` in-process) karena progress per-persentase diambil dari
+    parsing baris tqdm di stderr proses anak -- sesuatu yang tidak tersedia kalau MinerU dipanggil
+    langsung sebagai fungsi Python di proses yang sama. Konsekuensinya: fungsi ini masih kena
+    masalah reload model MinerU dari nol tiap window (lihat docstring `run()`) karena tiap panggilan
+    tetap subprocess baru. Belum diporting ke pendekatan in-process `run()`.
+    """
     pdf = Path(pdf).resolve()
     out = Path(out).resolve()
     if not pdf.exists():
@@ -94,7 +98,7 @@ async def run_async(pdf: Path, out: Path, *, backend="pipeline", method="auto", 
     except FileNotFoundError:
         print("[ERROR] modul mineru tidak ditemukan. Jalankan lewat `uv run`.", file=sys.stderr)
         return 127
-    
+
     # Read stderr in real-time to capture tqdm output for SSE streaming
     async for line_bytes in proc.stderr:
         line = line_bytes.decode("utf-8", errors="ignore").strip()
@@ -128,7 +132,7 @@ async def run_async(pdf: Path, out: Path, *, backend="pipeline", method="auto", 
     if proc.returncode != 0:
         print(f"[ERROR] MinerU keluar dengan kode {proc.returncode}", file=sys.stderr)
         return proc.returncode
-    
+
     if not keep_debug:
         removed = remove_debug_files(out, pdf.stem)
         if removed:
@@ -140,10 +144,22 @@ async def run_async(pdf: Path, out: Path, *, backend="pipeline", method="auto", 
 
     return 0
 
+
 def run(pdf: Path, out: Path, *, backend="pipeline", method="auto", lang=None,
         start=None, end=None, no_formula=False, no_table=False,
         device="auto", vram=None, keep_debug=False) -> int:
-    """Jalankan MinerU sekali pada rentang halaman; bersihkan file debug; kembalikan return code."""
+    """Jalankan MinerU sekali pada rentang halaman, in-process lewat `mineru.cli.common.do_parse`.
+
+    Dulu ini `subprocess.run(["-m", "mineru.cli.client", ...])`, yang ternyata (dikonfirmasi
+    langsung dari source mineru) menghidupkan lagi satu server FastAPI lokal per panggilan lewat
+    subprocess kedua, cuma buat memproses satu window lalu dimatikan lagi -- artinya seluruh model
+    MinerU (layout, OCR, formula, table) di-load ulang dari nol tiap window. `do_parse` adalah
+    fungsi Python biasa yang dipakai server itu sendiri; model-nya di-cache sebagai singleton di
+    dalam proses (lihat mineru/backend/pipeline/model_init.py -- `AtomModelSingleton`/
+    `MineruPipelineModel` pakai `__new__` + dict `_models`), jadi selama dipanggil dari proses yang
+    sama (annotation_worker.py, yang memang didesain long-running), window kedua dan seterusnya dalam satu bab
+    -- bahkan bab berikutnya -- pakai model yang sudah ke-load, tidak reload lagi.
+    """
     pdf = Path(pdf).resolve()
     out = Path(out).resolve()
     if not pdf.exists():
@@ -152,26 +168,45 @@ def run(pdf: Path, out: Path, *, backend="pipeline", method="auto", lang=None,
     out.mkdir(parents=True, exist_ok=True)
 
     resolved = resolve_device(device)
-    env = os.environ.copy()
-    env["MINERU_DEVICE_MODE"] = resolved
+    os.environ["MINERU_DEVICE_MODE"] = resolved
     if vram is not None:
-        env["MINERU_VIRTUAL_VRAM_SIZE"] = str(vram)
+        os.environ["MINERU_VIRTUAL_VRAM_SIZE"] = str(vram)
     if resolved.startswith("cuda") and not torch_sees_gpu():
         print("[WARN] CUDA diminta tapi torch tidak melihat GPU; proses jatuh ke CPU.", file=sys.stderr)
 
-    cmd = build_command(pdf, out, backend=backend, method=method, lang=lang,
-                        start=start, end=end, no_formula=no_formula, no_table=no_table)
-    print(f"[INFO] device : {resolved}")
-    print(f"[INFO] jalan  : {' '.join(cmd)}")
-
     try:
-        proc = subprocess.run(cmd, env=env)
-    except FileNotFoundError:
+        from mineru.cli.common import do_parse, read_fn
+    except ImportError:
         print("[ERROR] modul mineru tidak ditemukan. Jalankan lewat `uv run`.", file=sys.stderr)
         return 127
-    if proc.returncode != 0:
-        print(f"[ERROR] MinerU keluar dengan kode {proc.returncode}", file=sys.stderr)
-        return proc.returncode
+
+    print(f"[INFO] device : {resolved}")
+    print(f"[INFO] jalan  : do_parse in-process pdf={pdf} out={out} halaman={start}-{end}")
+
+    try:
+        pdf_bytes = read_fn(pdf)
+        do_parse(
+            output_dir=str(out),
+            pdf_file_names=[pdf.stem],
+            pdf_bytes_list=[pdf_bytes],
+            p_lang_list=[lang or "ch"],
+            backend=backend,
+            parse_method=method,
+            formula_enable=not no_formula,
+            table_enable=not no_table,
+            f_draw_layout_bbox=False,
+            f_draw_span_bbox=False,
+            f_dump_md=True,
+            f_dump_middle_json=False,
+            f_dump_model_output=False,
+            f_dump_orig_pdf=False,
+            f_dump_content_list=True,
+            start_page_id=start if start is not None else 0,
+            end_page_id=end,
+        )
+    except Exception as exc:
+        print(f"[ERROR] MinerU gagal: {exc}", file=sys.stderr)
+        return 1
 
     if not keep_debug:
         removed = remove_debug_files(out, pdf.stem)

@@ -1,34 +1,28 @@
-# Secrets
 .env
 **/.env
 !**/.env.example
 
-# Python
 .venv/
 __pycache__/
 *.pyc
 .python-version
 
-# uv
 .uv/
 
-# Hasil ekstraksi dan cache MLLM
-# ai-services/annotation/output/
+ai-services/annotation/output/
 ai-services/annotation/.cache/
+ai-services/quiz/.cache/
 
-# Basis data SQLite (peninggalan, sebelum pindah ke PostgreSQL)
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
 *.bak
+*.sql
 
-# PDF hasil upload guru (mentah + terpotong)
 backend/uploads/
 
-# Data modul PDF (besar, berhak cipta, tidak di-push)
 data/
 
-# OS
 .DS_Store
 Thumbs.db

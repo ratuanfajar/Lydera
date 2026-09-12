@@ -67,9 +67,9 @@ job
 | blocks_total | INTEGER | Jumlah blok tersimpan bila done |
 | created_at, updated_at | TIMESTAMPTZ | Waktu dibuat/diperbarui |
 
-### Skema Quiz Generator (rancangan, belum ada kode BE/AI yang mengimplementasikannya)
+### Skema Quiz Generator
 
-Tujuh tabel tambahan, murni untuk fitur quiz generator yang masih dalam tahap desain. `fase`/`cp` menyimpan data resmi kurikulum (referensi, tidak ikut cascade terhapus). `quiz_request` menyimpan satu request generate (bisa mencakup beberapa bab sekaligus lewat `quiz_request_chapter`). `soal` menyimpan satu soal pilihan ganda hasil generate, dengan `soal_opsi` (opsi jawaban) dan `soal_langkah` (langkah penyelesaian) sebagai anak tabelnya. `soal_stimulus` menyimpan cerita/data yang bisa dipakai bersama oleh beberapa `soal` HOTS sekaligus (lewat `soal.stimulus_id`).
+Tujuh tabel tambahan untuk fitur quiz generator. `fase`/`cp` menyimpan data resmi kurikulum (referensi, tidak ikut cascade terhapus). `quiz_request` menyimpan satu request generate (bisa mencakup beberapa bab sekaligus lewat `quiz_request_chapter`). `soal` menyimpan satu soal pilihan ganda hasil generate, dengan `soal_opsi` (opsi jawaban) dan `soal_langkah` (langkah penyelesaian) sebagai anak tabelnya. `soal_stimulus` menyimpan cerita/data yang bisa dipakai bersama oleh beberapa `soal` HOTS sekaligus (lewat `soal.stimulus_id`).
 
 fase
 
@@ -93,18 +93,20 @@ quiz_request
 |---|---|---|
 | id | SERIAL | Primary key |
 | module_id | INTEGER | Referensi ke module(id), cascade saat modul dihapus |
-| hots_count | INTEGER | Jumlah soal HOTS yang diminta guru |
-| lots_count | INTEGER | Jumlah soal LOTS yang diminta guru |
 | status | TEXT | queued, running, done, atau failed |
 | error | TEXT | Pesan galat bila failed |
 | created_at, updated_at | TIMESTAMPTZ | Waktu dibuat/diperbarui |
 
-quiz_request_chapter (tabel penghubung, bab-bab yang dipilih guru untuk satu request)
+quiz_request_chapter (tabel penghubung, bab-bab yang dipilih guru untuk satu request, dengan target jumlah soal per bab)
 
 | Kolom | Tipe | Keterangan |
 |---|---|---|
 | quiz_request_id | INTEGER | Referensi ke quiz_request(id), cascade |
 | chapter_id | INTEGER | Referensi ke chapter(id), cascade |
+| hots_count | INTEGER | Jumlah soal HOTS yang diminta guru untuk bab ini |
+| lots_count | INTEGER | Jumlah soal LOTS yang diminta guru untuk bab ini |
+
+Jumlah soal ditentukan per bab, bukan satu angka gabungan untuk semua bab dalam satu request. Guru menentukan alokasinya sendiri.
 
 soal_stimulus (cerita/data bersama, dipakai satu atau lebih `soal` HOTS sekaligus)
 
@@ -157,7 +159,7 @@ soal_langkah
 
 Human-in-the-loop untuk `soal`, ditentukan oleh `stimulus_id`:
 - **`stimulus_id` kosong** (soal berdiri sendiri, biasanya LOTS): guru edit langsung (`question_text`, opsi, `correct_option`, `soal_langkah`, `kesimpulan` sekaligus dalam satu layar) — tanpa keterlibatan LLM, sama seperti blok heading/text di anotasi.
-- **`stimulus_id` terisi** (soal bagian dari cluster bersama `soal_stimulus` dan mungkin soal lain yang berbagi stimulus sama, biasanya HOTS): feedback guru memicu LLM meregenerasi **satu cluster penuh** (soal itu + `soal_stimulus`-nya + semua soal lain dengan `stimulus_id` sama), guru approve draft hasilnya sebelum final — bukan langsung dianggap final seperti `regenerate()` di bagian 4.4.
+- **`stimulus_id` terisi** (soal bagian dari cluster bersama `soal_stimulus` dan mungkin soal lain yang berbagi stimulus sama, biasanya HOTS): feedback guru memicu LLM meregenerasi **satu cluster penuh** (soal itu + `soal_stimulus`-nya + semua soal lain dengan `stimulus_id` sama), guru approve draft hasilnya sebelum final — bukan langsung dianggap final seperti `regenerate()` di bagian 4.1.
 
 `review_priority`/`validation_notes` diisi oleh tahap Validation (LLM re-derive jawaban secara independen dari `soal_stimulus`/materi sumber, dibandingkan ke `correct_option`/`soal_langkah` hasil Generation) — ini sinyal untuk guru, bukan keputusan otomatis; guru tetap yang memvalidasi akhir.
 
@@ -169,6 +171,8 @@ Catatan penting:
 - `image_file` hanya nama file (hash konten dari MinerU), bukan path. BE yang me-resolve nama ke lokasi nyata.
 
 ## 3. Interface Backend (FE ↔ BE)
+
+> Bagian ini didokumentasikan saat backend masih berupa router flat tanpa autentikasi. Setelah digabung dengan `develop` (backend domain-driven, prefix `/api`, autentikasi JWT per role, response envelope `{message, data}`), path dan detail di bawah sudah berubah -- perlu didokumentasikan ulang. Bentuk request/response tiap endpoint (nama field, validasi) pada prinsipnya masih sama; yang berubah adalah path (`/api/...`), envelope response, dan syarat login.
 
 Base URL: `http://<host>:8000`. Semua request/response JSON, kecuali `POST /chapters` yang multipart/form-data (upload file). Field wajib yang kosong atau salah tipe otomatis dibalas `422` oleh FastAPI/Pydantic sebelum masuk logika endpoint — tidak dijabarkan per endpoint di bawah.
 
@@ -252,95 +256,109 @@ Error:
 - `404` — blok tidak ditemukan
 - `400` — `block_type` blok ini bukan formula/table/image (lihat gap di bawah untuk heading/text)
 
-### 3.5 Gap yang belum diimplementasikan (perlu FE tahu sebelum desain UI)
+### 3.6 Quiz Request (generate soal)
 
-- **Edit langsung blok heading/text**: desain manual-edit-tanpa-LLM untuk `block_type` heading/text (lihat bagian 4.4) belum punya endpoint BE. Saat ini tidak ada cara FE mengubah `readable_text` blok jenis ini lewat API.
+**POST /quiz-requests** — buat request generate soal untuk satu atau lebih bab dalam satu modul. Diproses async oleh `quiz_worker.py`.
+Request body: `{module_id: int, chapters: [{chapter_id: int, hots_count: int, lots_count: int}, ...]}`. Tiap elemen `chapters` menentukan jumlah soal HOTS/LOTS untuk bab itu secara terpisah.
+Response: `{quiz_request_id, status}` — `status` selalu `"queued"` di respons ini.
+Error: `400` kalau `chapters` kosong atau ada `chapter_id` yang bukan bagian dari `module_id` ini; `404` kalau `module_id`/`chapter_id` tidak ditemukan.
+
+**GET /quiz-requests/{quiz_request_id}/status** — status pemrosesan, untuk polling FE.
+Response: `{quiz_request_id, status, error}`. `status`: `queued` / `running` / `done` / `failed`.
+Error: `404` kalau `quiz_request_id` tidak ditemukan.
+
+**GET /quiz-requests/{quiz_request_id}/soal** — daftar seluruh soal hasil generate untuk request ini (semua bab tergabung).
+Response: array of `SoalOut` (lihat 3.7).
+
+### 3.7 Soal (review, edit, dan regenerasi guru)
+
+**GET /soal/{soal_id}** — detail satu soal.
+Response (`SoalOut`): `{id, chapter_id, stimulus_id, bloom_level, question_text, options: [{label, opsi_text}], correct_option, langkah: [string], kesimpulan, stimulus_text, review_status, review_priority, validation_notes}`. `stimulus_text` diisi dari `soal_stimulus.readable_text` kalau `stimulus_id` tidak kosong, `null` kalau soal berdiri sendiri.
+Error: `404` kalau tidak ditemukan.
+
+**PATCH /soal/{soal_id}** — edit langsung tanpa LLM. Hanya berlaku untuk soal berdiri sendiri (`stimulus_id` kosong, biasanya LOTS).
+Request body (semua field opsional, kirim yang mau diubah saja): `{question_text?, options?: {"A": "...", ...}, correct_option?, langkah?: [string], kesimpulan?}`. Field apa pun yang terisi men-set `review_status` jadi `edited`.
+Response: `SoalOut` (state terbaru).
+Error: `404` kalau tidak ditemukan; `400` kalau soal ini punya `stimulus_id` (harus lewat regenerate, bukan PATCH).
+
+**POST /soal/{soal_id}/approve**, **POST /soal/{soal_id}/reject** — set `review_status` jadi `approved`/`rejected`. Tidak ada body.
+Response: `{id, review_status}`.
+
+**POST /soal/{soal_id}/regenerate** — feedback guru memicu LLM regenerasi **satu cluster HOTS penuh** (soal ini + semua soal lain yang berbagi `soal_stimulus` yang sama, plus `soal_stimulus`-nya sendiri). Hanya berlaku untuk soal dengan `stimulus_id` terisi.
+Request body: `{feedback: string}`.
+Response: array of `SoalOut` — seluruh anggota cluster setelah regenerasi. `review_status` tiap soal di cluster dikembalikan ke `pending` (draft baru, bukan otomatis final) — guru approve lagi setelah ini.
+Error: `404` kalau tidak ditemukan; `400` kalau soal ini tidak punya `stimulus_id` (harus lewat PATCH, bukan regenerate); `502` kalau regenerasi gagal (LLM error/output tidak valid) — guru disarankan coba lagi.
+
+Catatan penyederhanaan v1: tiap soal di cluster diregenerasi lewat panggilan Generation terpisah; teks `soal_stimulus` final yang dipakai adalah hasil dari soal pertama di cluster, bukan hasil gabungan/konsensus semua panggilan. Karena hasilnya tetap draft (guru approve dulu sebelum final), ketidaksesuaian kecil di titik ini tertangkap saat review manual.
+
+### 3.8 Gap yang belum diimplementasikan (perlu FE tahu sebelum desain UI)
+
+- **Edit langsung blok heading/text**: desain manual-edit-tanpa-LLM untuk `block_type` heading/text (lihat bagian 4.1) belum punya endpoint BE. Saat ini tidak ada cara FE mengubah `readable_text` blok jenis ini lewat API.
 - **Serve file gambar**: `block.image_file` cuma nama file (hash konten), BE belum punya endpoint yang mengembalikan file/URL gambar aktualnya ke FE. FE belum bisa menampilkan gambar asli untuk blok `block_type=image`/`table` sebagai konteks visual bagi guru.
 - **List bab per modul**: tidak ada endpoint `GET /modules/{module_id}/chapters` atau semacamnya. FE tidak punya cara bertanya "modul ini punya bab apa saja" — kalau perlu, FE saat ini harus menyimpan sendiri `chapter_id` yang sudah dibuat, atau BE perlu ditambah endpoint ini.
 - **Tidak ada autentikasi/otorisasi**: seluruh endpoint bisa diakses siapa saja tanpa identitas. Tidak ada konsep guru yang login, tidak ada kepemilikan modul per guru — semua modul/bab terlihat oleh siapa pun yang bisa akses BE.
 - **Tidak ada endpoint hapus atau edit** modul/bab setelah dibuat. Salah input (judul, fase, rentang halaman) saat ini tidak bisa dikoreksi lewat API — perlu dibuat modul/bab baru, atau intervensi langsung ke DB.
+- **Bloom level soal tidak bisa dipilih spesifik**: guru cuma menentukan jumlah HOTS/LOTS, bukan level C1-C6 yang tepat. Sistem default ke C2 untuk tiap soal LOTS dan C5 untuk tiap soal HOTS (lihat `quiz_pipeline.py`, `_allocate`).
+- **List soal per modul (lintas quiz_request)**: `GET /quiz-requests/{id}/soal` cuma menampilkan soal dari satu request. Belum ada endpoint "semua soal yang pernah dibuat untuk modul ini" kalau guru generate berkali-kali.
 
 ## 4. Interface Layanan AI
 
-Semua modul ada di `ai-services/annotation/` dan dijalankan dengan uv dari folder itu.
+Fungsi berikut dipanggil langsung oleh backend lewat impor datar (lihat `paths.py` tiap folder). Detail modul internal dan CLI tiap tahap ada di `ai-services/README.md`, bukan di sini.
 
-### 4.1 batch (ekstraksi MinerU)
+### 4.1 Anotasi
 
-Masukan: satu PDF bab yang sudah terfokus (front matter dan back matter sudah dibuang BE). Keluaran: hasil MinerU per window di `<out>/p{awal}-{akhir}/<stem>/auto/` berisi `content_list.json`, file `.md`, dan `images/`.
+Dipanggil dari `backend/jobs.py` untuk memproses satu bab:
 
-```
-uv run python batch.py --pdf bab.pdf --out output/<chapter_id> [--max-pages 3] \
-  [--method auto|txt|ocr] [--no-formula] [--no-table] [--device auto] [--vram N] [--dry-run]
-```
+- `batch.plan(pdf, out_dir, max_pages) -> list[Window]` — rencana window halaman.
+- `run_mineru.run(pdf, out_dir, start=, end=, ...) -> int` — ekstraksi satu window, 0 = sukses.
+- `annotation_pipeline.run(conn, outputs_dir, chapter_id) -> int` — anotasi seluruh window bab dan ingest ke DB, mengembalikan jumlah blok.
 
-- `--out` wajib diisi unik per bab. Konvensi: gunakan `chapter_id` sebagai nama folder (lihat bagian 5).
-- `--max-pages` memecah PDF jadi window agar muat di memori. Default 3; nilai lebih besar berisiko gagal karena resource.
-- `--dry-run` mencetak rencana window tanpa menjalankan MinerU.
-- Kegagalan resource bersifat transien: batch tetap lanjut ke window berikutnya, window yang gagal bisa diulang per rentang tanpa mengulang seluruh bab.
-
-### 4.2 annotate (anotasi MLLM)
-
-Mengubah `content_list.json` menjadi daftar blok siap-talkback. Rumus, tabel, dan gambar dikonversi lewat MLLM secara paralel, urutan baca dijaga. Fungsi `annotate(content_list_path)` mengembalikan daftar objek dengan field: `block_type`, `reading_order`, `page`, `readable_text`, `review_priority`, `heading_level`, `source_markup`, `caption`, `image_file`. Field `page` hanya untuk penelusuran dan tidak disimpan ke DB.
-
-```
-uv run python annotate.py content_list.json [annotated.json]
-```
-
-Penyedia MLLM bisa mengembalikan 429 pada beban tinggi — sudah ditangani sendiri lewat retry dengan backoff, BE tidak perlu membangun retry untuk kasus ini (menurunkan `LLM_MAX_WORKERS` mengurangi tekanan bila masih sering terjadi).
-
-### 4.3 pipeline (orkestrasi anotasi dan ingest satu bab)
-
-Membuat modul dan bab, menganotasi seluruh window sebuah bab, lalu menyimpan bloknya ke DB.
-
-```
-uv run python pipeline.py --outputs output/<chapter_id> \
-  --module-title "Judul Modul" --fase-id 2 --chapter-number 1 --chapter-title "Judul Bab" \
-  --cp-id 3 --source-file bab.pdf
-```
-
-Untuk menambah bab ke modul yang sudah ada, ganti `--module-title`/`--fase-id` dengan `--module-id N`. `--fase-id`/`--cp-id` opsional (boleh kosong). Nilai judul modul, fase, nomor/judul bab, dan cp berasal dari guru melalui BE.
-
-BE dapat memakai `pipeline` langsung, atau memisah tahap dengan memanggil fungsi backend di bagian 4.5.
-
-### 4.4 regenerate (validasi guru, human in the loop)
-
-Menghasilkan ulang bacaan satu blok berdasarkan feedback guru. Berlaku untuk formula, table, dan image. Blok heading dan text diedit langsung tanpa MLLM.
+Dipanggil dari `app/routers/blocks.py` untuk regenerasi satu blok (formula/table/image) berdasarkan feedback guru:
 
 ```python
-from regenerate import regenerate
-
-teks_baru = regenerate(
-    block_type,          # "formula" | "table" | "image"
-    feedback,            # teks feedback guru
-    source_markup="",    # LaTeX untuk formula, HTML untuk table
-    image_path=None,     # path gambar untuk table dan image (BE resolve dari image_file)
-    caption="",
-    context="",
-)
+regenerate.regenerate(block_type, feedback, *, source_markup="", image_path=None, caption="", context="") -> str
 ```
 
-BE yang mengambil data blok dari DB, memanggil fungsi ini, lalu memperbarui kolom `readable_text`. Layanan AI tidak menyentuh DB.
+Layanan AI tidak menyentuh DB pada kedua kasus di atas — BE yang membaca/menulis lewat `annotation_ingest.py` (bagian 4.2).
 
-### 4.5 Fungsi backend (storage)
+### 4.2 Storage anotasi (backend)
 
-Di `backend/ingest.py`:
+`backend/annotation_ingest.py`, dipanggil dari `app/routers/modules.py`, `chapters.py`, dan `annotation_pipeline.py`:
 
 - `create_module(conn, title, fase_id) -> module_id`
 - `create_chapter(conn, module_id, number, title, source_file, cp_id) -> chapter_id`
 - `ingest(conn, annotated_path, chapter_id) -> jumlah_blok`
 
-Koneksi dibuat dengan `db.connect()`, memakai `DATABASE_URL` dari environment. Skema dibuat dengan `db.init_db()`.
+### 4.3 Quiz generator
+
+Dipanggil dari `backend/quiz_worker.py`:
+
+```python
+quiz_pipeline.run_for_chapter(conn, quiz_request_id, chapter_id, hots_count, lots_count) -> int
+```
+
+Berbeda dari anotasi, `quiz_pipeline.py` menulis langsung ke DB (lewat `backend/quiz_ingest.py`), bukan mengembalikan data untuk BE simpan. Soal digroundkan ke isi bab yang sudah dianotasi lewat prompt chaining (satu model, bukan multi-agent), dengan model `config.QUIZ_MODEL`.
+
+Dipanggil dari `app/routers/soal.py` untuk regenerasi cluster HOTS berdasarkan feedback guru:
+
+```python
+regenerate.regenerate_cluster(conn, stimulus_id, feedback) -> list[(soal_id, data, hasil_validasi)]
+```
 
 ## 5. Konvensi dan Aturan
 
-1. Penamaan folder output: gunakan `chapter_id` sebagai `--out`, yaitu `output/<chapter_id>`. `chapter_id` dijamin unik lintas modul dan tidak pernah didaur ulang (`SERIAL`), sehingga folder aman dipakai sebagai nama permanen — tidak akan pernah bentrok meskipun banyak modul memiliki Bab 2, dan tidak bergantung pada nama file PDF.
+1. Penamaan folder output: gunakan `chapter_id` sebagai `--out`, yaitu `output/<chapter_id>`. `chapter_id` unik lintas modul dan tidak pernah didaur ulang (`SERIAL`), sehingga folder aman dipakai sebagai nama permanen dan tidak bergantung pada nama file PDF.
 
-2. Resolve gambar: `block.image_file` menyimpan nama file saja. BE me-resolve ke lokasi nyata dengan basis folder yang diketahui BE. Karena nama file adalah hash konten yang unik global, gambar tidak akan bertabrakan meskipun disimpan flat.
+2. Resolve gambar: `block.image_file` menyimpan nama file saja. BE me-resolve ke lokasi nyata dengan basis folder yang diketahui BE. Nama file adalah hash konten yang unik global, sehingga gambar tidak bertabrakan meskipun disimpan flat.
 
-3. Pemrosesan per bab: satu pemanggilan batch dan pipeline menangani satu bab. Grouping bab ke modul terjadi karena bab dibuat di bawah `module_id` yang sama, bukan karena struktur folder.
+3. Pemrosesan per bab: satu pemanggilan batch dan pipeline menangani satu bab. Grouping bab ke modul terjadi lewat `module_id` yang sama, bukan struktur folder.
 
 4. Batas segmentasi bab berasal dari guru (FE), bukan deteksi otomatis. Guru menandai rentang halaman tiap bab dari preview PDF; BE memotong PDF sesuai itu.
 
-5. Retensi folder output: bersifat debug dan intermediate. Yang wajib dipertahankan untuk production adalah `images/` (dirujuk DB) dan opsional `content_list.json` (untuk re-annotate tanpa MinerU ulang). File `.md` tidak dipakai pipeline dan tidak perlu dipertahankan.
+5. Retensi folder output: bersifat debug dan intermediate. Wajib dipertahankan untuk production: `images/` (dirujuk DB) dan opsional `content_list.json` (untuk re-annotate tanpa MinerU ulang). File `.md` tidak dipakai pipeline.
 
-6. `POST /blocks/{block_id}/regenerate` tidak menyimpan riwayat: tiap panggilan langsung menimpa `readable_text` yang lama, dan teks feedback guru tidak disimpan ke DB sama sekali. Guru boleh memanggil endpoint ini berkali-kali untuk blok yang sama, tapi FE tidak bisa menampilkan percobaan-percobaan sebelumnya — cuma hasil paling akhir yang ada.
+6. `POST /blocks/{block_id}/regenerate` tidak menyimpan riwayat: tiap panggilan menimpa `readable_text` yang lama, teks feedback guru tidak disimpan ke DB. FE tidak bisa menampilkan percobaan sebelumnya, cuma hasil paling akhir. Berlaku sama untuk `POST /soal/{id}/regenerate` (bagian 3.7).
+
+7. Model quiz generator (`config.QUIZ_MODEL`, default `openai/gpt-4o`) beda dari model anotasi (`TEXT_MODEL`/`VISION_MODEL`, default `qwen/qwen3.7-flash`) karena reasoning matematika HOTS butuh model lebih kuat. `review_priority=high` dari Validation adalah sinyal untuk guru, bukan keputusan otomatis (lihat bagian 2).
+
+Catatan implementasi layanan AI dan backend (model MinerU in-process, pemisahan proses worker, paralelisasi quiz generator, konvensi penamaan file) ada di `ai services/README.md` dan `backend/README.md` — tidak diulang di sini karena tidak mengubah interface antar tim.
