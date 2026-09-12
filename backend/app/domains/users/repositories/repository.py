@@ -68,7 +68,7 @@ class TeacherRepository(TeacherRepositoryInterface):
     async def get_dashboard(self, classroom_id:int, limit:int) -> dict:
         modules_count = (
             select(func.count(Module.id))
-            .where(Module.classroom_id == classroom_id, Module.status == ModuleStatus.PUBLISH, Module.deleted_at.is_(None))
+            .where(Module.classroom_id == classroom_id, Module.deleted_at.is_(None))
             .scalar_subquery()
         )
 

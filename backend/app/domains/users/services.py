@@ -21,7 +21,7 @@ from app.domains.contents.models.chapter import Chapter
 from app.domains.users.schemas.taecher_dashboard_request import TeacherDashboardRequest
 from app.domains.users.schemas.taecher_dashboard_response import TeacherDashboardResponse
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
-from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse
+from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse, TeacherModuleWithoutChapterResponse
 from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
 
@@ -122,10 +122,10 @@ class TeacherService:
         except Exception as e:
             raise e
 
-    async def get_teacher_modules(self, dto: TeacherModuleRequest, teacher_id: int) -> list[TeacherModuleResponse]:
+    async def get_teacher_modules(self, dto: TeacherModuleRequest, teacher_id: int) -> list[TeacherModuleWithoutChapterResponse]:
             try:
                 raw_modules = await self.content_repo.get_all_modules_teachers(dto.classroom_id, teacher_id, dto.status, dto.search)
-                modules = [TeacherModuleResponse.model_validate(m) for m in raw_modules]
+                modules = [TeacherModuleWithoutChapterResponse.model_validate(m) for m in raw_modules]
                 return modules
             except Exception as e:
                 raise e

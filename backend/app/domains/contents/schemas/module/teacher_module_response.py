@@ -11,4 +11,9 @@ class TeacherModuleResponse(ModuleResponse):
     
     status: ModuleStatus | None = None
     
-    chapters: list[ChapterResponse]
+    chapters: list[ChapterResponse] = []
+
+class TeacherModuleWithoutChapterResponse(ModuleResponse):
+    model_config = ConfigDict(from_attributes=True)
+    
+    status: ModuleStatus | None = None

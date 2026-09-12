@@ -18,7 +18,7 @@ from app.domains.contents.schemas.chapters.student_chapter_detail_response impor
 from app.domains.users.schemas.taecher_dashboard_request import TeacherDashboardRequest
 from app.domains.users.schemas.taecher_dashboard_response import TeacherDashboardResponse
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
-from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse
+from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse, TeacherModuleWithoutChapterResponse
 from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
 from app.domains.contents.schemas.blocks.block_response import BlockResponse
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
@@ -82,7 +82,7 @@ async def register_teacher(
 @router_teacher.get(
     "/dashboard",
     response_model=Response[TeacherDashboardResponse],
-    description="Requires the STUDENT role.",
+    description="Requires the Teacher role.",
 )
 async def get_teacher_dashboard(
     query: Annotated[TeacherDashboardRequest, Depends()],
@@ -101,7 +101,7 @@ async def get_teacher_dashboard(
 
 @router_teacher.get(
     "/modules",
-    response_model=Response[list[TeacherModuleResponse]],
+    response_model=Response[list[TeacherModuleWithoutChapterResponse]],
     description="Requires the Teacher role.",
 )
 async def get_all_modules_teacher(
