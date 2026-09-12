@@ -7,7 +7,7 @@ Storage hasil anotasi ke database, ekspos lewat FastAPI, dan orkestrasi pemroses
 ### schema.sql
 Definisi seluruh tabel database, dijalankan oleh `db.init_db()`. Detail skema ada di `CONTRACT.md`.
 
-`schema.sql` dijalankan ulang setiap start, memakai `CREATE TABLE IF NOT EXISTS` dan `ADD COLUMN IF NOT EXISTS` supaya aman dipanggil berkali-kali. Batasannya: `ADD COLUMN IF NOT EXISTS` hanya memeriksa keberadaan kolom, bukan constraint-nya — kalau sebuah FK constraint pernah di-drop manual (mis. lewat `DROP TABLE ... CASCADE` pada tabel yang direferensikan) sementara kolomnya sendiri tetap ada, re-run `init_db()` tidak akan memulihkan constraint itu. Ini bukan pengganti sistem migrasi sungguhan (mis. Alembic) — cukup untuk tahap sekarang, tapi kalau skema makin sering berubah setelah pilot test, pertimbangkan pindah ke migration tool yang melacak versi skema secara eksplisit.
+Dijalankan ulang setiap start, memakai `CREATE TABLE IF NOT EXISTS` dan `ADD COLUMN IF NOT EXISTS`. `ADD COLUMN IF NOT EXISTS` hanya memeriksa keberadaan kolom, bukan constraint-nya — FK constraint yang di-drop manual tidak ikut dipulihkan. Bukan sistem migrasi (mis. Alembic).
 
 ### db.py
 Koneksi dan inisialisasi database lewat `psycopg`, dengan `row_factory=dict_row` (baris dikembalikan sebagai dict).
@@ -15,7 +15,7 @@ Koneksi dan inisialisasi database lewat `psycopg`, dengan `row_factory=dict_row`
 - `connect()` membuka koneksi ke `DATABASE_URL` (dari `backend/.env`, contoh nilai di `.env.example`).
 - `init_db()` menjalankan `schema.sql`.
 
-### ingest.py
+### annotation_ingest.py
 Membuat modul dan bab, lalu menyimpan blok dari `annotated.json` ke sebuah bab.
 
 - `create_module(conn, title, fase_id)` membuat baris modul dan mengembalikan `module_id`.
@@ -25,27 +25,43 @@ Membuat modul dan bab, lalu menyimpan blok dari `annotated.json` ke sebuah bab.
 
 Blok disimpan secara bertahap dalam satu bab. `reading_order` dihitung dari nilai terbesar yang ada ditambah kelipatan `READING_ORDER_STEP` (10), sehingga beberapa window dari satu bab yang diproses terpisah tetap menyambung.
 
+### quiz_ingest.py
+Menyimpan hasil quiz generator ke DB.
+
+- `create_quiz_request(conn, module_id)` membuat baris `quiz_request`, mengembalikan `quiz_request_id`.
+- `link_chapter(conn, quiz_request_id, chapter_id, hots_count, lots_count)` mengaitkan satu bab ke request dengan target jumlah soalnya.
+- `save_soal(conn, quiz_request_id, chapter_id, data, review_priority, validation_notes)` menyimpan satu soal (opsi, langkah, dan stimulus kalau HOTS). Satu commit per soal.
+
 ### pdf_cut.py
-Memotong PDF ke rentang halaman tertentu (0-based, inklusif) lewat `pypdf`. Dipakai `app/routers/chapters.py` untuk memotong PDF modul yang di-upload guru sesuai rentang halaman satu bab, sebelum diproses MinerU.
+Memotong PDF ke rentang halaman tertentu (0-based, inklusif) lewat `pypdf`. Dipakai `app/routers/chapters.py` untuk memotong PDF modul sesuai rentang halaman satu bab, sebelum diproses MinerU.
 
 ### jobs.py
 Queue pemrosesan bab berbasis tabel `job`.
 
 - `enqueue(conn, chapter_id, pdf_path, out_dir)` memasukkan satu job, mengembalikan `job_id`.
 - `get_latest_job_for_chapter(conn, chapter_id)` mengambil job terakhir milik satu bab.
-- `run_worker_forever()` menjalankan loop worker tanpa henti; dipakai oleh `worker.py`.
+- `run_worker_forever()` menjalankan loop worker tanpa henti; dipakai oleh `annotation_worker.py`.
 
-Worker memproses job satu per satu (tidak paralel) karena MinerU membutuhkan RAM besar per proses; menjalankan lebih dari satu worker MinerU sekaligus berisiko kehabisan memori.
+Worker memproses job satu per satu karena MinerU membutuhkan RAM besar per proses dan model MinerU tetap resident di memori selama proses ini hidup. Wajib tepat satu instance.
 
-### worker.py
-Proses worker MinerU, terpisah dari proses Uvicorn, **selalu dijalankan sebagai proses tersendiri** (bukan bagian dari proses API) supaya jumlahnya tetap tepat satu tidak peduli berapa banyak proses Uvicorn yang melayani HTTP. Wajib tepat satu instance berjalan.
+### annotation_worker.py
+Proses worker MinerU, terpisah dari proses Uvicorn, selalu dijalankan sebagai proses tersendiri. Wajib tepat satu instance berjalan.
 
 ```
-uv run python worker.py
+uv run python annotation_worker.py
 ```
+
+### quiz_worker.py
+Proses worker quiz generator, terpisah dari proses Uvicorn dan dari `annotation_worker.py`. Polling tabel `quiz_request` (status `queued`), menjalankan Chain 0-4 (`ai services/quiz/quiz_pipeline.py`) per bab yang diminta lewat `quiz_request_chapter`. Bebannya cuma panggilan API (LLM), bukan proses lokal berat seperti MinerU — boleh dijalankan lebih dari satu instance.
+
+```
+uv run python quiz_worker.py
+```
+
+`annotation_worker.py` dan `quiz_worker.py` dipisah karena karakteristiknya berbeda: satu wajib singleton dan menahan model resident di memori, satu lagi ringan dan boleh diskalakan. Memisahkan keduanya memberi isolasi kegagalan dan skala independen untuk masing-masing.
 
 ### paths.py
-`setup()` menaruh folder `backend/` dan `ai services/annotation/` ke `sys.path`, supaya impor datar (`import db`, `import config`, dst) bisa jalan dari kedua arah tanpa tiap entry point menghitung ulang lokasinya sendiri. Dipanggil `worker.py`, `jobs.py`, dan `app/main.py`.
+`setup()` menaruh folder `backend/`, `ai services/annotation/`, dan `ai services/quiz/` ke `sys.path`, supaya impor datar (`import db`, `import config`, dst) bisa jalan dari ketiga arah. Dipanggil `annotation_worker.py`, `quiz_worker.py`, `jobs.py`, dan `app/main.py`.
 
 ### app/
 Aplikasi FastAPI.
@@ -56,20 +72,27 @@ Aplikasi FastAPI.
 - `app/routers/chapters.py` — `POST /chapters` (upload PDF + rentang halaman, memotong PDF, membuat bab, mengantrekan job), `GET /chapters/{id}`, `GET /chapters/{id}/status`.
 - `app/routers/blocks.py` — `GET /chapters/{id}/blocks`, `POST /blocks/{id}/regenerate`.
 - `app/routers/fase.py` — `GET /fase`.
+- `app/routers/quiz.py` — `POST /quiz-requests`, `GET /quiz-requests/{id}/status`, `GET /quiz-requests/{id}/soal`.
+- `app/routers/soal.py` — `GET /soal/{id}`, `PATCH /soal/{id}`, `POST /soal/{id}/approve`, `POST /soal/{id}/reject`, `POST /soal/{id}/regenerate`.
 
-Detail parameter, response, dan kode error tiap endpoint ada di `CONTRACT.md` bagian 3 — bukan di sini.
+Detail parameter, response, dan kode error tiap endpoint ada di `CONTRACT.md` bagian 3.
 
-Menjalankan (dua proses terpisah, wajib dua-duanya):
+Menjalankan (tiga proses terpisah, wajib semuanya):
 
 ```
 # proses 1: worker MinerU
-uv run python worker.py
+uv run python annotation_worker.py
 
-# proses 2: API
+# proses 2: worker quiz generator
+uv run python quiz_worker.py
+
+# proses 3: API
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 ```
 
-`app/main.py` sendiri tidak pernah menjalankan worker MinerU, jadi `--workers` di Uvicorn boleh dinaikkan bebas untuk melayani lebih banyak request HTTP tanpa memengaruhi jumlah proses MinerU yang berjalan (tetap satu, dari `worker.py`).
+Kalau `uv run uvicorn ...` gagal dengan error `Failed to canonicalize script path`, jalankan lewat modul Python langsung: `uv run python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2`.
+
+`app/main.py` tidak pernah menjalankan worker MinerU atau quiz generator, jadi `--workers` di Uvicorn boleh dinaikkan bebas tanpa memengaruhi jumlah proses worker.
 
 ## Konfigurasi
 
@@ -79,12 +102,16 @@ uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
 |---|---|---|
 | `DATABASE_URL` | `postgresql://postgres:[PASSWORD]@localhost:5432/lydera` | Koneksi PostgreSQL |
 
-`DATABASE_URL` adalah nama generik (dipakai banyak framework/platform lain, mis. Heroku). Kalau proses ini nanti berjalan berdampingan dengan aplikasi lain di environment yang sama, pastikan tidak bentrok dengan variabel `DATABASE_URL` milik aplikasi lain.
+`DATABASE_URL` adalah nama generik — cek tidak bentrok kalau proses ini berjalan berdampingan dengan aplikasi lain di environment yang sama.
 
 ## Hubungan dengan AI Service
 
-Layanan AI (`ai services/annotation/`) menghasilkan `annotated.json` per window bab. `jobs.py` menjalankan `batch.plan` + `run_mineru.run` per window, lalu `pipeline.run` untuk menganotasi dan meng-ingest seluruh window bab tersebut ke satu `chapter`.
+Layanan AI anotasi (`ai services/annotation/`) menghasilkan `annotated.json` per window bab. `jobs.py` menjalankan `batch.plan` + `run_mineru.run` per window, lalu `annotation_pipeline.run` untuk menganotasi dan meng-ingest seluruh window bab ke satu `chapter`.
+
+Layanan AI quiz generator (`ai services/quiz/`) berbeda pola dari anotasi: modul-modulnya (`segment.py`, `context.py`, `generate.py`, `validate.py`, `regenerate.py`) tidak menyentuh DB, tapi `quiz_pipeline.py` memanggil `backend/quiz_ingest.py` langsung untuk menyimpan hasil — mirip `annotation_pipeline.py` (orkestrator yang boleh menyentuh DB), bukan modul konversi individualnya.
 
 ## Catatan
 
-Impor antar modul di `backend/` dan `ai services/annotation/` memakai gaya datar (`import db`, `import config`, dst — lihat `paths.py`). Ini aman selama layanan AI berdiri sendiri, tapi berisiko bentrok nama modul (`config`, `db`, `batch`, dst adalah nama umum) kalau `backend/app` disatukan langsung ke proses FastAPI aplikasi utama yang mungkin punya modul dengan nama sama. Sebelum penggabungan itu terjadi, sebaiknya: (a) folder `ai services/annotation` diganti nama jadi identifier Python valid (mis. `ai_services/annotation`, karena nama dengan spasi tidak bisa jadi package Python), (b) tambahkan `__init__.py` di `ai_services/`, `ai_services/annotation/`, dan `backend/`, (c) ganti seluruh `import X` datar di kedua folder itu jadi impor bernamespace (`from ai_services.annotation import X` atau `from backend import X`). Perubahan ini sengaja belum dikerjakan sekarang karena bentuk package yang tepat bergantung pada struktur BE utama yang belum diketahui detailnya.
+Impor antar modul di `backend/`, `ai services/annotation/`, dan `ai services/quiz/` memakai gaya datar (`import db`, `import config`, dst — lihat `paths.py`). File spesifik satu fitur diberi prefiks nama fiturnya (`annotation_*`/`quiz_*`) untuk menghindari ambiguitas dan bentrok impor antar fitur yang berbagi `sys.path` yang sama: `annotation_worker.py`, `annotation_ingest.py`, `annotation_pipeline.py`, `quiz_worker.py`, `quiz_ingest.py`, `quiz_pipeline.py`. File generik/dipakai bersama (`db.py`, `cache.py`, `llm.py`, `config.py`, `paths.py`) tidak diberi prefiks.
+
+Sebelum folder-folder ini disatukan ke proses FastAPI aplikasi utama, impor datar perlu diganti jadi impor bernamespace (butuh restrukturisasi folder jadi package Python yang valid).

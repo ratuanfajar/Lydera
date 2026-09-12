@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
+import annotation_ingest
 import db
-import ingest
 from app.schemas import CpOut, ModuleCreate, ModuleOut
 
 router = APIRouter(prefix="/modules", tags=["modules"])
@@ -14,7 +14,7 @@ def create_module(payload: ModuleCreate):
         fase = conn.execute("SELECT id FROM fase WHERE id = %s", (payload.fase_id,)).fetchone()
         if fase is None:
             raise HTTPException(400, f"fase_id={payload.fase_id} tidak ditemukan")
-        module_id = ingest.create_module(conn, payload.title, payload.fase_id)
+        module_id = annotation_ingest.create_module(conn, payload.title, payload.fase_id)
         row = conn.execute("SELECT * FROM module WHERE id = %s", (module_id,)).fetchone()
     finally:
         conn.close()

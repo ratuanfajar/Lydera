@@ -13,6 +13,7 @@ OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL") or "https://openrouter.ai
 MODEL = os.getenv("MODEL") or "qwen/qwen3.7-flash"
 TEXT_MODEL = os.getenv("TEXT_MODEL") or MODEL
 VISION_MODEL = os.getenv("VISION_MODEL") or MODEL
+QUIZ_MODEL = os.getenv("QUIZ_MODEL") or "openai/gpt-4o"
 CACHE_DIR = Path(os.getenv("CACHE_DIR") or str(ANNOTATION_DIR / ".cache"))
 OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR") or str(ANNOTATION_DIR / "output"))
 TEXT_MAX_TOKENS = int(os.getenv("TEXT_MAX_TOKENS") or "512")

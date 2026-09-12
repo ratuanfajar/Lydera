@@ -4,9 +4,9 @@ from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
+import annotation_ingest
 import config
 import db
-import ingest
 import jobs
 import pdf_cut
 from app.schemas import ChapterCreateResponse, ChapterOut, JobStatus
@@ -43,7 +43,7 @@ async def create_chapter(
             if cp["fase_id"] != module["fase_id"]:
                 raise HTTPException(400, "cp_id tidak sesuai fase modul ini")
 
-        chapter_id = ingest.create_chapter(conn, module_id, number, title, file.filename, cp_id)
+        chapter_id = annotation_ingest.create_chapter(conn, module_id, number, title, file.filename, cp_id)
 
         UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
         raw_path = UPLOAD_DIR / f"raw-{chapter_id}.pdf"

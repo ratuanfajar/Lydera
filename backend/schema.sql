@@ -63,8 +63,6 @@ ALTER TABLE chapter ADD COLUMN IF NOT EXISTS cp_id   INTEGER REFERENCES cp(id);
 CREATE TABLE IF NOT EXISTS quiz_request (
     id          SERIAL PRIMARY KEY,
     module_id   INTEGER NOT NULL REFERENCES module(id) ON DELETE CASCADE,
-    hots_count  INTEGER NOT NULL CHECK (hots_count >= 0),
-    lots_count  INTEGER NOT NULL CHECK (lots_count >= 0),
     status      TEXT    NOT NULL DEFAULT 'queued'
                     CHECK (status IN ('queued', 'running', 'done', 'failed')),
     error       TEXT,
@@ -72,11 +70,17 @@ CREATE TABLE IF NOT EXISTS quiz_request (
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE quiz_request DROP COLUMN IF EXISTS hots_count;
+ALTER TABLE quiz_request DROP COLUMN IF EXISTS lots_count;
+
 CREATE TABLE IF NOT EXISTS quiz_request_chapter (
     quiz_request_id INTEGER NOT NULL REFERENCES quiz_request(id) ON DELETE CASCADE,
     chapter_id      INTEGER NOT NULL REFERENCES chapter(id) ON DELETE CASCADE,
     PRIMARY KEY (quiz_request_id, chapter_id)
 );
+
+ALTER TABLE quiz_request_chapter ADD COLUMN IF NOT EXISTS hots_count INTEGER NOT NULL DEFAULT 0 CHECK (hots_count >= 0);
+ALTER TABLE quiz_request_chapter ADD COLUMN IF NOT EXISTS lots_count INTEGER NOT NULL DEFAULT 0 CHECK (lots_count >= 0);
 
 CREATE TABLE IF NOT EXISTS soal_stimulus (
     id                          SERIAL PRIMARY KEY,

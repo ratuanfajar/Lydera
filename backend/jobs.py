@@ -10,7 +10,7 @@ paths.setup()
 
 import db
 import batch
-import pipeline
+import annotation_pipeline
 import run_mineru
 
 POLL_INTERVAL_SECONDS = 2
@@ -33,7 +33,7 @@ def get_latest_job_for_chapter(conn, chapter_id):
 
 
 def run_worker_forever() -> None:
-    """Entry point untuk proses worker MinerU yang berdiri sendiri (lihat worker.py).
+    """Entry point untuk proses worker MinerU yang berdiri sendiri (lihat annotation_worker.py).
 
     Selalu dijalankan sebagai proses terpisah dari API (bukan thread di dalam
     proses FastAPI), supaya jumlahnya tetap tepat satu tidak peduli berapa
@@ -67,7 +67,7 @@ def _process(job_id, pdf_path, out_dir, chapter_id) -> None:
             rc = run_mineru.run(pdf_path, w.out_dir, start=w.start_page, end=w.end_page)
             if rc != 0:
                 raise RuntimeError(f"MinerU gagal pada window {w.label}")
-        total = pipeline.run(conn, out_dir, chapter_id)
+        total = annotation_pipeline.run(conn, out_dir, chapter_id)
         _mark(conn, job_id, "done", blocks_total=total)
     except Exception as exc:
         traceback.print_exc()

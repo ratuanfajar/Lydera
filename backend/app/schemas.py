@@ -70,3 +70,63 @@ class RegenerateRequest(BaseModel):
 class RegenerateResponse(BaseModel):
     block_id: int
     readable_text: str
+
+
+class QuizChapterRequest(BaseModel):
+    chapter_id: int
+    hots_count: int
+    lots_count: int
+
+
+class QuizRequestCreate(BaseModel):
+    module_id: int
+    chapters: list[QuizChapterRequest]
+
+
+class QuizRequestCreateResponse(BaseModel):
+    quiz_request_id: int
+    status: str
+
+
+class QuizRequestStatus(BaseModel):
+    quiz_request_id: int
+    status: str
+    error: str | None
+
+
+class SoalOpsiOut(BaseModel):
+    label: str
+    opsi_text: str
+
+
+class SoalOut(BaseModel):
+    id: int
+    chapter_id: int
+    stimulus_id: int | None
+    bloom_level: int
+    question_text: str
+    options: list[SoalOpsiOut]
+    correct_option: str
+    langkah: list[str]
+    kesimpulan: str
+    stimulus_text: str | None
+    review_status: str
+    review_priority: str
+    validation_notes: str | None
+
+
+class SoalEditRequest(BaseModel):
+    question_text: str | None = None
+    options: dict[str, str] | None = None
+    correct_option: str | None = None
+    langkah: list[str] | None = None
+    kesimpulan: str | None = None
+
+
+class SoalRegenerateRequest(BaseModel):
+    feedback: str
+
+
+class SoalStatusResponse(BaseModel):
+    id: int
+    review_status: str

@@ -11,8 +11,8 @@ import paths
 paths.setup()
 
 import annotate
+import annotation_ingest
 import db
-import ingest
 
 
 def content_lists(outputs_dir: Path) -> list[Path]:
@@ -37,7 +37,7 @@ def run(conn, outputs_dir, chapter_id) -> int:
             json.dumps([asdict(b) for b in blocks], ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
-        total += ingest.ingest(conn, annotated_path, chapter_id)
+        total += annotation_ingest.ingest(conn, annotated_path, chapter_id)
         print(f"[OK] {cl.parent.name}")
     return total
 
@@ -65,8 +65,8 @@ def main() -> int:
     db.init_db()
     conn = db.connect()
     try:
-        module_id = args.module_id or ingest.create_module(conn, args.module_title or "Modul", args.fase_id)
-        chapter_id = ingest.create_chapter(
+        module_id = args.module_id or annotation_ingest.create_module(conn, args.module_title or "Modul", args.fase_id)
+        chapter_id = annotation_ingest.create_chapter(
             conn, module_id, args.chapter_number, args.chapter_title, args.source_file, args.cp_id
         )
         total = run(conn, outputs, chapter_id)
