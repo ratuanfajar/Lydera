@@ -11,7 +11,11 @@ __pycache__/
 
 ai-services/annotation/output/
 ai-services/annotation/.cache/
+<<<<<<< HEAD
 ai-services/quiz/.cache/
+=======
+ai-services/annotation/output/
+>>>>>>> fbc465a6560f16cb005c7acd6c0a337d5475fd39
 
 *.db
 *.db-journal
