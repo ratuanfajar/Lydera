@@ -6,7 +6,8 @@ from app.domains.quizz.models.quiz_request import QuizRequestStatus
 from app.domains.quizz.models.quiz_request_chapter import QuizRequestChapter
 from app.domains.quizz.schemas.module_quiz_response import ModuleQuizResponse
 
-class QuizRequestTeacherResponse(BaseModel):
+
+class QuizRequestStudentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
@@ -23,8 +24,6 @@ class QuizRequestTeacherResponse(BaseModel):
     module: ModuleQuizResponse
 
 # Detail
-
-
 class QuestionExplanationSteps(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

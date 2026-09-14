@@ -15,6 +15,8 @@ from app.utils.idempotency import generate_idempotency_key
 from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
 from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
+from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
+from app.domains.quizz.schemas.quiz_request_student_response import QuizRequestStudentResponse
 import paths
 
 paths.setup()
@@ -187,6 +189,7 @@ class QuizService:
         )
         if not updated:
             raise NotFoundException("Quiz request tidak ditemukan.")
+        await self.db.commit()
 
         return True
 
@@ -404,6 +407,10 @@ class QuizService:
     async def get_quizzes_teacher(self, query: QuizRequestQuery, teacher_id:int) -> list[QuizRequestTeacherResponse]:
         quizzes = await self.repo.get_quizzes_teacher(query.classroom_id, teacher_id, query.status)
         return [QuizRequestTeacherResponse.model_validate(q) for q in quizzes]
+
+    async def get_quizzes_student(self, query: QuizRequestStudentQuery, student_id:int) -> list[QuizRequestStudentResponse]:
+        quizzes = await self.repo.get_quizzes_student(query.classroom_id, student_id, query.status)
+        return [QuizRequestStudentResponse.model_validate(q) for q in quizzes]
 
     async def get_quiz_teacher(self, query: QuizRequestDetailQuery, teacher_id:int, id:int) -> QuizRequestTeacherDetailResponse: 
         quiz = await self.repo.get_quiz_teacher(query.classroom_id, teacher_id, id)

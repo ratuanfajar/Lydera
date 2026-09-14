@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List, Optional, Sequence
 
-from sqlalchemy import delete, func, insert, select
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy import Label, and_, delete, func, insert, or_, select
+from sqlalchemy.orm import contains_eager, joinedload, selectinload
 
 from app.core.db import AsyncSession
 from app.domains.contents.models import Block, Chapter, Module
@@ -11,6 +11,9 @@ from app.domains.quizz.repositories.interface import QuizRepositoryInterface
 from app.domains.quizz.schemas.quiz_request_query import QuizRequestQueryStatus
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest
+from app.domains.quizz.models.quiz_progress import QuizProgress
+from app.domains.quizz.models.quiz_request import QuizRequestStatus
+from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
 
 
 class QuizRepository(QuizRepositoryInterface):
@@ -178,14 +181,19 @@ class QuizRepository(QuizRepositoryInterface):
 
         return result.rowcount > 0
 
-    # Teacher
-    async def get_quizzes_teacher(self, classroom_id: int, teacher_id:int, status: QuizRequestQueryStatus) -> Sequence[QuizRequest]:
-        soal_count_subquery = (
+        
+    def _get_soal_count(self) -> Label[int]:
+        """Synchronous subquery builder returning question count per quiz_request."""
+        return (
             select(func.count(Soal.id))
             .where(Soal.quiz_request_id == QuizRequest.id)
             .scalar_subquery()
             .label("question_counts")
         )
+
+    # Teacher
+    async def get_quizzes_teacher(self, classroom_id: int, teacher_id:int, status: QuizRequestQueryStatus) -> Sequence[QuizRequest]:
+        soal_count_subquery = self._get_soal_count()
 
         stmt = (
             select(QuizRequest, soal_count_subquery)
@@ -205,12 +213,56 @@ class QuizRepository(QuizRepositoryInterface):
             stmt = stmt.where(QuizRequest.status_published == status.value)
 
         result = await self.db.execute(stmt)
-        rows = result.all()
+        rows = result.unique().all()
+
         quizzes = []
         for quiz, count in rows:
             quiz.question_counts = count or 0
             quizzes.append(quiz)
 
+        return quizzes
+
+    async def get_quizzes_student(self, classroom_id: int, student_id:int, status: QuizRequestStudentQueryStatus) -> Sequence[QuizRequest]: 
+
+        soal_count_subquery = self._get_soal_count()
+        
+        progress_join = and_(
+            QuizProgress.quiz_request_id == QuizRequest.id,
+            QuizProgress.student_id == student_id
+        )
+
+        stmt = (
+            select(QuizRequest, soal_count_subquery)
+            .outerjoin(QuizProgress, progress_join)
+            .where(
+                QuizRequest.classroom_id == classroom_id,
+                QuizRequest.status_published == QuizRequestStatus.PUBLISH
+            )
+            .options(
+                joinedload(QuizRequest.module),
+                contains_eager(QuizRequest.quiz_progress)
+            )
+            .order_by(QuizRequest.start_time.desc())
+        )
+
+        if status == QuizRequestStudentQueryStatus.DONE:
+            stmt = stmt.where(QuizProgress.is_done.is_(True))
+
+        elif status == QuizRequestStudentQueryStatus.NOT_DONE:
+            stmt = stmt.where(
+                or_(
+                    QuizProgress.id.is_(None),
+                    QuizProgress.is_done.is_(False),
+                )
+            )
+
+        result = await self.db.execute(stmt)
+        rows = result.unique().all()
+
+        quizzes = []
+        for quiz, count in rows:
+            setattr(quiz, "question_counts", count or 0)
+            quizzes.append(quiz)
         return quizzes
 
     async def get_quiz_teacher(self, classroom_id: int, teacher_id:int, id:int) -> QuizRequest | None: 
@@ -224,17 +276,18 @@ class QuizRepository(QuizRepositoryInterface):
                 Classroom.teacher_id == teacher_id
             )
             .options(
-                joinedload(QuizRequest.module),
+                contains_eager(QuizRequest.module),
                 selectinload(QuizRequest.chapter_links),
-                selectinload(QuizRequest.soals).selectinload(Soal.stimulus),
-                selectinload(QuizRequest.soals).selectinload(Soal.opsi),
-                selectinload(QuizRequest.soals).selectinload(Soal.langkah),
+                selectinload(QuizRequest.soals).options(
+                    selectinload(Soal.stimulus),
+                    selectinload(Soal.opsi),
+                    selectinload(Soal.langkah),
+                ),
             ).order_by(QuizRequest.id)
         )
 
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
-
 
     async def update_quiz_status_publish(self, quiz_request_id: int, status: str, error: Optional[str] = None) -> bool:
         quiz_req = await self.db.get(QuizRequest, quiz_request_id)

@@ -36,6 +36,8 @@ from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
 from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 from app.domains.quizz.schemas.quiz_delete_request import QuizDeleteRequest
 from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
+from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
+from app.domains.quizz.schemas.quiz_request_student_response import QuizRequestStudentResponse
 
 
 def _to_soal_response(soal: Soal) -> SoalResponse:
@@ -54,133 +56,43 @@ def _to_soal_response(soal: Soal) -> SoalResponse:
         review_priority=soal.review_priority,
         validation_notes=soal.validation_notes,
     )
-
-
-# ==========================================
-# QUIZ REQUEST ROUTER
-# ==========================================
-router_quiz_requests = APIRouter(prefix="/quiz-requests", tags=["quiz"], route_class=WrappedRoute)
-
-
-@router_quiz_requests.post(
-    "",
-    description="Requires the TEACHER role.",
-    response_model=Response[QuizRequestCreateResponse],
-    status_code=status.HTTP_201_CREATED,
-    responses=COMMON_VALIDATION_RESPONSES,
-)
-async def create_quiz_request(
-    _: Roles(Role.TEACHER),
-    payload: Annotated[QuizRequestCreate, Body()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    quiz_request_id = await service.create_quiz_request(payload.module_id, payload.chapters)
-    await process_quiz_request_task.kiq(quiz_request_id=quiz_request_id)
-    return Response(
-        message=get_response_message(),
-        data={"quiz_request_id": quiz_request_id, "status": "queued"},
-    )
-
-
-@router_quiz_requests.get(
-    "/{quiz_request_id}/status",
-    response_model=Response[QuizRequestStatus],
-    status_code=status.HTTP_200_OK,
-)
-async def get_quiz_request_status(
-    quiz_request_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    quiz_request = await service.get_quiz_request_status(quiz_request_id)
-    return Response(
-        message=get_response_message(),
-        data={"quiz_request_id": quiz_request_id, "status": quiz_request.status, "error": quiz_request.error},
-    )
-
-
-@router_quiz_requests.get(
-    "/{quiz_request_id}/soal",
-    response_model=Response[list[SoalResponse]],
-    status_code=status.HTTP_200_OK,
-)
-async def list_soal_for_request(
-    quiz_request_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    soal_list = await service.list_soal_for_request(quiz_request_id)
-    return Response(message=get_response_message(), data=[_to_soal_response(s) for s in soal_list])
-
-
 # ==========================================
 # SOAL ROUTER
 # ==========================================
 router_soal = APIRouter(prefix="/soal", tags=["soal"], route_class=WrappedRoute)
 
-
-@router_soal.get(
-    "/{soal_id}",
-    response_model=Response[SoalResponse],
-    status_code=status.HTTP_200_OK,
-)
-async def get_soal(
-    soal_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    soal = await service.get_soal(soal_id)
-    return Response(message=get_response_message(), data=_to_soal_response(soal))
-
-
-@router_soal.post(
-    "/{soal_id}/approve",
-    description="Requires the TEACHER role.",
-    response_model=Response[SoalStatusResponse],
-    status_code=status.HTTP_200_OK,
-)
-async def approve_soal(
-    _: Roles(Role.TEACHER),
-    soal_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    soal = await service.set_review_status(soal_id, "approved")
-    return Response(message=get_response_message(), data={"id": soal.id, "review_status": soal.review_status})
+# @router_soal.post(
+#     "/{soal_id}/approve",
+#     description="Requires the TEACHER role.",
+#     response_model=Response[SoalStatusResponse],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def approve_soal(
+#     _: Roles(Role.TEACHER),
+#     soal_id: Annotated[int, FastAPIPath()],
+#     service: QuizService = Depends(get_quiz_service),
+# ):
+#     soal = await service.set_review_status(soal_id, "approved")
+#     return Response(message=get_response_message(), data={"id": soal.id, "review_status": soal.review_status})
 
 
-@router_soal.post(
-    "/{soal_id}/reject",
-    description="Requires the TEACHER role.",
-    response_model=Response[SoalStatusResponse],
-    status_code=status.HTTP_200_OK,
-)
-async def reject_soal(
-    _: Roles(Role.TEACHER),
-    soal_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    soal = await service.set_review_status(soal_id, "rejected")
-    return Response(message=get_response_message(), data={"id": soal.id, "review_status": soal.review_status})
+# @router_soal.post(
+#     "/{soal_id}/reject",
+#     description="Requires the TEACHER role.",
+#     response_model=Response[SoalStatusResponse],
+#     status_code=status.HTTP_200_OK,
+# )
+# async def reject_soal(
+#     _: Roles(Role.TEACHER),
+#     soal_id: Annotated[int, FastAPIPath()],
+#     service: QuizService = Depends(get_quiz_service),
+# ):
+#     soal = await service.set_review_status(soal_id, "rejected")
+#     return Response(message=get_response_message(), data={"id": soal.id, "review_status": soal.review_status})
 
-
-@router_soal.post(
-    "/{soal_id}/regenerate",
-    description="Requires the TEACHER role. Hanya berlaku untuk soal HOTS (stimulus_id terisi) -- meregenerasi seluruh cluster.",
-    response_model=Response[list[SoalResponse]],
-    status_code=status.HTTP_200_OK,
-    responses=COMMON_VALIDATION_RESPONSES,
-)
-async def regenerate_soal(
-    _: Roles(Role.TEACHER),
-    soal_id: Annotated[int, FastAPIPath()],
-    payload: Annotated[SoalRegenerateRequest, Body()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    soal = await service.get_soal(soal_id)
-    if soal.stimulus_id is None:
-        from app.core.exceptions import BadRequestException
-        raise BadRequestException("soal ini tidak punya stimulus, edit langsung lewat PATCH /soal/{id}")
-
-    updated = await service.regenerate_cluster(soal.stimulus_id, payload.feedback)
-    return Response(message=get_response_message(), data=[_to_soal_response(s) for s in updated])
-
+# ==========================================
+# Teacher ROUTER
+# ==========================================
 router_teacher_quizz = APIRouter(prefix="/teachers", tags=["teachers"], route_class=WrappedRoute)
 
 @router_teacher_quizz.get(
@@ -385,7 +297,6 @@ async def update_quiz(
     result = await service.update_quiz_settings(teacher.profile_id, payload.classroom_id, quiz_id, payload)
     return Response(message="Berhasil update quizz", data=result)
 
-
 @router_teacher_quizz.delete(
     "/quizzes/{quiz_id}",
     description="Requires the TEACHER role",
@@ -401,5 +312,28 @@ async def delete_quiz(
 ):
     result = await service.delete_quiz(teacher.profile_id, quiz_id, payload.classroom_id)
     return Response(message="Berhasil hapus quizz", data=result)
+
+# ==========================================
+# Student ROUTER
+# ==========================================
+
+router_student_quizz = APIRouter(prefix="/students", tags=["students"], route_class=WrappedRoute)
+@router_student_quizz.get(
+    "/quizzes",
+    description="Requires the STUDENT role.",
+    response_model=Response[list[QuizRequestStudentResponse]],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES
+)
+async def get_list_quizzes(
+    student: Roles(Role.STUDENT),
+    query: Annotated[QuizRequestStudentQuery, Query()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    result = await service.get_quizzes_student(query, student.profile_id)
+    return Response(
+        message="Berhasil dapatkan list quiz",
+        data=result
+    )
 
 

@@ -171,7 +171,6 @@ class StudentService:
         return student
 
     async def dashboard_student(self, dto: StudentDashboardRequest, student_id: int, user_id:int) -> StudentDashboardResponse:
-        # Kasih Redis
         try:
             classroom_info = await self.classroom_repo.get_classroom_info(dto.classroom_id, student_id, Role.STUDENT)
             tasks = await self.student_repo.get_task_counts(dto.classroom_id, student_id)

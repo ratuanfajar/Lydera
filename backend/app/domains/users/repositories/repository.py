@@ -12,7 +12,8 @@ from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.domains.contents.models import Module, ModuleProgress, ModuleStatus
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.users.models.student import student_classrooms
-from app.domains.quizz.models.quiz_request import QuizRequest
+from app.domains.quizz.models.quiz_request import QuizRequest, QuizRequestStatus
+from app.domains.quizz.models.quiz_progress import QuizProgress
 
 
 class UserRepository(UserRepositoryInterface):
@@ -112,7 +113,7 @@ class TeacherRepository(TeacherRepositoryInterface):
             .order_by(QuizRequest.created_at.desc()) 
             .limit(limit)
         )
-        
+
         newest_exams = (await self.db.scalars(exams_stmt)).all()
 
         return {
@@ -136,7 +137,7 @@ class StudentRepository(StudentRepositoryInterface):
         return student
     
     async def get_task_counts(self,classroom_id: int,student_id: int) -> dict[str, int]:
-        stmt = (
+        modules_subquery = (
             select(func.count(func.distinct(Module.id)))
             .outerjoin(
                 ModuleProgress,
@@ -151,10 +152,42 @@ class StudentRepository(StudentRepositoryInterface):
                     ModuleProgress.is_done.is_(False),
                 ),
             )
+            .scalar_subquery()
         )
 
-        modules_not_done = await self.db.scalar(stmt) or 0
+        # 2. Subquery for pending exams (QuizRequest) count
+        exams_subquery = (
+            select(func.count(func.distinct(QuizRequest.id)))
+            .outerjoin(
+                QuizProgress,
+                (QuizProgress.quiz_request_id == QuizRequest.id)
+                & (QuizProgress.student_id == student_id),
+            )
+            .where(
+                QuizRequest.classroom_id == classroom_id,
+                QuizRequest.status_published == QuizRequestStatus.PUBLISH,
+                or_(
+                    QuizProgress.id.is_(None),
+                    QuizProgress.is_done.is_(False),
+                ),
+            )
+            .scalar_subquery()
+        )
+
+        stmt = select(
+            modules_subquery.label("modules_not_done"),
+            exams_subquery.label("exam_not_done"),
+        )
+
+        result = (await self.db.execute(stmt)).one_or_none()
+
+        if not result:
+            return {
+                "modules_not_done": 0,
+                "exam_not_done": 0,
+            }
+        
         return {
-            "modules_not_done": modules_not_done,
-            "exam_not_done": 0,
+            "modules_not_done": result.modules_not_done or 0,
+            "exam_not_done": result.exam_not_done or 0,
         }

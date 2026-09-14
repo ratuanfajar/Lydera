@@ -7,6 +7,7 @@ from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, Soal
 from app.domains.quizz.schemas.quiz_request_query import QuizRequestQueryStatus
 from app.domains.quizz.schemas.quiz_request_create import QuizChapterRequest
 from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest
+from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
 
 
 class QuizRepositoryInterface(ABC):
@@ -54,6 +55,9 @@ class QuizRepositoryInterface(ABC):
     # New Method Soal
     @abstractmethod
     async def get_quizzes_teacher(self, classroom_id: int, teacher_id:int, status: QuizRequestQueryStatus) -> Sequence[QuizRequest]: raise NotImplementedError
+    @abstractmethod
+    async def get_quizzes_student(self, classroom_id: int, student_id:int, status: QuizRequestStudentQueryStatus) -> Sequence[QuizRequest]: raise NotImplementedError
+    
 
     @abstractmethod
     async def update_quiz_request_settings(
