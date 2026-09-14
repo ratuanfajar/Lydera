@@ -31,7 +31,6 @@ async def run_all_seeds():
             await seed_teachers(session, user_id=teacher_user.id, school_id=school.id)
             await seed_students(session, user_id=student_user.id)
             await seed_classrooms(session)
-            await seed_student_classroom(session, student_id=1, classroom_id=1)
             
             print("✅ All seed data inserted successfully!")
 
