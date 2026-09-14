@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Sequence
 
 from sqlalchemy import select
@@ -5,7 +6,10 @@ from sqlalchemy.orm import selectinload
 
 from app.core.db import AsyncSession
 from app.domains.contents.models import Block, Chapter, Module
-from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalLangkah, SoalOpsi, SoalStimulus
+from app.domains.quizz.models import (
+    QuizRequest, QuizRequestChapter, Soal, SoalJawaban, SoalJawabanLangkah,
+    SoalLangkah, SoalOpsi, SoalStimulus,
+)
 from app.domains.quizz.repositories.interface import QuizRepositoryInterface
 
 
@@ -155,3 +159,47 @@ class QuizRepository(QuizRepositoryInterface):
         for urutan, teks in enumerate(langkah, start=1):
             soal.langkah.append(SoalLangkah(soal_id=soal_id, urutan=urutan, teks=teks))
         await self.db.flush()
+
+    # SoalJawaban (jawaban siswa)
+    async def get_soal_jawaban(self, soal_id: int, student_id: int) -> SoalJawaban | None:
+        stmt = (
+            select(SoalJawaban)
+            .where(SoalJawaban.soal_id == soal_id, SoalJawaban.student_id == student_id)
+            .options(selectinload(SoalJawaban.langkah))
+        )
+        result = await self.db.scalars(stmt)
+        return result.first()
+
+    async def create_soal_jawaban(self, soal_id: int, student_id: int, selected_option: str,
+                                   is_correct: bool, langkah: list[str]) -> int:
+        jawaban = SoalJawaban(
+            soal_id=soal_id,
+            student_id=student_id,
+            selected_option=selected_option,
+            is_correct=is_correct,
+        )
+        self.db.add(jawaban)
+        await self.db.flush()
+
+        for urutan, teks in enumerate(langkah, start=1):
+            self.db.add(SoalJawabanLangkah(jawaban_id=jawaban.id, urutan=urutan, teks=teks))
+        await self.db.flush()
+
+        return jawaban.id
+
+    async def get_jawaban_for_request(self, quiz_request_id: int, student_id: int) -> Sequence[SoalJawaban]:
+        stmt = (
+            select(SoalJawaban)
+            .join(Soal, SoalJawaban.soal_id == Soal.id)
+            .where(Soal.quiz_request_id == quiz_request_id, SoalJawaban.student_id == student_id)
+            .options(selectinload(SoalJawaban.langkah))
+        )
+        result = await self.db.scalars(stmt)
+        return result.all()
+
+    async def save_evaluation(self, jawaban: SoalJawaban, divergence_step: int | None,
+                               diagnosis: str, personalized_justification: str) -> None:
+        jawaban.divergence_step = divergence_step
+        jawaban.diagnosis = diagnosis
+        jawaban.personalized_justification = personalized_justification
+        jawaban.evaluated_at = datetime.now(timezone.utc)

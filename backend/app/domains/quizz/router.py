@@ -15,11 +15,14 @@ from app.domains.quizz.schemas import (
     QuizRequestCreate,
     QuizRequestCreateResponse,
     QuizRequestStatus,
+    QuizResultItem,
     SoalEditRequest,
     SoalOpsiResponse,
     SoalRegenerateRequest,
     SoalResponse,
     SoalStatusResponse,
+    SoalSubmitRequest,
+    SoalSubmitResponse,
 )
 from app.domains.quizz.services import QuizService
 from app.tasks.quiz_tasks import process_quiz_request_task
@@ -98,6 +101,25 @@ async def list_soal_for_request(
     return Response(message=get_response_message(), data=[_to_soal_response(s) for s in soal_list])
 
 
+@router_quiz_requests.get(
+    "/{quiz_request_id}/my-results",
+    description=(
+        "Requires the STUDENT role. Hasil kuis siswa yang login: untuk soal yang dijawab salah, "
+        "justifikasi personal (perbandingan langkah pengerjaan siswa vs yang benar) dievaluasi di "
+        "sini kalau belum pernah, lalu disimpan -- panggilan berikutnya pakai hasil tersimpan."
+    ),
+    response_model=Response[list[QuizResultItem]],
+    status_code=status.HTTP_200_OK,
+)
+async def get_my_quiz_results(
+    student: Roles(Role.STUDENT),
+    quiz_request_id: Annotated[int, FastAPIPath()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    results = await service.get_quiz_results(quiz_request_id, student.profile_id)
+    return Response(message=get_response_message(), data=results)
+
+
 # ==========================================
 # SOAL ROUTER
 # ==========================================
@@ -162,6 +184,28 @@ async def reject_soal(
 ):
     soal = await service.set_review_status(soal_id, "rejected")
     return Response(message=get_response_message(), data={"id": soal.id, "review_status": soal.review_status})
+
+
+@router_soal.post(
+    "/{soal_id}/submit",
+    description=(
+        "Requires the STUDENT role. Simpan jawaban + langkah pengerjaan siswa untuk satu soal. "
+        "Tidak ada evaluasi LLM di sini -- justifikasi untuk jawaban salah baru dihitung saat "
+        "siswa minta hasil lewat GET /quiz-requests/{id}/my-results. Satu siswa cuma bisa submit "
+        "sekali per soal."
+    ),
+    response_model=Response[SoalSubmitResponse],
+    status_code=status.HTTP_201_CREATED,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def submit_soal_answer(
+    student: Roles(Role.STUDENT),
+    soal_id: Annotated[int, FastAPIPath()],
+    payload: Annotated[SoalSubmitRequest, Body()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    await service.submit_answer(soal_id, student.profile_id, payload)
+    return Response(message=get_response_message(), data={"soal_id": soal_id, "status": "saved"})
 
 
 @router_soal.post(

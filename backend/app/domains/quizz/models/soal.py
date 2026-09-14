@@ -33,3 +33,4 @@ class Soal(Base):
     stimulus: Mapped[Optional["SoalStimulus"]] = relationship(back_populates="soals")
     opsi: Mapped[List["SoalOpsi"]] = relationship(back_populates="soal", cascade="all, delete-orphan")
     langkah: Mapped[List["SoalLangkah"]] = relationship(back_populates="soal", cascade="all, delete-orphan")
+    jawaban: Mapped[List["SoalJawaban"]] = relationship(back_populates="soal", cascade="all, delete-orphan")

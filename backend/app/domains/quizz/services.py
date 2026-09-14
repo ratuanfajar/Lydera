@@ -3,14 +3,17 @@ import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BadRequestException, NotFoundException
-from app.domains.quizz.models import Soal
+from app.domains.quizz.models import Soal, SoalJawaban
 from app.domains.quizz.repositories.interface import QuizRepositoryInterface
+from app.domains.quizz.schemas import QuizResultItem, SoalJustification, SoalSubmitRequest
 
 import paths
 
 paths.setup()
 
+import evaluate as quiz_evaluate
 import regenerate as quiz_regenerate
+from segment import Segment
 
 
 class QuizService:
@@ -163,3 +166,98 @@ class QuizService:
         if soal is None:
             raise NotFoundException("soal tidak ditemukan")
         return soal
+
+    # -- Jawaban siswa --
+    async def submit_answer(self, soal_id: int, student_id: int, payload: SoalSubmitRequest) -> None:
+        """Simpan jawaban + langkah pengerjaan siswa untuk satu soal. Tidak ada panggilan LLM di
+        sini -- evaluasi (untuk yang salah) baru dijalankan saat siswa minta hasil akhir kuis lewat
+        `get_quiz_results`. Satu siswa cuma bisa submit sekali per soal (unique constraint DB)."""
+        soal = await self.repo.get_soal_by_id(soal_id)
+        if soal is None:
+            raise NotFoundException("soal tidak ditemukan")
+
+        existing = await self.repo.get_soal_jawaban(soal_id, student_id)
+        if existing is not None:
+            raise BadRequestException("soal ini sudah dijawab")
+
+        is_correct = payload.selected_option == soal.correct_option
+        try:
+            await self.repo.create_soal_jawaban(soal_id, student_id, payload.selected_option, is_correct, payload.langkah)
+            await self.db.commit()
+        except Exception as e:
+            await self.db.rollback()
+            raise e
+
+    async def get_quiz_results(self, quiz_request_id: int, student_id: int) -> list[QuizResultItem]:
+        """Hasil kuis siswa untuk satu quiz_request: tiap soal yang dijawab SALAH dan belum pernah
+        dievaluasi dipicu evaluasinya sekarang (paralel), lalu hasilnya disimpan supaya panggilan
+        berikutnya tidak memanggil LLM ulang (`evaluated_at` jadi penanda sudah final)."""
+        quiz_request = await self.repo.get_quiz_request(quiz_request_id)
+        if quiz_request is None:
+            raise NotFoundException("quiz_request tidak ditemukan")
+
+        soal_list = await self.repo.get_soal_for_request(quiz_request_id)
+        jawaban_list = await self.repo.get_jawaban_for_request(quiz_request_id, student_id)
+        jawaban_by_soal = {j.soal_id: j for j in jawaban_list}
+
+        to_evaluate: list[tuple[Soal, SoalJawaban]] = []
+        for soal in soal_list:
+            jawaban = jawaban_by_soal.get(soal.id)
+            if jawaban is not None and not jawaban.is_correct and jawaban.evaluated_at is None:
+                to_evaluate.append((soal, jawaban))
+
+        if to_evaluate:
+            evaluations = await asyncio.gather(*[
+                self._evaluate_one(soal, jawaban) for soal, jawaban in to_evaluate
+            ])
+            try:
+                for (_, jawaban), result in zip(to_evaluate, evaluations):
+                    await self.repo.save_evaluation(
+                        jawaban, result.get("divergence_step"),
+                        result.get("diagnosis", ""), result.get("personalized_justification", ""),
+                    )
+                await self.db.commit()
+            except Exception as e:
+                await self.db.rollback()
+                raise e
+
+        results = []
+        for soal in soal_list:
+            jawaban = jawaban_by_soal.get(soal.id)
+            justification = None
+            if jawaban is not None and not jawaban.is_correct:
+                justification = SoalJustification(
+                    divergence_step=jawaban.divergence_step,
+                    diagnosis=jawaban.diagnosis or "",
+                    personalized_justification=jawaban.personalized_justification or "",
+                )
+            results.append(QuizResultItem(
+                soal_id=soal.id,
+                question_text=soal.question_text,
+                selected_option=jawaban.selected_option if jawaban else None,
+                correct_option=soal.correct_option,
+                is_correct=jawaban.is_correct if jawaban else None,
+                justification=justification,
+            ))
+        return results
+
+    async def _evaluate_one(self, soal: Soal, jawaban: SoalJawaban) -> dict:
+        """Bangun Segment sumber dari rentang block soal ini, lalu jalankan Chain 5 di thread
+        terpisah (sama seperti `regenerate_cluster` memanggil `compute_cluster`)."""
+        blocks = await self.repo.get_blocks_for_chapter(soal.chapter_id)
+        seg_blocks = [b for b in blocks if soal.source_reading_order_start <= b.reading_order <= soal.source_reading_order_end]
+        seg = Segment(
+            chapter_id=soal.chapter_id,
+            title="",
+            reading_order_start=soal.source_reading_order_start,
+            reading_order_end=soal.source_reading_order_end,
+            text="\n".join(b.readable_text for b in seg_blocks),
+        )
+        options = {o.label: o.opsi_text for o in soal.opsi}
+        correct_langkah = [l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)]
+        student_langkah = [l.teks for l in sorted(jawaban.langkah, key=lambda l: l.urutan)]
+        return await asyncio.to_thread(
+            quiz_evaluate.evaluate_scratchwork,
+            seg, soal.question_text, options, soal.correct_option, correct_langkah, soal.kesimpulan,
+            jawaban.selected_option, student_langkah,
+        )

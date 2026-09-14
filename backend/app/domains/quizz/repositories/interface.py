@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Sequence
 
 from app.domains.contents.models import Block, Chapter, Module
-from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalStimulus
+from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalJawaban, SoalStimulus
 
 
 class QuizRepositoryInterface(ABC):
@@ -49,3 +49,18 @@ class QuizRepositoryInterface(ABC):
     async def replace_soal_opsi(self, soal_id: int, options: dict[str, str]) -> None: raise NotImplementedError
     @abstractmethod
     async def replace_soal_langkah(self, soal_id: int, langkah: list[str]) -> None: raise NotImplementedError
+
+    # SoalJawaban (jawaban siswa)
+    @abstractmethod
+    async def get_soal_jawaban(self, soal_id: int, student_id: int) -> SoalJawaban | None: raise NotImplementedError
+    @abstractmethod
+    async def create_soal_jawaban(self, soal_id: int, student_id: int, selected_option: str,
+                                   is_correct: bool, langkah: list[str]) -> int:
+        raise NotImplementedError
+    @abstractmethod
+    async def get_jawaban_for_request(self, quiz_request_id: int, student_id: int) -> Sequence[SoalJawaban]:
+        raise NotImplementedError
+    @abstractmethod
+    async def save_evaluation(self, jawaban: SoalJawaban, divergence_step: int | None,
+                               diagnosis: str, personalized_justification: str) -> None:
+        raise NotImplementedError
