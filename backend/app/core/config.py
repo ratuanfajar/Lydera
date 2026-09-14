@@ -48,6 +48,13 @@ class Settings(BaseSettings):
     # Will use the .env variable if provided, otherwise defaults to the physical folder
     OUTPUT_DIR: str = os.getenv("OUTPUT_DIR", str(DEFAULT_AI_OUTPUT_DIR))
 
+    # --- Chatbot ---
+    EMBEDDING_DIM: int = int(os.getenv("EMBEDDING_DIM", 3072))  # dimensi asli text-embedding-3-large
+    CHAT_HISTORY_TURNS: int = int(os.getenv("CHAT_HISTORY_TURNS", 10))
+    CHAT_HISTORY_TTL_SECONDS: int = int(os.getenv("CHAT_HISTORY_TTL_SECONDS", 1800))       # 30 menit
+    QUERY_EMBEDDING_CACHE_TTL_SECONDS: int = int(os.getenv("QUERY_EMBEDDING_CACHE_TTL_SECONDS", 604800))  # 7 hari
+    RETRIEVAL_CACHE_TTL_SECONDS: int = int(os.getenv("RETRIEVAL_CACHE_TTL_SECONDS", 3600))  # 1 jam
+
     @property
     def DATABASE_URL(self) -> str:
         if os.getenv("APP_ENV") == "testing":

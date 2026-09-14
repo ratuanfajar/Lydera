@@ -18,6 +18,7 @@ from app.domains.jobs.models import Job
 from app.domains.jobs.repositories.repository import JobRepository
 from app.domains.contents.repositories.repository import ContentRepository
 from app.domains.contents.services import ContentService
+from app.tasks.chatbot_tasks import reindex_chapter_task
 
 MAX_RETRIES = 3
 
@@ -130,6 +131,12 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
             await repo.update_job_status(job, "done", blocks_total=total_blocks)
             await db.commit()
             await publish_progress(redis, job_id, "done", 100, f"Successfully processed {total_blocks} blocks.", relative_json_paths)
+
+            # 5. Trigger reindex chatbot (vector DB) otomatis -- guru tidak perlu panggil
+            # POST /chatbot/chapters/{id}/reindex manual lagi. Aman dipanggil sebelum module
+            # published -- search_module tetap memfilter WHERE module.status = 'publish', jadi
+            # embedding yang sudah terbentuk duluan tidak otomatis kelihatan ke siswa.
+            await reindex_chapter_task.kiq(chapter_id=chapter_id)
                 
         except Exception as exc:
             traceback.print_exc()

@@ -1,0 +1,839 @@
+{
+  "info": {
+    "_postman_id": "lydera-api-collection-v1",
+    "name": "Lydera API Collection",
+    "description": "Koleksi Postman lengkap untuk semua endpoint Backend Lydera (Auth, Users, Classes, Modules, Chapters, Annotation, Quiz Generator, dan Chatbot Semantic/RAG).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "0. Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Auth & Users",
+      "item": [
+        {
+          "name": "Login (Teacher / Student / Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData && jsonData.data) {",
+                  "    pm.collectionVariables.set(\"token\", jsonData.data);",
+                  "    console.log(\"Token successfully saved to collection variable\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"guru@lydera.id\",\n  \"password\": \"password123\",\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "login"]
+            },
+            "description": "Role yang valid: TEACHER, STUDENT, ADMIN. Script test otomatis menyimpan token ke variabel collection."
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Teachers",
+      "item": [
+        {
+          "name": "Register Teacher",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"guru@lydera.id\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\",\n  \"role\": \"TEACHER\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teachers"]
+            }
+          }
+        },
+        {
+          "name": "Teacher Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teachers", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Get All Modules (Teacher)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/modules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teachers", "modules"]
+            }
+          }
+        },
+        {
+          "name": "Get Module Detail (Teacher)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/modules/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teachers", "modules", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Chapter Detail (Teacher)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/teachers/chapters/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teachers", "chapters", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Students",
+      "item": [
+        {
+          "name": "Register Student",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"siswa@lydera.id\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\",\n  \"role\": \"STUDENT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"]
+            }
+          }
+        },
+        {
+          "name": "Student Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Student Tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/dashboard/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "dashboard", "tasks"]
+            }
+          }
+        },
+        {
+          "name": "Get All Modules (Student)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/modules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "modules"]
+            }
+          }
+        },
+        {
+          "name": "Get Module Detail (Student)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/modules/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "modules", "1"]
+            }
+          }
+        },
+        {
+          "name": "Start Chapter",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/chapters/1/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "chapters", "1", "start"]
+            }
+          }
+        },
+        {
+          "name": "Mark Chapter Completed",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/chapters/1/mark-complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "chapters", "1", "mark-complete"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Cities, Schools & Classrooms",
+      "item": [
+        {
+          "name": "Get All Cities",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cities",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cities"]
+            }
+          }
+        },
+        {
+          "name": "Create City (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Bandung\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cities",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cities"]
+            }
+          }
+        },
+        {
+          "name": "Create School (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"SMAN 1 Bandung\",\n  \"city_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/schools",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schools"]
+            }
+          }
+        },
+        {
+          "name": "Get School by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/schools/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schools", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Schools by City ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/schools/city/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "schools", "city", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Classroom Types (Public)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/classroom-types",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classroom-types"]
+            }
+          }
+        },
+        {
+          "name": "Create Classroom (Teacher)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kelas 10 MIPA 1\",\n  \"classroom_type_id\": 1,\n  \"school_id\": 1,\n  \"grade\": 10\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms"]
+            }
+          }
+        },
+        {
+          "name": "Get User Classrooms",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms"]
+            }
+          }
+        },
+        {
+          "name": "Get Classroom Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms", "1"]
+            }
+          }
+        },
+        {
+          "name": "Join Classroom (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"ABC1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/classrooms/join",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "classrooms", "join"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Contents (Modules, Chapters & Blocks)",
+      "item": [
+        {
+          "name": "Get All Fases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/fases",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "fases"]
+            }
+          }
+        },
+        {
+          "name": "Create Module",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Modul Aljabar dan Fungsi\",\n  \"description\": \"Pembahasan fungsi kuadrat dan eksponensial\",\n  \"classroom_id\": 1,\n  \"fase_id\": 1,\n  \"status\": \"DRAFT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/modules",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "modules"]
+            }
+          }
+        },
+        {
+          "name": "Publish Module",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/modules/publish/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "modules", "publish", "1"]
+            }
+          }
+        },
+        {
+          "name": "Upload Chapter & Start MinerU",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "module_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "title",
+                  "value": "Bab 1 - Persamaan Kuadrat",
+                  "type": "text"
+                },
+                {
+                  "key": "cp_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "number",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chapters",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chapters"]
+            }
+          }
+        },
+        {
+          "name": "Preview Annotated Chapter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/chapters/preview?annotation_path=1/raw-1/auto/annotated.json",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chapters", "preview"],
+              "query": [
+                {
+                  "key": "annotation_path",
+                  "value": "1/raw-1/auto/annotated.json"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Confirm & Ingest Chapter Blocks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"annotation_path\": \"1/raw-1/auto/annotated.json\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chapters/confirm/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chapters", "confirm", "1"]
+            }
+          }
+        },
+        {
+          "name": "Stream Job Progress (SSE)",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/chapters/jobs/1/stream",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chapters", "jobs", "1", "stream"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Regenerate Text Blocks",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedback\": \"Koreksi teks paragraf\",\n  \"block_ids\": [1, 2]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/blocks/bulk-regenerate/text",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blocks", "bulk-regenerate", "text"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Regenerate Special Blocks (MLLM)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedback\": \"Jelaskan langkah rumus pecahan secara lebih detail untuk pembaca layar\",\n  \"block_ids\": [101, 102]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/blocks/bulk-regenerate/special",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "blocks", "bulk-regenerate", "special"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Quiz Generator",
+      "item": [
+        {
+          "name": "Create Quiz Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"module_id\": 1,\n  \"chapters\": [\n    {\n      \"chapter_id\": 1,\n      \"hots_count\": 2,\n      \"lots_count\": 3\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/quiz-requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quiz-requests"]
+            }
+          }
+        },
+        {
+          "name": "Get Quiz Request Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/quiz-requests/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quiz-requests", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "List Soal for Quiz Request",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/quiz-requests/1/soal",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "quiz-requests", "1", "soal"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Soal Detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/soal/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "soal", "1"]
+            }
+          }
+        },
+        {
+          "name": "Edit Soal (LOTS)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question_text\": \"Tentukan nilai x dari persamaan 2x + 4 = 10\",\n  \"options\": {\n    \"A\": \"2\",\n    \"B\": \"3\",\n    \"C\": \"4\",\n    \"D\": \"5\"\n  },\n  \"correct_option\": \"B\",\n  \"langkah\": [\n    \"2x = 10 - 4\",\n    \"2x = 6\",\n    \"x = 3\"\n  ],\n  \"kesimpulan\": \"Nilai x adalah 3\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/soal/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "soal", "1"]
+            }
+          }
+        },
+        {
+          "name": "Approve Soal",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/soal/1/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "soal", "1", "approve"]
+            }
+          }
+        },
+        {
+          "name": "Reject Soal",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/soal/1/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "soal", "1", "reject"]
+            }
+          }
+        },
+        {
+          "name": "Regenerate Soal Cluster (HOTS)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"feedback\": \"Tingkatkan kesulitan cerita stimulus kontekstual\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/soal/1/regenerate",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "soal", "1", "regenerate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Chatbot (Semantic / RAG)",
+      "item": [
+        {
+          "name": "Reindex Chapter Knowledge Base",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/chatbot/chapters/1/reindex",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chatbot", "chapters", "1", "reindex"]
+            },
+            "description": "Menghasilkan vector embedding dari seluruh blok materi bab dan menyimpannya ke database untuk semantic search."
+          }
+        },
+        {
+          "name": "Create Chat Session (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chapter_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chatbot/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chatbot", "sessions"]
+            }
+          }
+        },
+        {
+          "name": "Ask Question to Chatbot (Student)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Bagaimana cara mencari titik puncak grafik fungsi kuadrat?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chatbot/sessions/1/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chatbot", "sessions", "1", "messages"]
+            }
+          }
+        },
+        {
+          "name": "Get Session Chat History (Student)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/chatbot/sessions/1/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chatbot", "sessions", "1", "messages"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

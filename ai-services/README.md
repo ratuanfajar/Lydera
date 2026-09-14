@@ -1,6 +1,6 @@
 # AI Services
 
-Dua fitur: **anotasi** (`annotation/`) mengubah modul matematika (PDF) jadi teks siap dibacakan pembaca layar, dan **quiz generator** (`quiz/`) menghasilkan soal pilihan ganda dari modul yang sudah dianotasi. Keduanya menyimpan hasilnya ke PostgreSQL lewat `backend/`.
+Tiga fitur: **anotasi** (`annotation/`) mengubah modul matematika (PDF) jadi teks siap dibacakan pembaca layar, **quiz generator** (`quiz/`) menghasilkan soal pilihan ganda dari modul yang sudah dianotasi, dan **chatbot** (`chatbot/`) menjawab pertanyaan siswa berbasis RAG dari modul yang sama. Ketiganya menyimpan hasilnya ke PostgreSQL lewat `backend/`.
 
 ## Alur Pipeline — Anotasi
 
@@ -133,3 +133,46 @@ Mencegah loss-in-the-middle di `generate.py`: segmen kecil diberi teks penuh, se
 **jsonutil.py** — `parse_json(raw) -> dict`. Toleran terhadap code fence markdown dan backslash yang bukan escape sequence JSON valid (notasi LaTeX seperti `\%`/`\rightarrow`).
 
 **paths.py** — `setup()` menaruh folder `quiz/`, `annotation/`, dan `backend/` ke `sys.path`. File spesifik satu fitur diberi prefiks nama fiturnya (`quiz_pipeline.py`/`annotation_pipeline.py`) karena keduanya berbagi `sys.path` yang sama.
+
+## Alur Pipeline — Chatbot (RAG)
+
+```
+guru publish/edit bab
+  -> reindex (backend/app/tasks/chatbot_tasks.py, taskiq)
+       blocks (DB) -> chunk.build_chunks (SATU block = SATU vector, bukan digabung) ->
+       llm_ext.embed_texts -> block_embeddings (pgvector) -> chapter_kb, kb_version++
+
+siswa bertanya (sesi di-scope ke CLASSROOM, bukan satu chapter)
+  -> search_module lintas SEMUA chapter published di classroom itu (backend/sync_search.py)
+       -> similarity top-1 dipakai LANGSUNG sebagai scope gate (scope_gate.check_scope):
+            tinggi -> inti, rendah -> di_luar_topik (redirect halus, tanpa tool calling lagi),
+            zona abu-abu -> LLM classifier (konteks: chunk paling mirip yang beneran ketemu)
+  -> agent.run (tool-calling loop, urutan wajib):
+       search_module (lagi, kena cache Redis) -> search_oer (OER whitelist)
+       -> query_wolfram_alpha (Full Results API, tier gratis 2000 call/bulan, cross-check numerik)
+       -> search_academic_web (domain-ranked: trusted_domains.py, .edu/.gov/arxiv diutamakan)
+       -> compose_answer (WAJIB): rincian sumber (evidence + justifikasi) + ringkasan
+  -> citations.verify_citations   grounding check: evidence harus match konten tool asli,
+       trust_tier dihitung ULANG server-side dari reference (URL), bukan dipercaya dari model
+  -> simpan ke chat_messages (PostgreSQL) + histori hot di Redis (backend/app/domains/chatbot/services.py)
+```
+
+Sama seperti quiz: modul `ai-services/chatbot/` murni komputasi + panggilan HTTP eksternal (OpenRouter, embedding provider, Wolfram, search API) -- tidak menyentuh PostgreSQL. `search_module` butuh pgvector, jadi backend menyuntikkan hasilnya lewat callable `search_module_executor` (`backend/app/domains/chatbot/sync_search.py`), bukan lewat data statis seperti `blocks` di quiz -- karena tool calling di sini interaktif (LLM yang memutuskan kapan dan berapa kali memanggil).
+
+## Modul (chatbot/)
+
+**chunk.py** — `build_chunks(chapter_id, blocks) -> list[Chunk]`. SATU block DB = SATU chunk/vector -- tidak digabung beberapa block jadi satu blob, karena block sudah tersegmentasi rapi dari pipeline anotasi. Block non-heading diberi prefix heading terdekat sebagai konteks.
+
+**llm_ext.py** — `embed_texts`/`embed_text` (client embedding terpisah, lihat `EMBEDDING_*` di config), `chat_with_tools` (tool calling lewat OpenRouter, reuse client `annotation/llm.py`).
+
+**tools.py** — skema tool (format OpenAI function calling): `search_module`, `search_oer`, `query_wolfram_alpha`, `search_academic_web`, `compose_answer`.
+
+**external_tools.py** — implementasi HTTP untuk `query_wolfram_alpha` (Wolfram Alpha Full Results API, tier gratis 2000 call/bulan non-komersial, ambil pod "Result" paling relevan sebagai cross-check singkat -- bukan step-by-step, di-cache file lewat `annotation/cache.py`), `search_oer`, `search_academic_web` (keduanya lewat search API yang sama -- autentikasi via header `Authorization: Bearer`, discope beda).
+
+**trusted_domains.py** — ranking domain (bukan filter/buang) untuk `search_academic_web`: tier 1 (`.edu`/`.gov`/`.ac.id`/`.go.id`/arxiv, dicek regex, paling diutamakan), tier 2 (katalog OER whitelist eksplisit), tier 3 (catch-all -- Wikipedia/blog/situs umum, tetap ditampilkan tapi diberi label kepercayaan rendah).
+
+**scope_gate.py** — `check_scope(question, top_chunks)`: similarity top-1 hasil retrieval (bukan anchor statis) untuk kasus jelas, LLM classifier (structured JSON, konteks dari chunk paling mirip) untuk zona abu-abu. Klasifikasi: `inti`/`perluasan`/`di_luar_topik`.
+
+**citations.py** — `verify_citations(sources, tool_outputs)`: grounding check fuzzy-match evidence yang diklaim LLM ke konten mentah tool result (supaya kutipan tidak dikarang), sekaligus hitung ulang `trust_tier` server-side dari `reference` (URL) -- tidak dipercaya dari isian model.
+
+**agent.py** — `run(question, history, search_module_executor) -> dict`. Orkestrator: search_module dulu buat scope gate -> tool-calling loop -> `compose_answer` -> verifikasi kutipan. Dipanggil backend (`backend/app/domains/chatbot/services.py`) lewat `asyncio.to_thread`.
