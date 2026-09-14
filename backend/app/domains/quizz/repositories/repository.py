@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional, Sequence
 
 from sqlalchemy import delete, func, insert, select
@@ -82,9 +83,41 @@ class QuizRepository(QuizRepositoryInterface):
             return False, "Beberapa chapter_id tidak valid atau tidak termasuk dalam modul ini."
 
         return True, None
+
+    async def update_quiz_request_settings(
+        self,
+        quiz_request_id: int,
+        title: Optional[str] = None,
+        max_duration_minutes: Optional[int] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+    ) -> Optional[QuizRequest]:
+        quiz = await self.db.get(QuizRequest, quiz_request_id)
+        if not quiz:
+            return None
+
+        if title is not None:
+            quiz.title = title
+        if max_duration_minutes is not None:
+            quiz.max_duration_minutes = max_duration_minutes
+        if start_time is not None:
+            quiz.start_time = start_time
+        if end_time is not None:
+            quiz.end_time = end_time
+
+        await self.db.flush()
+        return quiz
     
-    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int) -> QuizRequest:
-        new_request = QuizRequest(module_id=module_id, status="queued", title=title, classroom_id=classroom_id)
+    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int,max_duration_minutes: int, start_time: datetime, end_time: datetime) -> QuizRequest:
+        new_request = QuizRequest(
+            module_id=module_id,
+            classroom_id=classroom_id,
+            title=title,
+            status="queued",
+            max_duration_minutes=max_duration_minutes,
+            start_time=start_time,
+            end_time=end_time,
+        )
         self.db.add(new_request)
         await self.db.flush()
         return new_request.id
@@ -142,7 +175,7 @@ class QuizRepository(QuizRepositoryInterface):
         stmt = delete(QuizRequest).where(QuizRequest.id == quiz_request_id)
         result = await self.db.execute(stmt)
         await self.db.flush()
-        
+
         return result.rowcount > 0
 
     # Teacher

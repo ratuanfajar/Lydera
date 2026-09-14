@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from sqlalchemy import exists, func, or_, select, update
+from sqlalchemy import delete, exists, func, or_, select, update
 from typing import Sequence
 from sqlalchemy.dialects.postgresql import insert
 from app.tasks.progress_tasks import enqueue_chapter_progress_reset_job, enqueue_module_progress_job
@@ -196,7 +196,21 @@ class ContentRepository(ContentRepositoryInterface):
         result = await self.db.scalars(stmt)
         module = result.unique().first()
         return module
-    
+
+    async def delete_module_teacher(self, module_id:int, classroom_id: int, teacher_id: int) -> bool:
+        stmt = (
+            delete(Module)    
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(
+                Module.id == module_id,
+                Module.classroom_id == classroom_id,
+                Classroom.teacher_id == teacher_id,
+            )
+        )  
+        result = await self.db.execute(stmt)
+        await self.db.flush()
+        return result.rowcount > 0
+
     async def get_module_by_id(self, module_id: int) -> Module | None:
         return await self.db.get(Module, module_id)
 

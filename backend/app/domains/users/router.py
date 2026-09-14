@@ -22,6 +22,8 @@ from app.domains.contents.schemas.module.teacher_module_response import TeacherM
 from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
 from app.domains.contents.schemas.blocks.block_response import BlockResponse
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
+from app.domains.contents.depedencies import get_content_service
+from app.domains.contents.services import ContentService
 
 router_user = APIRouter(prefix="/users", tags=["users"], route_class=WrappedRoute)
 
@@ -136,6 +138,28 @@ async def get_module_teacher(
     )
     return Response(
         message="Berhasil mendapatkan data modules",
+        data=result
+    )
+
+@router_teacher.delete(
+    "/modules/{module_id}",
+    response_model=Response[TeacherModuleResponse],
+    description="Requires the Teacher role.",
+)
+async def delete_module_teacher(
+    query: Annotated[TeacherModuleDetailRequest, Depends()],
+    teacher: Roles(Role.TEACHER),
+    module_id:int,
+    service: ContentService = Depends(get_content_service),
+):    
+    result = await service.delete_module(
+        teacher.profile_id,
+        query.classroom_id,
+        module_id
+    )
+
+    return Response(
+        message="Berhasil menghapus data module",
         data=result
     )
 

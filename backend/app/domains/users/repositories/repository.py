@@ -12,6 +12,7 @@ from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.domains.contents.models import Module, ModuleProgress, ModuleStatus
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.users.models.student import student_classrooms
+from app.domains.quizz.models.quiz_request import QuizRequest
 
 
 class UserRepository(UserRepositoryInterface):
@@ -72,7 +73,11 @@ class TeacherRepository(TeacherRepositoryInterface):
             .scalar_subquery()
         )
 
-        # exams_count = 0
+        exams_count = (
+            select(func.count(QuizRequest.id))
+            .where(QuizRequest.classroom_id == classroom_id)
+            .scalar_subquery()
+        )
 
         students_count = (
             select(func.count(student_classrooms.c.student_id))
@@ -82,7 +87,7 @@ class TeacherRepository(TeacherRepositoryInterface):
 
         summary_stmt = select(
             modules_count.label("total_modules"),
-            # exams_count.label("total_exams"),
+            exams_count.label("total_exams"),
             students_count.label("total_students"),
         ).where(Classroom.id == classroom_id)
 
@@ -101,11 +106,18 @@ class TeacherRepository(TeacherRepositoryInterface):
         )
         newest_modules = (await self.db.scalars(modules_stmt)).all()
 
-        newest_exams = []
+        exams_stmt = (
+            select(QuizRequest)
+            .where(QuizRequest.classroom_id == classroom_id)
+            .order_by(QuizRequest.created_at.desc()) 
+            .limit(limit)
+        )
+        
+        newest_exams = (await self.db.scalars(exams_stmt)).all()
 
         return {
             "total_modules": summary_res.total_modules,
-            "total_exams": 0,
+            "total_exams": summary_res.total_exams,
             "total_students": summary_res.total_students,
             "newest_modules": newest_modules,
             "newest_exams": newest_exams,

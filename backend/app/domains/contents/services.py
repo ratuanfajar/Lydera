@@ -3,6 +3,8 @@ import json
 from pathlib import Path
 from sqlalchemy import select
 from app.utils import paths
+from app.domains.jobs.repositories.interface import JobRepositoryInterface
+from app.tasks.file_tasks import cleanup_module_files_task
 paths.setup()
 import annotation_regenerate
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,8 +25,9 @@ PRIORITY_MAP = {"high": 3, "normal": 2, "low": 1}
 PRIORITY_REVERSE = {3: "high", 2: "normal", 1: "low"}
 
 class ContentService:
-    def __init__(self, repo: ContentRepositoryInterface, db: AsyncSession):
+    def __init__(self, repo: ContentRepositoryInterface, job_repo: JobRepositoryInterface, db: AsyncSession):
         self.repo = repo
+        self.job_repo = job_repo
         self.db = db
         self.READING_ORDER_STEP = 10
 
@@ -212,7 +215,24 @@ class ContentService:
         except Exception as e:
             await self.db.rollback()
             raise e
+
+    async def delete_module(self, teacher_id, classroom_id:int, module_id:int) -> bool :
+        file_paths = await self.job_repo.get_job_file_paths_by_module(
+            module_id=module_id, 
+            classroom_id=classroom_id, 
+            teacher_id=teacher_id
+        )
+
+        deleted = await self.repo.delete_module_teacher(module_id, classroom_id, teacher_id)
+        if not deleted:
+            raise NotFoundException("Module tidak ditemukan.")
+        await self.db.commit()
+
+        if file_paths:
+            await cleanup_module_files_task.kiq(file_paths)
         
+        return True
+    
     def load_preview(self, annotated_path:str):
         path = DEFAULT_AI_OUTPUT_DIR / annotated_path
         raw_blocks_data = self._load_annotated(path)

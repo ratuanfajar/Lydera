@@ -39,6 +39,8 @@ class ContentRepositoryInterface(ABC):
     @abstractmethod
     async def get_detail_module_teacher(self, module_id:int, classroom_id: int, teacher_id: int) -> Module | None: raise NotImplementedError
     @abstractmethod
+    async def delete_module_teacher(self, module_id:int, classroom_id: int, teacher_id: int) -> bool : raise NotImplementedError
+    @abstractmethod
     async def publish_module(self, module_id:int, teacher_id:int) -> True: raise NotImplementedError
     @abstractmethod
     async def verify_chapter_teacher(self, chapter_id: int, teacher_id: int) -> bool: raise NotImplementedError

@@ -14,6 +14,7 @@ from app.domains.quizz.schemas.quiz_request_create import QuizRequestCreate
 from app.utils.idempotency import generate_idempotency_key
 from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
 from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
+from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 import paths
 
 paths.setup()
@@ -65,7 +66,9 @@ class QuizService:
         chapter_ids = [c.chapter_id for c in dto.chapters]
 
         idem_key = generate_idempotency_key(
-            teacher_id, dto.classroom_id, dto.module_id, dto.title, chapter_dicts
+            teacher_id, dto.classroom_id, dto.module_id, dto.title, chapter_dicts, dto.max_duration_minutes,
+            dto.start_time.isoformat(),
+            dto.end_time.isoformat(),
         )
 
         cached_job = await self.redis.get(idem_key)
@@ -82,7 +85,9 @@ class QuizService:
             raise BadRequestException(err_msg)
 
         try:
-            quiz_request = await self.repo.create_quiz_request(dto.module_id, dto.title, classroom_id=dto.classroom_id)
+            quiz_request = await self.repo.create_quiz_request(dto.module_id, dto.title, classroom_id=dto.classroom_id, max_duration_minutes=dto.max_duration_minutes,
+                start_time=dto.start_time,
+                end_time=dto.end_time,)
             await self.repo.bulk_link_chapters(quiz_request, dto.chapters)
             await self.repo.db.commit()
 
@@ -95,6 +100,65 @@ class QuizService:
         await self.redis.set(f"quiz_idem_map:{quiz_request}", idem_key, ex=TTL_3_MINUTES)
 
         return quiz_request, "queued", False, idem_key
+
+    async def update_quiz_settings(
+        self,
+        teacher_id: int,
+        classroom_id: int,
+        quiz_request_id: int,
+        dto: QuizRequestUpdate,
+    ) -> QuizRequestTeacherDetailResponse:
+        """
+        Validates teacher authorization, merges partial updates with existing DB schedule 
+        to guarantee schedule validity, updates DB record, and returns full details.
+        """
+        # 1. Validate teacher ownership and classroom hierarchy
+        is_valid = await self.repo.validate_quiz_request(
+            quiz_request_id=quiz_request_id,
+            teacher_id=teacher_id,
+            classroom_id=classroom_id,
+        )
+        if not is_valid:
+            raise ForbiddenException(
+                "Kelas atau Quiz Request tidak ditemukan atau Anda tidak memiliki akses."
+            )
+
+        # 2. Fetch existing record to validate combined schedule state
+        existing_quiz = await self.repo.get_quiz_request(quiz_request_id)
+        if not existing_quiz:
+            raise NotFoundException("Quiz request tidak ditemukan.")
+
+        # Merge payload values with existing DB state for cross-field schedule validation
+        final_start = dto.start_time or existing_quiz.start_time
+        final_end = dto.end_time or existing_quiz.end_time
+        final_duration = dto.max_duration_minutes or existing_quiz.max_duration_minutes
+
+        if final_end <= final_start:
+            raise BadRequestException("Waktu selesai (end_time) harus lebih besar dari waktu mulai.")
+
+        window_minutes = (final_end - final_start).total_seconds() / 60.0
+        if window_minutes < final_duration:
+            raise BadRequestException(
+                f"Rentang waktu kuis ({int(window_minutes)} menit) tidak boleh lebih pendek "
+                f"dari durasi pengerjaan kuis ({final_duration} menit)."
+            )
+
+        # 3. Apply updates to DB
+        updated_quiz = await self.repo.update_quiz_request_settings(
+            quiz_request_id=quiz_request_id,
+            title=dto.title,
+            max_duration_minutes=dto.max_duration_minutes,
+            start_time=dto.start_time,
+            end_time=dto.end_time,
+        )
+        await self.repo.db.commit()
+
+        # 4. Return updated quiz details
+        return await self.get_quiz_teacher(
+            QuizRequestDetailQuery(classroom_id=classroom_id),
+            teacher_id=teacher_id,
+            id=quiz_request_id,
+        )
 
     async def update_publish_status(
         self,

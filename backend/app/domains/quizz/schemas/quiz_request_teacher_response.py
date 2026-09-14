@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -22,6 +23,9 @@ class QuizRequestTeacherResponse(BaseModel):
     module_id: int
     title: str
     status_published: QuizRequestStatus
+    max_duration_minutes: int
+    start_time: datetime
+    end_time: datetime
     status: str
     error: Optional[str] = None
 
@@ -90,6 +94,9 @@ class QuizRequestTeacherDetailResponse(BaseModel):
     title: str
     status_published: QuizRequestStatus
     status: str
+    max_duration_minutes: int
+    start_time: datetime
+    end_time: datetime
     error: Optional[str] = None
     questions: List[QuizRequestQuestionResponse] = Field(validation_alias="soals")
     quiz_request_chapters: List[QuizRequestChapterDetailResponse] = Field(validation_alias="chapter_links")

@@ -35,6 +35,7 @@ from app.core.redis import get_redis_client
 from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
 from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 from app.domains.quizz.schemas.quiz_delete_request import QuizDeleteRequest
+from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 
 
 def _to_soal_response(soal: Soal) -> SoalResponse:
@@ -367,6 +368,23 @@ async def edit_soal(
 ):
     soal = await service.edit_soal(soal_id, payload)
     return Response(message=get_response_message(), data=_to_soal_response(soal))
+
+@router_teacher_quizz.patch(
+    "/quizzes/{quiz_id}",
+    description="Requires the TEACHER role",
+    response_model=Response[QuizRequestTeacherDetailResponse],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def update_quiz(
+    teacher: Roles(Role.TEACHER),
+    quiz_id: Annotated[int, FastAPIPath()],
+    payload: Annotated[QuizRequestUpdate, Body()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    result = await service.update_quiz_settings(teacher.profile_id, payload.classroom_id, quiz_id, payload)
+    return Response(message="Berhasil update quizz", data=result)
+
 
 @router_teacher_quizz.delete(
     "/quizzes/{quiz_id}",

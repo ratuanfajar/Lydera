@@ -11,3 +11,5 @@ class JobRepositoryInterface(ABC):
     async def get_latest_job_for_chapter(self, chapter_id: int) -> Job | None: raise NotImplementedError
     @abstractmethod
     async def create_job(self, chapter_id: int, pdf_path: str, out_dir: str) -> int: raise NotImplementedError
+    @abstractmethod
+    async def get_job_file_paths_by_module(self, module_id: int, classroom_id: int, teacher_id: int) -> list[tuple[str | None, str | None]]: raise NotImplementedError

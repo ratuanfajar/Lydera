@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List, Sequence
+from datetime import datetime
+from typing import List, Optional, Sequence
 
 from app.domains.contents.models import Block, Chapter, Module
 from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalStimulus
@@ -25,7 +26,7 @@ class QuizRepositoryInterface(ABC):
     @abstractmethod
     async def validate_quiz_request(self, quiz_request_id:int, teacher_id: int, classroom_id: int) -> bool: raise NotImplementedError
     @abstractmethod
-    async def create_quiz_request(self, module_id: int, title: str, classroom_id: int) -> QuizRequest: raise NotImplementedError
+    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int,max_duration_minutes: int, start_time: datetime, end_time: datetime) -> QuizRequest: raise NotImplementedError
     @abstractmethod
     async def bulk_link_chapters(self, quiz_request_id: int, chapters: list[QuizChapterRequest]) -> None:
         raise NotImplementedError
@@ -53,6 +54,18 @@ class QuizRepositoryInterface(ABC):
     # New Method Soal
     @abstractmethod
     async def get_quizzes_teacher(self, classroom_id: int, teacher_id:int, status: QuizRequestQueryStatus) -> Sequence[QuizRequest]: raise NotImplementedError
+
+    @abstractmethod
+    async def update_quiz_request_settings(
+        self,
+        quiz_request_id: int,
+        title: Optional[str] = None,
+        max_duration_minutes: Optional[int] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+    ) -> Optional[QuizRequest]:
+        """Updates quiz request scheduling and title settings."""
+        raise NotImplementedError
 
     @abstractmethod
     async def get_quiz_teacher(self, classroom_id: int, teacher_id:int, id:int) -> QuizRequest | None: raise NotImplementedError
