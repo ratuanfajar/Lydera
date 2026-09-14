@@ -1,18 +1,43 @@
-from typing import Sequence
+from typing import List, Optional, Sequence
 
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import delete, func, insert, select
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.core.db import AsyncSession
 from app.domains.contents.models import Block, Chapter, Module
 from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalLangkah, SoalOpsi, SoalStimulus
 from app.domains.quizz.repositories.interface import QuizRepositoryInterface
+from app.domains.quizz.schemas.quiz_request_query import QuizRequestQueryStatus
+from app.domains.classrooms.models.classroom import Classroom
+from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest
 
 
 class QuizRepository(QuizRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def validate_quiz_request(self, quiz_request_id:int, teacher_id: int, classroom_id: int) -> bool:
+        stmt = (
+            select(QuizRequest.id)
+            .join(QuizRequest.module)
+            .join(Module.classroom)
+            .where(
+                QuizRequest.id == quiz_request_id,
+                Module.classroom_id == classroom_id,
+                Classroom.teacher_id == teacher_id,
+            )
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none() is not None
+
+    async def validate_classroom_ownership(self, teacher_id: int, classroom_id: int) -> bool:
+        stmt = select(Classroom.id).where(
+            Classroom.id == classroom_id,
+            Classroom.teacher_id == teacher_id,
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none() is not None
+    
     # Module/Chapter
     async def get_module_by_id(self, module_id: int) -> Module | None:
         return await self.db.get(Module, module_id)
@@ -26,11 +51,70 @@ class QuizRepository(QuizRepositoryInterface):
         return result.all()
 
     # QuizRequest
-    async def create_quiz_request(self, module_id: int) -> int:
-        new_request = QuizRequest(module_id=module_id, status="queued")
+    async def validate_ownership_and_hierarchy(
+        self, teacher_id: int, classroom_id: int, module_id: int, chapter_ids: list[int]
+    ) -> tuple[bool, Optional[str]]:
+        stmt_module = (
+            select(Module)
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(
+                Module.id == module_id,
+                Module.classroom_id == classroom_id,
+                Classroom.teacher_id == teacher_id,
+            )
+        )
+        module_res = await self.db.execute(stmt_module)
+        if not module_res.scalar_one_or_none():
+            return False, "Modul atau kelas tidak ditemukan / tidak valid untuk guru ini."
+
+        stmt_chapters = (
+            select(Chapter.id)
+            .join(Block, Block.chapter_id == Chapter.id)
+            .where(
+                Chapter.id.in_(chapter_ids),
+                Chapter.module_id == module_id,
+            )
+            .distinct()
+        )
+        valid_chapters = (await self.db.execute(stmt_chapters)).scalars().all()
+
+        if len(valid_chapters) != len(set(chapter_ids)):
+            return False, "Beberapa chapter_id tidak valid atau tidak termasuk dalam modul ini."
+
+        return True, None
+    
+    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int) -> QuizRequest:
+        new_request = QuizRequest(module_id=module_id, status="queued", title=title, classroom_id=classroom_id)
         self.db.add(new_request)
         await self.db.flush()
         return new_request.id
+
+    async def bulk_link_chapters(self, quiz_request_id: int, chapters: list[QuizRequestChapter]) -> None:
+        values = [
+            {
+                "quiz_request_id": quiz_request_id,
+                "chapter_id": item.chapter_id,
+                "hots_count": item.hots_count,
+                "lots_count": item.lots_count,
+            }
+            for item in chapters
+        ]
+        await self.db.execute(insert(QuizRequestChapter), values)
+
+    async def update_quiz_request_status_by_id(self, quiz_request_id: int, status: str, error: Optional[str] = None) -> None:
+        quiz = await self.db.get(QuizRequest, quiz_request_id)
+        if quiz:
+            quiz.status = status
+            if error:
+                quiz.error = error
+            await self.db.flush()
+
+    async def get_chapter_links(self, quiz_request_id: int) -> Sequence[QuizRequestChapter]:
+        stmt = select(QuizRequestChapter).where(
+            QuizRequestChapter.quiz_request_id == quiz_request_id
+        )
+        result = await self.db.execute(stmt)
+        return result.scalars().all()
 
     async def link_chapter(self, quiz_request_id: int, chapter_id: int, hots_count: int, lots_count: int) -> None:
         self.db.add(QuizRequestChapter(
@@ -53,6 +137,83 @@ class QuizRepository(QuizRepositoryInterface):
         quiz_request.status = status
         if error is not None:
             quiz_request.error = error
+
+    async def delete_quizz(self, quiz_request_id: int) -> bool : 
+        stmt = delete(QuizRequest).where(QuizRequest.id == quiz_request_id)
+        result = await self.db.execute(stmt)
+        await self.db.flush()
+        
+        return result.rowcount > 0
+
+    # Teacher
+    async def get_quizzes_teacher(self, classroom_id: int, teacher_id:int, status: QuizRequestQueryStatus) -> Sequence[QuizRequest]:
+        soal_count_subquery = (
+            select(func.count(Soal.id))
+            .where(Soal.quiz_request_id == QuizRequest.id)
+            .scalar_subquery()
+            .label("question_counts")
+        )
+
+        stmt = (
+            select(QuizRequest, soal_count_subquery)
+            .join(QuizRequest.module)
+            .join(Module.classroom)
+            .where(
+                Module.classroom_id == classroom_id,
+                Classroom.teacher_id == teacher_id,  # Validates classroom ownership
+            )
+            .options(
+                joinedload(QuizRequest.module).joinedload(Module.classroom)
+            )
+            .order_by(QuizRequest.id.desc())
+        )
+
+        if status != QuizRequestQueryStatus.ALL:
+            stmt = stmt.where(QuizRequest.status_published == status.value)
+
+        result = await self.db.execute(stmt)
+        rows = result.all()
+        quizzes = []
+        for quiz, count in rows:
+            quiz.question_counts = count or 0
+            quizzes.append(quiz)
+
+        return quizzes
+
+    async def get_quiz_teacher(self, classroom_id: int, teacher_id:int, id:int) -> QuizRequest | None: 
+        stmt = (
+            select(QuizRequest)
+            .join(QuizRequest.module)
+            .join(Module.classroom)
+            .where(
+                QuizRequest.id == id,
+                Module.classroom_id == classroom_id,
+                Classroom.teacher_id == teacher_id
+            )
+            .options(
+                joinedload(QuizRequest.module),
+                selectinload(QuizRequest.chapter_links),
+                selectinload(QuizRequest.soals).selectinload(Soal.stimulus),
+                selectinload(QuizRequest.soals).selectinload(Soal.opsi),
+                selectinload(QuizRequest.soals).selectinload(Soal.langkah),
+            ).order_by(QuizRequest.id)
+        )
+
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
+
+    async def update_quiz_status_publish(self, quiz_request_id: int, status: str, error: Optional[str] = None) -> bool:
+        quiz_req = await self.db.get(QuizRequest, quiz_request_id)
+        if not quiz_req:
+            return False
+
+        quiz_req.status_published = status
+        if error is not None:
+            quiz_req.error = error
+
+        await self.db.flush()
+        return True
 
     # Soal
     async def save_soal(self, quiz_request_id: int, chapter_id: int, data: dict,
@@ -96,6 +257,88 @@ class QuizRepository(QuizRepositoryInterface):
 
         return new_soal.id
 
+    async def save_quiz_data(self, quiz_request_id: int, classroom_id:int, status_val: str, items: List[SoalCreateRequest]) -> bool:
+        quiz_req = await self.db.get(QuizRequest, quiz_request_id)
+
+        if not quiz_req:
+            return False
+
+        quiz_req.status = status_val
+        quiz_req.classroom_id = classroom_id
+
+        await self.db.execute(delete(Soal).where(Soal.quiz_request_id == quiz_request_id))
+        await self.db.execute(delete(SoalStimulus).where(SoalStimulus.quiz_request_id == quiz_request_id))
+
+        stimulus_objects = []
+        stimulus_map = {}
+
+        for idx, item in enumerate(items):
+            if item.data.stimulus:
+                stim = SoalStimulus(
+                    quiz_request_id=quiz_request_id,
+                    chapter_id=item.chapter_id,
+                    source_markup=item.data.stimulus.source_markup or "",
+                    readable_text=item.data.stimulus.readable_text,
+                    source_reading_order_start=(
+                        item.data.stimulus.source_reading_order_start
+                        if item.data.stimulus.source_reading_order_start is not None
+                        else item.data.reading_order_start
+                    ),
+                    source_reading_order_end=(
+                        item.data.stimulus.source_reading_order_end
+                        if item.data.stimulus.source_reading_order_end is not None
+                        else item.data.reading_order_end
+                    ),
+                )
+                stimulus_objects.append(stim)
+                stimulus_map[idx] = stim
+
+        if stimulus_objects:
+            self.db.add_all(stimulus_objects)
+            await self.db.flush()
+
+        soal_objects = []
+        for idx, item in enumerate(items):
+            stim_id = stimulus_map[idx].id if idx in stimulus_map else None
+            soal = Soal(
+                quiz_request_id=quiz_request_id,
+                chapter_id=item.chapter_id,
+                stimulus_id=stim_id,
+                bloom_level=item.data.bloom_level,
+                question_text=item.data.question_text,
+                correct_option=item.data.correct_option,
+                kesimpulan=item.data.kesimpulan,
+                source_reading_order_start=item.data.reading_order_start,
+                source_reading_order_end=item.data.reading_order_end,
+                review_priority=item.review_priority,
+                validation_notes=item.validation_notes,
+            )
+            soal_objects.append(soal)
+        self.db.add_all(soal_objects)
+        await self.db.flush()
+
+        opsi_objects = []
+        langkah_objects = []
+
+        for idx, item in enumerate(items):
+            parent_soal_id = soal_objects[idx].id
+
+            for label, text in item.data.options.items():
+                opsi_objects.append(
+                    SoalOpsi(soal_id=parent_soal_id, label=label, opsi_text=text)
+                )
+
+            for step_idx, step_text in enumerate(item.data.langkah, start=1):
+                langkah_objects.append(
+                    SoalLangkah(soal_id=parent_soal_id, urutan=step_idx, teks=step_text)
+                )
+
+        self.db.add_all(opsi_objects)
+        self.db.add_all(langkah_objects)
+
+        await self.db.commit()
+        return True
+        
     async def get_soal_by_id(self, soal_id: int) -> Soal | None:
         stmt = (
             select(Soal)

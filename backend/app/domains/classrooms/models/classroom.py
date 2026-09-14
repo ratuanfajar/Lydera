@@ -53,5 +53,6 @@ class Classroom(Base):
         secondary=student_classrooms,
         back_populates="classrooms"
     )
+    quiz_requests: Mapped[list["QuizRequest"]] = relationship(back_populates="classroom", cascade="all, delete-orphan")
 
 

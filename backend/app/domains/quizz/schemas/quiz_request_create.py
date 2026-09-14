@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class QuizChapterRequest(BaseModel):
@@ -8,5 +8,9 @@ class QuizChapterRequest(BaseModel):
 
 
 class QuizRequestCreate(BaseModel):
+    classroom_id: int
     module_id: int
-    chapters: list[QuizChapterRequest]
+    title: str = Field(min_length=1, max_length=255)
+    chapters: list[QuizChapterRequest] = Field(min_items=1)
+
+    

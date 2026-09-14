@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 import re
 
 from fastapi import APIRouter, FastAPI, Request
@@ -21,7 +22,8 @@ from app.domains.schools.router import router as router_school
 from app.domains.users.router import router_user, router_student, router_teacher
 from app.domains.classrooms.router import router_classrooms, router_classrooms_types
 from app.domains.contents.router import router_blocks, router_chapters, router_fases, router_modules
-from app.domains.quizz.router import router_quiz_requests, router_soal
+from app.domains.quizz.router import router_quiz_requests, router_soal, router_teacher_quizz
+from app.core.redis import close_redis_client, get_redis_client
 
 
 
@@ -31,6 +33,7 @@ api_router.include_router(router_school)
 api_router.include_router(router_user)
 api_router.include_router(router_student)
 api_router.include_router(router_teacher)
+api_router.include_router(router_teacher_quizz)
 api_router.include_router(router_classrooms_types)
 api_router.include_router(router_classrooms)
 api_router.include_router(router_blocks)
@@ -42,7 +45,13 @@ api_router.include_router(router_soal)
 
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    get_redis_client()
+    yield
+    await close_redis_client()
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(api_router)
 

@@ -7,6 +7,7 @@ import app.core.model_registry
 from app.utils import paths
 paths.setup()
 
+from app.core.redis import get_redis_client
 import batch
 import pipeline
 import run_mineru
@@ -48,11 +49,7 @@ async def publish_progress(redis: Redis, job_id: int, status: str, progress:int,
 
 @broker.task
 async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter_id:int, teacher_id:int, attempt: int = 1) -> None:
-    redis = Redis.from_url(
-        settings.REDIS_URL,
-        decode_responses=True,
-        socket_keepalive=True
-    )
+    redis: Redis = get_redis_client()
 
     async with AsyncSessionLocal() as db:
         repo = JobRepository(db)

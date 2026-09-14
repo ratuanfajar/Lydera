@@ -8,3 +8,4 @@ from app.domains.contents.models.chapter_progress import ChapterProgress
 from app.domains.contents.models import Chapter, Block, Module, Cp, Fase, ModuleProgress, ModuleStatus
 from app.domains.quizz.models import QuizRequest, SoalStimulus, SoalOpsi, SoalLangkah, Soal, QuizRequestChapter
 from app.domains.jobs.models import Job
+from app.domains.quizz.models.quiz_progress import QuizProgress

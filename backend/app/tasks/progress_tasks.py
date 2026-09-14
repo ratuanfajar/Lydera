@@ -9,10 +9,11 @@ from app.domains.contents.models.module import Module
 from app.domains.jobs.models.job import Job
 from app.domains.contents.models.chapter_progress import ChapterProgress
 from app.domains.contents.models.module_progress import ModuleProgress
+from app.core.redis import get_redis_client
 
 
 async def enqueue_module_progress_job(module_id: int) -> bool:
-    redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+    redis : Redis = get_redis_client()
     lock_key = f"lock:recalculate_module:{module_id}"
     pending_key = f"pending:recalculate_module:{module_id}"
 
@@ -31,7 +32,7 @@ async def enqueue_module_progress_job(module_id: int) -> bool:
 
 @broker.task
 async def recalculate_module_progress_task(module_id: int) -> None:
-    redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+    redis: Redis = get_redis_client()
     lock_key = f"lock:recalculate_module:{module_id}"
     pending_key = f"pending:recalculate_module:{module_id}"
 
@@ -70,7 +71,7 @@ async def recalculate_module_progress_task(module_id: int) -> None:
 
 
 async def enqueue_chapter_progress_reset_job(chapter_id: int) -> bool:
-    redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+    redis: Redis = get_redis_client()
     lock_key = f"lock:reset_chapter_progress:{chapter_id}"
     pending_key = f"pending:reset_chapter_progress:{chapter_id}"
 
@@ -89,7 +90,7 @@ async def enqueue_chapter_progress_reset_job(chapter_id: int) -> bool:
 
 @broker.task
 async def reset_chapter_progress_task(chapter_id: int) -> None:
-    redis = Redis.from_url(settings.REDIS_URL, decode_responses=True)
+    redis: Redis = get_redis_client()
     lock_key = f"lock:reset_chapter_progress:{chapter_id}"
     pending_key = f"pending:reset_chapter_progress:{chapter_id}"
 

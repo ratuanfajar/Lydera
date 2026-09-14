@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import paths
 
@@ -13,7 +13,7 @@ import segment
 import validate
 
 
-def compute_for_chapter(chapter_id, blocks, hots_count, lots_count) -> list[tuple[dict, dict]]:
+def compute_for_chapter(chapter_id, blocks, hots_count, lots_count, on_progress=None) -> list[tuple[dict, dict]]:
     """Jalankan Chain 0-4 untuk satu bab, tanpa menyentuh DB. Mengembalikan list (data, hasil_validasi)
     per soal -- pemanggil (`backend/app/tasks/quiz_tasks.py`) yang menyimpan hasilnya.
 
@@ -24,6 +24,8 @@ def compute_for_chapter(chapter_id, blocks, hots_count, lots_count) -> list[tupl
     independen satu sama lain dalam satu bab (segmen tidak saling butuh; soal cuma butuh segmen +
     chapter_summary yang sudah pasti selesai lebih dulu). Reduce tetap satu panggilan tunggal
     (butuh semua ringkasan Map bab ini).
+
+    `on_progress`: Callback opsional yang dipanggil setiap kali 1 soal selesai.
     """
     segments = segment.build_segments(chapter_id, blocks)
     if not segments:
@@ -33,8 +35,41 @@ def compute_for_chapter(chapter_id, blocks, hots_count, lots_count) -> list[tupl
     chapter_summary = context.summarize_chapter(summaries)
 
     plan = _allocate(segments, hots_count, lots_count)
-    return _parallel_map(lambda item: _generate_and_validate(item, chapter_summary), plan)
+    # return _parallel_map(
+    #     lambda item: _generate_and_validate(item, chapter_summary), 
+    #     plan,
+    #     on_progress=on_progress
+    # )
+    return _parallel_map_with_progress(
+        lambda item: _generate_and_validate(item, chapter_summary), 
+        plan,
+        on_progress=on_progress
+    )
 
+def _parallel_map_with_progress(fn, items: list, on_progress=None) -> list:
+    workers = max(1, min(config.LLM_MAX_WORKERS, len(items)))
+    if not items:
+        return []
+
+    results = [None] * len(items)
+    
+    if workers == 1:
+        for idx, item in enumerate(items):
+            results[idx] = fn(item)
+            if on_progress:
+                on_progress()
+        return results
+
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        future_to_idx = {pool.submit(fn, item): idx for idx, item in enumerate(items)}
+        
+        for future in as_completed(future_to_idx):
+            idx = future_to_idx[future]
+            results[idx] = future.result()
+            if on_progress:
+                on_progress() 
+
+    return results
 
 def _generate_and_validate(item: tuple, chapter_summary: str) -> tuple[dict, dict]:
     seg, bloom_level = item

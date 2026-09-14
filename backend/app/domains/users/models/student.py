@@ -33,6 +33,7 @@ class Student(Base):
     )
 
     chapters_progress: Mapped[list["ChapterProgress"]] = relationship(back_populates="student")
+    quiz_progress: Mapped[list["QuizProgress"]] = relationship(back_populates="student")
 
     module_progress: Mapped["ModuleProgress"] = relationship(
         back_populates="student"

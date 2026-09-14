@@ -33,6 +33,7 @@ from app.domains.contents.services import ContentService
 from app.domains.jobs.depedencies import get_job_service
 from app.domains.jobs.services import JobService
 from app.core.config import settings
+from app.core.redis import get_redis_client
 
 UPLOAD_DIR = Path(__file__).resolve().parents[3] / "uploads"
 
@@ -267,12 +268,10 @@ response_class=StreamingResponse,
 )
 async def stream_job_progress(job_id: int):
     """Real-time SSE stream for monitoring MinerU job progress."""
-    async def event_generator():
-        redis = Redis.from_url(
-            settings.REDIS_URL,
-            decode_responses=True,
-            socket_keepalive=True
-        )
+    async def event_generator(
+            
+    ):
+        redis: Redis = get_redis_client()
         pubsub = redis.pubsub()
         channel_name = f"job_progress:{job_id}"
         

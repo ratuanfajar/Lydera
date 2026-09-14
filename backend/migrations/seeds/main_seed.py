@@ -3,7 +3,7 @@ import asyncio
 from app.core.db import AsyncSessionLocal
 # Use relative imports within the package
 import app.core.model_registry
-
+from .classroom_seed import seed_classrooms
 from .city_seed import seed_cities
 from .classroom_type_seed import seed_classroom_types
 from .school_seed import seed_schools
@@ -29,6 +29,7 @@ async def run_all_seeds():
             # 3. Domain Entities
             await seed_teachers(session, user_id=teacher_user.id, school_id=school.id)
             await seed_students(session, user_id=student_user.id)
+            await seed_classrooms(session)
             
             print("✅ All seed data inserted successfully!")
 

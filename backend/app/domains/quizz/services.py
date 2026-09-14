@@ -1,50 +1,158 @@
 import asyncio
-
+from redis.asyncio import Redis
+import json
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import BadRequestException, NotFoundException
+from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.domains.quizz.models import Soal
 from app.domains.quizz.repositories.interface import QuizRepositoryInterface
 
+from app.domains.quizz.models.quiz_request import QuizRequest, QuizRequestStatus
+from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
+from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
+from app.domains.quizz.schemas.quiz_request_create import QuizRequestCreate
+from app.utils.idempotency import generate_idempotency_key
+from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
+from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 import paths
 
 paths.setup()
 
 import regenerate as quiz_regenerate
 
-
+TTL_3_MINUTES = 180
 class QuizService:
-    def __init__(self, repo: QuizRepositoryInterface, db: AsyncSession):
+    def __init__(self, repo: QuizRepositoryInterface, db: AsyncSession, redis:Redis):
         self.repo = repo
         self.db = db
+        self.redis = redis
+
+    async def delete_quiz(self, teacher_id:int, quiz_request_id:int, classroom_id:int):
+        if classroom_id:
+            is_valid = await self.repo.validate_quiz_request(
+                quiz_request_id=quiz_request_id,
+                teacher_id=teacher_id,
+                classroom_id=classroom_id,
+            )
+
+            if not is_valid:
+                raise ForbiddenException("Quiz Request tidak ditemukan atau Anda tidak memiliki akses.")
+
+        deleted = await self.repo.delete_quizz(quiz_request_id)
+
+        if not deleted:
+            raise NotFoundException("Quiz request tidak ditemukan.")
+
+        map_key = f"quiz_idem_map:{quiz_request_id}"
+        idem_key = await self.redis.get(map_key)
+        await self.db.commit()
+        keys_to_delete = [
+            f"quiz_result:{quiz_request_id}",
+            f"quiz_stream:{quiz_request_id}",
+            map_key,
+        ]
+        if idem_key:
+            keys_to_delete.append(idem_key)
+
+        await self.redis.delete(*keys_to_delete)
+        return True
 
     # -- Write (dengan commit) --
-    async def create_quiz_request(self, module_id: int, chapters: list) -> int:
+    async def create_quiz_request(self, teacher_id: int, dto: QuizRequestCreate) -> tuple[int, str, bool, str]:
         """Validasi module/chapter, buat quiz_request + link tiap bab dengan target soal-nya sendiri.
         Pemrosesan sesungguhnya (generate + validate) dijalankan async lewat quiz_tasks.py."""
-        if not chapters:
-            raise BadRequestException("chapters tidak boleh kosong")
+        chapter_dicts = [c.model_dump() for c in dto.chapters]
+        chapter_ids = [c.chapter_id for c in dto.chapters]
 
-        module = await self.repo.get_module_by_id(module_id)
-        if module is None:
-            raise NotFoundException("modul tidak ditemukan")
+        idem_key = generate_idempotency_key(
+            teacher_id, dto.classroom_id, dto.module_id, dto.title, chapter_dicts
+        )
 
-        for item in chapters:
-            chapter = await self.repo.get_chapter_by_id(item.chapter_id)
-            if chapter is None:
-                raise NotFoundException(f"chapter_id={item.chapter_id} tidak ditemukan")
-            if chapter.module_id != module_id:
-                raise BadRequestException(f"chapter_id={item.chapter_id} bukan bagian dari modul ini")
+        cached_job = await self.redis.get(idem_key)
+        if cached_job:
+            await self.redis.expire(idem_key, TTL_3_MINUTES)
+            data = json.loads(cached_job)
+            return data["quiz_request_id"], data["status"], True, idem_key
+        
+        is_valid, err_msg = await self.repo.validate_ownership_and_hierarchy(
+            teacher_id, dto.classroom_id, dto.module_id, chapter_ids
+        )
+
+        if not is_valid:
+            raise BadRequestException(err_msg)
 
         try:
-            quiz_request_id = await self.repo.create_quiz_request(module_id)
-            for item in chapters:
-                await self.repo.link_chapter(quiz_request_id, item.chapter_id, item.hots_count, item.lots_count)
-            await self.db.commit()
-            return quiz_request_id
+            quiz_request = await self.repo.create_quiz_request(dto.module_id, dto.title, classroom_id=dto.classroom_id)
+            await self.repo.bulk_link_chapters(quiz_request, dto.chapters)
+            await self.repo.db.commit()
+
         except Exception as e:
-            await self.db.rollback()
+            await self.repo.db.rollback()
             raise e
+
+        job_meta = {"quiz_request_id": quiz_request, "status": "queued"}
+        await self.redis.set(idem_key, json.dumps(job_meta), ex=TTL_3_MINUTES)
+        await self.redis.set(f"quiz_idem_map:{quiz_request}", idem_key, ex=TTL_3_MINUTES)
+
+        return quiz_request, "queued", False, idem_key
+
+    async def update_publish_status(
+        self,
+        teacher_id: int,
+        classroom_id: int,
+        quiz_request_id: int,
+        status: QuizRequestStatus,
+    ) -> bool:
+        """
+        Validates ownership and updates the publication status of a quiz request.
+        """
+        # Validate that quiz_request_id exists and belongs to teacher & classroom
+        is_valid = await self.repo.validate_quiz_request(
+            quiz_request_id=quiz_request_id,
+            teacher_id=teacher_id,
+            classroom_id=classroom_id,
+        )
+        if not is_valid:
+            raise ForbiddenException(
+                "Kelas atau Quiz Request tidak ditemukan atau Anda tidak memiliki akses."
+            )
+
+        updated = await self.repo.update_quiz_status_publish(
+            quiz_request_id=quiz_request_id,
+            status=status.value,
+        )
+        if not updated:
+            raise NotFoundException("Quiz request tidak ditemukan.")
+
+        return True
+
+    async def save_and_finalize_quiz(
+        self,
+        teacher_id: int,
+        quiz_request_id: int,
+        payload: SaveQuizRequestPayload,
+    ) -> bool:
+        is_owner = await self.repo.validate_quiz_request(
+        quiz_request_id=quiz_request_id,
+        teacher_id=teacher_id,
+        classroom_id=payload.classroom_id,
+        )
+        if not is_owner:
+            raise ForbiddenException("Kelas tidak ditemukan atau Anda tidak memiliki akses ke kelas ini.")
+
+        # map_key = f"quiz_idem_map:{quiz_request_id}"
+        # idem_key = await self.redis.get(map_key)
+
+        # keys_to_delete = [
+        #     f"quiz_result:{quiz_request_id}",
+        #     f"quiz_stream:{quiz_request_id}",
+        #     map_key,
+        # ]
+        # if idem_key:
+        #     keys_to_delete.append(idem_key)
+
+        # await self.redis.delete(*keys_to_delete)
+        return True
 
     async def edit_soal(self, soal_id: int, payload) -> Soal:
         """Edit langsung tanpa LLM. Hanya berlaku untuk soal berdiri sendiri (stimulus_id kosong, biasanya LOTS)."""
@@ -120,7 +228,7 @@ class QuizService:
             )
         except Exception as exc:
             raise BadRequestException(f"regenerasi gagal, coba lagi: {exc}")
-
+        
         try:
             new_stimulus_text = (results[0][1].get("stimulus") or {}).get("readable_text", "")
             if new_stimulus_text:
@@ -148,6 +256,71 @@ class QuizService:
             await self.db.rollback()
             raise e
 
+    async def regenerate_cluster_from_input(self, payload: RegenerateClusterRequest) -> dict:
+        """
+        Regenerates a HOTS cluster (stimulus + questions) based entirely on user input.
+        Only fetches chapter text blocks from the database.
+        """
+        # 1. Fetch chapter blocks from DB (Chapter text blocks always exist after module upload)
+        all_blocks = await self.repo.get_blocks_for_chapter(payload.chapter_id)
+        if not all_blocks:
+            raise NotFoundException(f"Teks modul untuk chapter_id={payload.chapter_id} tidak ditemukan")
+
+        blocks_as_rows = [
+            {
+                "reading_order": b.reading_order,
+                "block_type": b.block_type,
+                "readable_text": b.readable_text,
+            }
+            for b in all_blocks
+        ]
+
+        # 2. Map items to (soal_id/temp_id, bloom_level) tuples expected by compute_cluster
+        soal_bloom_levels = [(item.id, item.bloom_level) for item in payload.items]
+
+        # 3. Call LLM regeneration in a thread pool
+        try:
+            results = await asyncio.to_thread(
+                quiz_regenerate.compute_cluster,
+                payload.chapter_id,
+                blocks_as_rows,
+                payload.stimulus.source_reading_order_start,
+                payload.stimulus.source_reading_order_end,
+                soal_bloom_levels,
+                payload.feedback,
+            )
+        except Exception as exc:
+            raise BadRequestException(f"Regenerasi gagal, coba lagi: {exc}")
+
+        # 4. Format preview results
+        new_stimulus_text = (results[0][1].get("stimulus") or {}).get("readable_text", "")
+
+        preview_cluster = {
+            "stimulus_text": new_stimulus_text,
+            "soal_list": []
+        }
+
+        for soal_id, data, val in results:
+            validation_notes = None
+            if not val["matches"]:
+                validation_notes = (
+                    f"Validasi independen sampai ke jawaban {val['derived_option']}, berbeda dari "
+                    f"jawaban Generation ({data['correct_option']})."
+                )
+
+            preview_cluster["soal_list"].append({
+                "soal_id": soal_id,
+                "question_text": data["question_text"],
+                "correct_option": data["correct_option"],
+                "kesimpulan": data["kesimpulan"],
+                "review_status": "pending",
+                "review_priority": "normal" if val["matches"] else "high",
+                "validation_notes": validation_notes,
+                "options": data["options"],
+                "langkah": data["langkah"],
+            })
+
+        return preview_cluster
     # -- Read (tanpa commit) --
     async def get_quiz_request_status(self, quiz_request_id: int):
         quiz_request = await self.repo.get_quiz_request(quiz_request_id)
@@ -163,3 +336,15 @@ class QuizService:
         if soal is None:
             raise NotFoundException("soal tidak ditemukan")
         return soal
+
+    async def get_quizzes_teacher(self, query: QuizRequestQuery, teacher_id:int) -> list[QuizRequestTeacherResponse]:
+        quizzes = await self.repo.get_quizzes_teacher(query.classroom_id, teacher_id, query.status)
+        return [QuizRequestTeacherResponse.model_validate(q) for q in quizzes]
+
+    async def get_quiz_teacher(self, query: QuizRequestDetailQuery, teacher_id:int, id:int) -> QuizRequestTeacherDetailResponse: 
+        quiz = await self.repo.get_quiz_teacher(query.classroom_id, teacher_id, id)
+        if not quiz:
+            raise NotFoundException(
+                "Quiz tidak ditemukan"
+            )
+        return QuizRequestTeacherDetailResponse.model_validate(quiz)

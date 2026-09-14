@@ -31,5 +31,5 @@ class Soal(Base):
     # Relationships
     quiz_request: Mapped["QuizRequest"] = relationship(back_populates="soals")
     stimulus: Mapped[Optional["SoalStimulus"]] = relationship(back_populates="soals")
-    opsi: Mapped[List["SoalOpsi"]] = relationship(back_populates="soal", cascade="all, delete-orphan")
-    langkah: Mapped[List["SoalLangkah"]] = relationship(back_populates="soal", cascade="all, delete-orphan")
+    opsi: Mapped[List["SoalOpsi"]] = relationship(back_populates="soal",order_by="SoalOpsi.id", cascade="all, delete-orphan")
+    langkah: Mapped[List["SoalLangkah"]] = relationship(back_populates="soal", order_by="SoalLangkah.urutan", cascade="all, delete-orphan")

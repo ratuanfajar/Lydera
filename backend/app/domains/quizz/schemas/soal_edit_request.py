@@ -9,7 +9,7 @@ class SoalEditRequest(BaseModel):
     kesimpulan: str | None = None
 
 
-class SoalRegenerateRequest(BaseModel):
+class   SoalRegenerateRequest(BaseModel):
     feedback: str
 
 
