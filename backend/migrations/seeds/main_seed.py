@@ -11,6 +11,7 @@ from .fase_cp_seed import seed_fase_and_cp
 from .user_seed import seed_users
 from .teacher_seed import seed_teachers
 from .student_seed import seed_students
+from .classroom_students_seed import seed_student_classroom
 
 async def run_all_seeds():
     async with AsyncSessionLocal() as session:
@@ -30,6 +31,7 @@ async def run_all_seeds():
             await seed_teachers(session, user_id=teacher_user.id, school_id=school.id)
             await seed_students(session, user_id=student_user.id)
             await seed_classrooms(session)
+            await seed_student_classroom(session, student_id=1, classroom_id=1)
             
             print("✅ All seed data inserted successfully!")
 
