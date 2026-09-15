@@ -1,12 +1,15 @@
-from datetime import datetime
 from typing import List, Optional, Sequence
+from datetime import datetime, timezone
 
 from sqlalchemy import Label, and_, delete, func, insert, or_, select
 from sqlalchemy.orm import contains_eager, joinedload, selectinload
 
 from app.core.db import AsyncSession
 from app.domains.contents.models import Block, Chapter, Module
-from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalLangkah, SoalOpsi, SoalStimulus
+from app.domains.quizz.models import (
+    QuizRequest, QuizRequestChapter, Soal, SoalJawaban, SoalJawabanLangkah,
+    SoalLangkah, SoalOpsi, SoalStimulus,
+)
 from app.domains.quizz.repositories.interface import QuizRepositoryInterface
 from app.domains.quizz.schemas.quiz_request_query import QuizRequestQueryStatus
 from app.domains.classrooms.models.classroom import Classroom
@@ -14,6 +17,7 @@ from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest
 from app.domains.quizz.models.quiz_progress import QuizProgress
 from app.domains.quizz.models.quiz_request import QuizRequestStatus
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
+from app.core.exceptions import NotFoundException
 
 
 class QuizRepository(QuizRepositoryInterface):
@@ -34,21 +38,7 @@ class QuizRepository(QuizRepositoryInterface):
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none() is not None
 
-    async def validate_classroom_ownership(self, teacher_id: int, classroom_id: int) -> bool:
-        stmt = select(Classroom.id).where(
-            Classroom.id == classroom_id,
-            Classroom.teacher_id == teacher_id,
-        )
-        result = await self.db.execute(stmt)
-        return result.scalar_one_or_none() is not None
-    
     # Module/Chapter
-    async def get_module_by_id(self, module_id: int) -> Module | None:
-        return await self.db.get(Module, module_id)
-
-    async def get_chapter_by_id(self, chapter_id: int) -> Chapter | None:
-        return await self.db.get(Chapter, chapter_id)
-
     async def get_blocks_for_chapter(self, chapter_id: int) -> Sequence[Block]:
         stmt = select(Block).where(Block.chapter_id == chapter_id).order_by(Block.reading_order)
         result = await self.db.scalars(stmt)
@@ -144,22 +134,6 @@ class QuizRepository(QuizRepositoryInterface):
             if error:
                 quiz.error = error
             await self.db.flush()
-
-    async def get_chapter_links(self, quiz_request_id: int) -> Sequence[QuizRequestChapter]:
-        stmt = select(QuizRequestChapter).where(
-            QuizRequestChapter.quiz_request_id == quiz_request_id
-        )
-        result = await self.db.execute(stmt)
-        return result.scalars().all()
-
-    async def link_chapter(self, quiz_request_id: int, chapter_id: int, hots_count: int, lots_count: int) -> None:
-        self.db.add(QuizRequestChapter(
-            quiz_request_id=quiz_request_id,
-            chapter_id=chapter_id,
-            hots_count=hots_count,
-            lots_count=lots_count,
-        ))
-        await self.db.flush()
 
     async def get_quiz_request(self, quiz_request_id: int) -> QuizRequest | None:
         return await self.db.get(QuizRequest, quiz_request_id)
@@ -289,6 +263,13 @@ class QuizRepository(QuizRepositoryInterface):
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def check_is_quiz_done(self, student_id: int, quiz_id: int) -> bool:
+        stmt = select(QuizProgress.is_done).where(
+            QuizProgress.quiz_request_id == quiz_id,
+            QuizProgress.student_id == student_id,
+        )
+        return bool(await self.db.scalar(stmt))
+    
     async def update_quiz_status_publish(self, quiz_request_id: int, status: str, error: Optional[str] = None) -> bool:
         quiz_req = await self.db.get(QuizRequest, quiz_request_id)
         if not quiz_req:
@@ -302,47 +283,6 @@ class QuizRepository(QuizRepositoryInterface):
         return True
 
     # Soal
-    async def save_soal(self, quiz_request_id: int, chapter_id: int, data: dict,
-                         review_priority: str, validation_notes: str | None) -> int:
-        stimulus_id = None
-        stimulus = data.get("stimulus")
-        if stimulus:
-            new_stimulus = SoalStimulus(
-                quiz_request_id=quiz_request_id,
-                chapter_id=chapter_id,
-                source_markup=stimulus.get("source_markup", ""),
-                readable_text=stimulus["readable_text"],
-                source_reading_order_start=data["reading_order_start"],
-                source_reading_order_end=data["reading_order_end"],
-            )
-            self.db.add(new_stimulus)
-            await self.db.flush()
-            stimulus_id = new_stimulus.id
-
-        new_soal = Soal(
-            quiz_request_id=quiz_request_id,
-            chapter_id=chapter_id,
-            stimulus_id=stimulus_id,
-            bloom_level=data["bloom_level"],
-            question_text=data["question_text"],
-            correct_option=data["correct_option"],
-            kesimpulan=data["kesimpulan"],
-            source_reading_order_start=data["reading_order_start"],
-            source_reading_order_end=data["reading_order_end"],
-            review_priority=review_priority,
-            validation_notes=validation_notes,
-        )
-        self.db.add(new_soal)
-        await self.db.flush()
-
-        for label, opsi_text in data["options"].items():
-            self.db.add(SoalOpsi(soal_id=new_soal.id, label=label, opsi_text=opsi_text))
-        for urutan, teks in enumerate(data["langkah"], start=1):
-            self.db.add(SoalLangkah(soal_id=new_soal.id, urutan=urutan, teks=teks))
-        await self.db.flush()
-
-        return new_soal.id
-
     async def save_quiz_data(self, quiz_request_id: int, classroom_id:int, status_val: str, items: List[SoalCreateRequest]) -> bool:
         quiz_req = await self.db.get(QuizRequest, quiz_request_id)
 
@@ -461,9 +401,6 @@ class QuizRepository(QuizRepositoryInterface):
         stimulus.readable_text = readable_text
         stimulus.review_status = "edited"
 
-    async def set_review_status(self, soal: Soal, status: str) -> None:
-        soal.review_status = status
-
     async def replace_soal_opsi(self, soal_id: int, options: dict[str, str]) -> None:
         # Manipulasi lewat koleksi relationship (soal.opsi), bukan session.delete() langsung --
         # Soal.opsi punya cascade="all, delete-orphan", jadi clear()+append() di sini yang membuat
@@ -484,3 +421,117 @@ class QuizRepository(QuizRepositoryInterface):
         for urutan, teks in enumerate(langkah, start=1):
             soal.langkah.append(SoalLangkah(soal_id=soal_id, urutan=urutan, teks=teks))
         await self.db.flush()
+
+    async def get_quiz_questions_with_answers(self, quiz_id: int, student_id: int) -> list[Soal]:
+        stmt = (
+            select(Soal)
+            .where(Soal.quiz_request_id == quiz_id)
+            .options(
+                selectinload(Soal.stimulus),
+                selectinload(Soal.opsi),
+                selectinload(Soal.jawaban).selectinload(SoalJawaban.langkah),
+            )
+            .order_by(Soal.id.asc())
+        )
+        return list((await self.db.scalars(stmt)).all())
+    # SoalJawaban (jawaban siswa)
+    async def get_or_create_quiz_progress(self, student_id: int, quiz_id: int) -> tuple[QuizRequest, QuizProgress] :
+        quiz = await self.db.get(QuizRequest, quiz_id)
+        if not quiz:
+            raise NotFoundException("Kuis tidak ditemukan.")
+        stmt = select(QuizProgress).where(
+            QuizProgress.quiz_request_id == quiz_id,
+            QuizProgress.student_id == student_id
+        )
+        progress = (await self.db.scalars(stmt)).one_or_none()
+
+        if not progress:
+            progress = QuizProgress(
+                quiz_request_id=quiz_id,
+                student_id=student_id,
+                attempt_count=0,
+                is_done=False,
+            )
+            self.db.add(progress)
+            await self.db.flush()
+
+        return quiz, progress
+
+    async def mark_quiz_completed(self, student_id: int, quiz_id: int) -> None:
+        stmt = select(QuizProgress).where(
+            QuizProgress.quiz_request_id == quiz_id,
+            QuizProgress.student_id == student_id,
+        )
+
+        progress = (await self.db.scalars(stmt)).one_or_none()
+
+        if progress and not progress.is_done:
+            progress.is_done = True
+            progress.completed_at = datetime.now(timezone.utc)
+            await self.db.commit()
+
+    async def update_soal_jawaban(self, jawaban_id:int, selected_option: str, is_correct: bool, langkah: list[str]) -> None:
+        jawaban = await self.db.get(SoalJawaban, jawaban_id)
+        if not jawaban:
+            return
+
+        jawaban.selected_option = selected_option
+        jawaban.is_correct = is_correct
+
+        jawaban.langkah.clear()
+        for item in langkah:
+            jawaban.langkah.append(
+                SoalJawabanLangkah(urutan=item.urutan, teks=item.teks)
+            )
+
+    async def get_soal_jawaban(self, soal_id: int, student_id: int) -> SoalJawaban | None:
+        stmt = (
+            select(SoalJawaban)
+            .where(SoalJawaban.soal_id == soal_id, SoalJawaban.student_id == student_id)
+            .options(selectinload(SoalJawaban.langkah))
+        )
+        result = await self.db.scalars(stmt)
+        return result.first()
+
+    async def create_soal_jawaban(self, soal_id: int, student_id: int, selected_option: str,
+    is_correct: bool, langkah: list[str]) -> int:
+        jawaban = SoalJawaban(
+            soal_id=soal_id,
+            student_id=student_id,
+            selected_option=selected_option,
+            is_correct=is_correct,
+        )
+        self.db.add(jawaban)
+        await self.db.flush()
+
+        for urutan, teks in enumerate(langkah, start=1):
+            self.db.add(SoalJawabanLangkah(jawaban_id=jawaban.id, urutan=urutan, teks=teks))
+        await self.db.flush()
+
+        return jawaban.id
+
+    async def get_jawaban_for_request(self, quiz_request_id: int, student_id: int) -> Sequence[SoalJawaban]:
+        stmt = (
+            select(SoalJawaban)
+            .join(Soal, SoalJawaban.soal_id == Soal.id)
+            .where(Soal.quiz_request_id == quiz_request_id, SoalJawaban.student_id == student_id)
+            .options(selectinload(SoalJawaban.langkah))
+        )
+        result = await self.db.scalars(stmt)
+        return result.all()
+
+    async def get_quiz_progress(self, quiz_request_id: int, student_id: int) -> Optional[QuizProgress]:
+        """Fetches the progress record for a specific student and quiz request."""
+        stmt = select(QuizProgress).where(
+            QuizProgress.quiz_request_id == quiz_request_id,
+            QuizProgress.student_id == student_id,
+        )
+        result = await self.db.scalars(stmt)
+        return result.one_or_none()
+
+    async def save_evaluation(self, jawaban: SoalJawaban, divergence_step: int | None,
+                               diagnosis: str, personalized_justification: str) -> None:
+        jawaban.divergence_step = divergence_step
+        jawaban.diagnosis = diagnosis
+        jawaban.personalized_justification = personalized_justification
+        jawaban.evaluated_at = datetime.now(timezone.utc)

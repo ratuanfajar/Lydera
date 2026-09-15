@@ -8,7 +8,7 @@ class SoalLangkah(Base):
     __tablename__ = "soal_langkah"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    soal_id: Mapped[int] = mapped_column(ForeignKey("soal.id", ondelete="CASCADE"), nullable=False, index=True)
+    soal_id: Mapped[int] = mapped_column(ForeignKey("soal.id", ondelete="CASCADE"), nullable=False)
     urutan: Mapped[int] = mapped_column(Integer, nullable=False)
     teks: Mapped[str] = mapped_column(Text, nullable=False)
 

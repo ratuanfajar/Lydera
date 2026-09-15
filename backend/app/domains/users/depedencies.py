@@ -7,6 +7,8 @@ from app.domains.classrooms.depedencies import get_classroom_repository
 from app.domains.classrooms.repositories.repository import ClassroomRepository
 from app.domains.contents.repositories.repository import ContentRepository
 from app.domains.contents.depedencies import get_content_repository
+from app.domains.quizz.depedencies import get_quiz_repository
+from app.domains.quizz.repositories.repository import QuizRepository
 
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     return UserRepository(db)
@@ -34,6 +36,7 @@ def get_student_service(
     user_repo: UserRepository = Depends(get_user_repository),
     classroom_repo: ClassroomRepository = Depends(get_classroom_repository),
     content_repo: ContentRepository = Depends(get_content_repository),
+    quiz_repo: QuizRepository = Depends(get_quiz_repository),
     db: AsyncSession = Depends(get_db),
 ) -> StudentService:
-    return StudentService(user_repo, repo, classroom_repo, content_repo, db)
+    return StudentService(user_repo, repo, quiz_repo, classroom_repo, content_repo, db)

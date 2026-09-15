@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.db import Base
 from sqlalchemy import Enum as SQLEnum
@@ -25,12 +25,20 @@ class QuizRequest(Base):
     status: Mapped[str] = mapped_column(Text, nullable=False, server_default='queued')
     error: Mapped[Optional[str]] = mapped_column(Text)
 
+    max_retry: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     max_duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
     start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
+
     __table_args__ = (
         CheckConstraint("status IN ('queued', 'running', 'done', 'failed')", name="check_quiz_req_status"),
+        Index(
+            "ix_quiz_requests_classroom_status_start",
+            "classroom_id",
+            "status_published",
+            text("start_time DESC"),
+        ),
         Index("ix_quiz_request_status", "status", "id"),
     )
 

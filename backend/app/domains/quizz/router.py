@@ -20,11 +20,14 @@ from app.domains.quizz.schemas import (
     QuizRequestCreate,
     QuizRequestCreateResponse,
     QuizRequestStatus,
+    QuizResultItem,
     SoalEditRequest,
     SoalOpsiResponse,
     SoalRegenerateRequest,
     SoalResponse,
     SoalStatusResponse,
+    SoalSubmitRequest,
+    SoalSubmitResponse,
 )
 from app.domains.quizz.services import QuizService
 from app.tasks.quiz_tasks import TTL_3_MINUTES, process_quiz_request_task
@@ -56,39 +59,6 @@ def _to_soal_response(soal: Soal) -> SoalResponse:
         review_priority=soal.review_priority,
         validation_notes=soal.validation_notes,
     )
-# ==========================================
-# SOAL ROUTER
-# ==========================================
-router_soal = APIRouter(prefix="/soal", tags=["soal"], route_class=WrappedRoute)
-
-# @router_soal.post(
-#     "/{soal_id}/approve",
-#     description="Requires the TEACHER role.",
-#     response_model=Response[SoalStatusResponse],
-#     status_code=status.HTTP_200_OK,
-# )
-# async def approve_soal(
-#     _: Roles(Role.TEACHER),
-#     soal_id: Annotated[int, FastAPIPath()],
-#     service: QuizService = Depends(get_quiz_service),
-# ):
-#     soal = await service.set_review_status(soal_id, "approved")
-#     return Response(message=get_response_message(), data={"id": soal.id, "review_status": soal.review_status})
-
-
-# @router_soal.post(
-#     "/{soal_id}/reject",
-#     description="Requires the TEACHER role.",
-#     response_model=Response[SoalStatusResponse],
-#     status_code=status.HTTP_200_OK,
-# )
-# async def reject_soal(
-#     _: Roles(Role.TEACHER),
-#     soal_id: Annotated[int, FastAPIPath()],
-#     service: QuizService = Depends(get_quiz_service),
-# ):
-#     soal = await service.set_review_status(soal_id, "rejected")
-#     return Response(message=get_response_message(), data={"id": soal.id, "review_status": soal.review_status})
 
 # ==========================================
 # Teacher ROUTER
@@ -281,22 +251,6 @@ async def edit_soal(
     soal = await service.edit_soal(soal_id, payload)
     return Response(message=get_response_message(), data=_to_soal_response(soal))
 
-@router_teacher_quizz.patch(
-    "/quizzes/{quiz_id}",
-    description="Requires the TEACHER role",
-    response_model=Response[QuizRequestTeacherDetailResponse],
-    status_code=status.HTTP_200_OK,
-    responses=COMMON_VALIDATION_RESPONSES,
-)
-async def update_quiz(
-    teacher: Roles(Role.TEACHER),
-    quiz_id: Annotated[int, FastAPIPath()],
-    payload: Annotated[QuizRequestUpdate, Body()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    result = await service.update_quiz_settings(teacher.profile_id, payload.classroom_id, quiz_id, payload)
-    return Response(message="Berhasil update quizz", data=result)
-
 @router_teacher_quizz.delete(
     "/quizzes/{quiz_id}",
     description="Requires the TEACHER role",
@@ -336,4 +290,97 @@ async def get_list_quizzes(
         data=result
     )
 
+
+@router_student_quizz.post(
+    "/quizzes/{quiz_id}/start",
+    description="Requires STUDENT role. Returns SSE stream starting with question list followed by countdown ticks.",
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {
+            "description": "SSE Stream. Event 1 sends question list JSON; subsequent events send countdown ticks.",
+            "content": {
+                "text/event-stream": {
+                    "schema": {
+                        "type": "string",
+                        "example": 'data: {"type":"INIT","questions":[...],"target_end_time":"..."}\n\ndata: {"type":"TICK","time":"15:00"}\n\n',
+                    }
+                }
+            },
+        },
+        **COMMON_VALIDATION_RESPONSES,
+    },
+)
+async def start_quiz(
+    student: Roles(Role.STUDENT),
+    quiz_id: Annotated[int, FastAPIPath()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    stream_gen = await service.initialize_and_stream_quiz(
+        student_id=student.profile_id, quiz_id=quiz_id
+    )
+    return StreamingResponse(
+        stream_gen,
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+@router_student_quizz.post(
+    "/quizzes/{quiz_id}/finish",
+    description="Submits the quiz early, closes active SSE streams, and dispatches the review job queue.",
+    response_model=Response[dict],
+    status_code=status.HTTP_200_OK,
+)
+async def finish_quiz(
+    student: Roles(Role.STUDENT),
+    quiz_id: Annotated[int, FastAPIPath()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    await service.finish_and_enqueue_review(quiz_id=quiz_id, student_id=student.profile_id)
+    return Response(
+        message="Kuis berhasil dikumpulkan dan sedang dievaluasi.",
+        data={"quiz_id": quiz_id, "status": "PROCESSING"},
+    )
+
+@router_student_quizz.get(
+    "/quizzes/{quiz_request_id}/my-results",
+    description=(
+        "Requires the STUDENT role. Hasil kuis siswa yang login: untuk soal yang dijawab salah, "
+        "justifikasi personal (perbandingan langkah pengerjaan siswa vs yang benar) dievaluasi di "
+        "sini kalau belum pernah, lalu disimpan -- panggilan berikutnya pakai hasil tersimpan."
+    ),
+    response_model=Response[list[QuizResultItem]],
+    status_code=status.HTTP_200_OK,
+)
+async def get_my_quiz_results(
+    student: Roles(Role.STUDENT),
+    quiz_request_id: Annotated[int, FastAPIPath()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    results = await service.get_quiz_results(quiz_request_id, student.profile_id)
+    return Response(message=get_response_message(), data=results)
+
+@router_student_quizz.post(
+    "/soal/{soal_id}/submit",
+    description=(
+        "Requires the STUDENT role. Simpan jawaban + langkah pengerjaan siswa untuk satu soal. "
+        "Tidak ada evaluasi LLM di sini -- justifikasi untuk jawaban salah baru dihitung saat "
+        "siswa minta hasil lewat GET /quiz-requests/{id}/my-results. Satu siswa cuma bisa submit "
+        "sekali per soal."
+    ),
+    response_model=Response[SoalSubmitResponse],
+    status_code=status.HTTP_201_CREATED,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def submit_soal_answer(
+    student: Roles(Role.STUDENT),
+    soal_id: Annotated[int, FastAPIPath()],
+    payload: Annotated[SoalSubmitRequest, Body()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    await service.submit_answer(soal_id, student.profile_id, payload)
+    return Response(message=get_response_message(), data={"soal_id": soal_id, "status": "saved"})
 

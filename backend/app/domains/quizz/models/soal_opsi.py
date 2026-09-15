@@ -8,7 +8,7 @@ class SoalOpsi(Base):
     __tablename__ = "soal_opsi"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    soal_id: Mapped[int] = mapped_column(ForeignKey("soal.id", ondelete="CASCADE"), nullable=False, index=True)
+    soal_id: Mapped[int] = mapped_column(ForeignKey("soal.id", ondelete="CASCADE"), nullable=False)
     label: Mapped[str] = mapped_column(CHAR(1), nullable=False)
     opsi_text: Mapped[str] = mapped_column(Text, nullable=False)
 

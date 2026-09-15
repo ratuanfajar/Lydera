@@ -26,6 +26,7 @@ class Soal(Base):
         CheckConstraint("correct_option IN ('A', 'B', 'C', 'D')", name="check_soal_correct_opt"),
         CheckConstraint("review_status IN ('pending', 'approved', 'rejected', 'edited')", name="check_soal_review"),
         CheckConstraint("review_priority IN ('low', 'normal', 'high')", name="check_soal_priority"),
+        Index("ix_soal_quiz_req_id", "quiz_request_id", "id"),
     )
 
     # Relationships
@@ -33,3 +34,5 @@ class Soal(Base):
     stimulus: Mapped[Optional["SoalStimulus"]] = relationship(back_populates="soals")
     opsi: Mapped[List["SoalOpsi"]] = relationship(back_populates="soal",order_by="SoalOpsi.id", cascade="all, delete-orphan")
     langkah: Mapped[List["SoalLangkah"]] = relationship(back_populates="soal", order_by="SoalLangkah.urutan", cascade="all, delete-orphan")
+    jawaban: Mapped[List["SoalJawaban"]] = relationship(back_populates="soal", cascade="all, delete-orphan")
+

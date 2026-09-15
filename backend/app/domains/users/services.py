@@ -24,6 +24,8 @@ from app.domains.contents.schemas.module.teacher_module_request import TeacherMo
 from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse, TeacherModuleWithoutChapterResponse
 from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
+from app.domains.quizz.repositories.interface import QuizRepositoryInterface
+from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
 
 class UserService:
     def __init__(
@@ -151,6 +153,7 @@ class StudentService:
         self,
         user_repo: UserRepositoryInterface,
         student_repo: StudentRepositoryInterface,
+        quiz_repo: QuizRepositoryInterface,
         classroom_repo: ClassroomRepositoryInterface,
         content_repo: ContentRepositoryInterface,
         db: AsyncSession
@@ -159,6 +162,7 @@ class StudentService:
         self.student_repo = student_repo
         self.classroom_repo = classroom_repo
         self.content_repo = content_repo
+        self.quiz_repo = quiz_repo
         self.db = db
 
     async def create_student(self, dto: StudentCreate):
@@ -198,7 +202,7 @@ class StudentService:
                 match dto.status:
                     case StudentTaskStatus.ALL:
                         modules = await self.content_repo.get_all_modules_student(dto.classroom_id, student_id, StudentModuleStatus.NOT_DONE)
-                        exams = []
+                        exams = await self.quiz_repo.get_quizzes_student(dto.classroom_id, student_id, QuizRequestStudentQueryStatus.NOT_DONE)
         
                     case StudentTaskStatus.MODULE:
                         modules = await self.content_repo.get_all_modules_student(dto.classroom_id, student_id, StudentModuleStatus.NOT_DONE)
@@ -206,8 +210,7 @@ class StudentService:
         
                     case StudentTaskStatus.EXAM:
                         modules = []
-                        # exams = await self.get_exams(dto.classroom_id, student_id)
-                        exams = []
+                        exams = await self.quiz_repo.get_quizzes_student(dto.classroom_id, student_id, QuizRequestStudentQueryStatus.NOT_DONE)
         
                     case _:
                         raise ValueError(f"Status tidak valid: {dto.status}")
