@@ -110,7 +110,8 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
             # 3. Database Ingestion
             await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
             content_repo = ContentRepository(db)
-            content_service = ContentService(content_repo, db)
+            job_repo = JobRepository(db)
+            content_service = ContentService(content_repo, job_repo, db)
 
             total_blocks = 0
             for json_path in list_json_paths:
