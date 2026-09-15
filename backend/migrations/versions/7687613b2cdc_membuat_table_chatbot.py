@@ -1,22 +1,26 @@
-"""membuat tabel pertama
+"""membuat table chatbot
 
-Revision ID: ea062bd0a1ec
+Revision ID: 7687613b2cdc
 Revises: 
-Create Date: 2026-09-15 15:44:09.031381
+Create Date: 2026-09-16 02:48:34.058898
 
 """
 from typing import Sequence, Union
 
 from alembic import op
+import pgvector
 import sqlalchemy as sa
-
+from pgvector.sqlalchemy import Vector
+from app.core.config import settings
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'ea062bd0a1ec'
+revision: str = '7687613b2cdc'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+EMBEDDING_DIM = settings.EMBEDDING_DIM
 
 def upgrade() -> None:
     """Upgrade schema."""
@@ -126,6 +130,18 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_classrooms_code'), 'classrooms', ['code'], unique=True)
     op.create_index(op.f('ix_classrooms_teacher_id'), 'classrooms', ['teacher_id'], unique=False)
+    op.create_table('chat_sessions',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('student_id', sa.Integer(), nullable=False),
+    sa.Column('classroom_id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.ForeignKeyConstraint(['classroom_id'], ['classrooms.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['student_id'], ['students.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('ix_chat_sessions_student_classroom', 'chat_sessions', ['student_id', 'classroom_id'], unique=False)
     op.create_table('modules',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('title', sa.Text(), nullable=False),
@@ -167,6 +183,22 @@ def upgrade() -> None:
     )
     op.create_index('ix_chapter_module', 'chapters', ['module_id', 'number'], unique=False)
     op.create_index(op.f('ix_chapters_module_id'), 'chapters', ['module_id'], unique=False)
+    op.create_table('chat_messages',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('session_id', sa.Integer(), nullable=False),
+    sa.Column('role', sa.Text(), nullable=False),
+    sa.Column('content', sa.Text(), nullable=False),
+    sa.Column('tool_calls', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('citations', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('scope_klass', sa.Text(), nullable=True),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.CheckConstraint("role IN ('user', 'assistant')", name='check_chat_message_role'),
+    sa.ForeignKeyConstraint(['session_id'], ['chat_sessions.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('ix_chat_messages_session', 'chat_messages', ['session_id', 'id'], unique=False)
     op.create_table('modules_progress',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
@@ -191,6 +223,7 @@ def upgrade() -> None:
     sa.Column('status_published', sa.Enum('DRAFT', 'PUBLISH', name='quizrequeststatus', native_enum=False, length=20), nullable=False),
     sa.Column('status', sa.Text(), server_default='queued', nullable=False),
     sa.Column('error', sa.Text(), nullable=True),
+    sa.Column('max_retry', sa.Integer(), nullable=False),
     sa.Column('max_duration_minutes', sa.Integer(), nullable=False),
     sa.Column('start_time', sa.DateTime(timezone=True), nullable=False),
     sa.Column('end_time', sa.DateTime(timezone=True), nullable=False),
@@ -204,7 +237,25 @@ def upgrade() -> None:
     )
     op.create_index('ix_quiz_request_status', 'quiz_requests', ['status', 'id'], unique=False)
     op.create_index(op.f('ix_quiz_requests_classroom_id'), 'quiz_requests', ['classroom_id'], unique=False)
+    op.create_index('ix_quiz_requests_classroom_status_start', 'quiz_requests', ['classroom_id', 'status_published', sa.literal_column('start_time DESC')], unique=False)
     op.create_index(op.f('ix_quiz_requests_module_id'), 'quiz_requests', ['module_id'], unique=False)
+
+    op.create_table('block_embeddings',
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('chapter_id', sa.Integer(), nullable=False),
+    sa.Column('block_ids', postgresql.ARRAY(sa.Integer()), nullable=False),
+    sa.Column('heading', sa.Text(), nullable=False),
+    sa.Column('chunk_text', sa.Text(), nullable=False),
+    sa.Column('embedding', Vector(EMBEDDING_DIM), nullable=False),
+    sa.Column('kb_version', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.ForeignKeyConstraint(['chapter_id'], ['chapters.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_index('ix_block_embeddings_chapter', 'block_embeddings', ['chapter_id', 'kb_version'], unique=False)
+    
     op.create_table('blocks',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('chapter_id', sa.Integer(), nullable=False),
@@ -226,6 +277,15 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index('ix_block_chapter_order', 'blocks', ['chapter_id', 'reading_order'], unique=False)
+    op.create_table('chapter_kb',
+    sa.Column('chapter_id', sa.Integer(), nullable=False),
+    sa.Column('kb_version', sa.Integer(), server_default='1', nullable=False),
+    sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.ForeignKeyConstraint(['chapter_id'], ['chapters.id'], ondelete='CASCADE'),
+    sa.PrimaryKeyConstraint('chapter_id')
+    )
     op.create_table('chapters_progress',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('chapter_id', sa.Integer(), nullable=False),
@@ -261,17 +321,25 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('quiz_request_id', sa.Integer(), nullable=False),
     sa.Column('student_id', sa.Integer(), nullable=False),
+    sa.Column('attempt_count', sa.Integer(), nullable=False),
     sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('is_done', sa.Boolean(), nullable=False),
+    sa.Column('started_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('completed_at', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('review_status', sa.Enum('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', name='quizreviewstatus', native_enum=False, length=20), nullable=False),
+    sa.Column('review_error', sa.Text(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('deleted_at', sa.DateTime(timezone=True), nullable=True),
+    sa.CheckConstraint("review_status IN ('PENDING', 'PROCESSING', 'COMPLETED', 'FAILED')", name='check_quiz_progress_review_status'),
     sa.ForeignKeyConstraint(['quiz_request_id'], ['quiz_requests.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['student_id'], ['students.id'], ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('quiz_request_id', 'student_id', name='uq_quiz_progress_quiz_student')
     )
-    op.create_index('ix_quiz_progress_student_request', 'quiz_progress', ['student_id', 'quiz_request_id'], unique=True)
+    op.create_index('ix_quiz_progress_sse_check', 'quiz_progress', ['quiz_request_id', 'student_id', 'is_done'], unique=False)
+    op.create_index('ix_quiz_progress_stuck_processing', 'quiz_progress', ['review_status', 'started_at'], unique=False, postgresql_where=sa.text("review_status IN ('PROCESSING', 'FAILED')"))
+    op.create_index('ix_quiz_progress_student_id', 'quiz_progress', ['student_id'], unique=False)
     op.create_table('quiz_request_chapters',
     sa.Column('quiz_request_id', sa.Integer(), nullable=False),
     sa.Column('chapter_id', sa.Integer(), nullable=False),
@@ -332,6 +400,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_soal_chapter_id'), 'soal', ['chapter_id'], unique=False)
+    op.create_index('ix_soal_quiz_req_id', 'soal', ['quiz_request_id', 'id'], unique=False)
     op.create_index(op.f('ix_soal_quiz_request_id'), 'soal', ['quiz_request_id'], unique=False)
     op.create_index(op.f('ix_soal_stimulus_id'), 'soal', ['stimulus_id'], unique=False)
     op.create_table('soal_jawaban',
@@ -353,8 +422,8 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('soal_id', 'student_id', name='uq_soal_jawaban_student')
     )
-    op.create_index(op.f('ix_soal_jawaban_soal_id'), 'soal_jawaban', ['soal_id'], unique=False)
-    op.create_index(op.f('ix_soal_jawaban_student_id'), 'soal_jawaban', ['student_id'], unique=False)
+    op.create_index('ix_soal_jawaban_pending_eval', 'soal_jawaban', ['student_id', 'soal_id'], unique=False, postgresql_where=sa.text('is_correct = FALSE AND evaluated_at IS NULL'))
+    op.create_index('ix_soal_jawaban_student_soal', 'soal_jawaban', ['student_id', 'soal_id'], unique=False)
     op.create_table('soal_langkah',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('soal_id', sa.Integer(), nullable=False),
@@ -367,7 +436,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('soal_id', 'urutan', name='uq_soal_langkah_urutan')
     )
-    op.create_index(op.f('ix_soal_langkah_soal_id'), 'soal_langkah', ['soal_id'], unique=False)
     op.create_table('soal_opsi',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('soal_id', sa.Integer(), nullable=False),
@@ -381,7 +449,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('soal_id', 'label', name='uq_soal_opsi_label')
     )
-    op.create_index(op.f('ix_soal_opsi_soal_id'), 'soal_opsi', ['soal_id'], unique=False)
     op.create_table('soal_jawaban_langkah',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('jawaban_id', sa.Integer(), nullable=False),
@@ -394,46 +461,51 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('jawaban_id', 'urutan', name='uq_soal_jawaban_langkah_urutan')
     )
-    op.create_index(op.f('ix_soal_jawaban_langkah_jawaban_id'), 'soal_jawaban_langkah', ['jawaban_id'], unique=False)
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     """Downgrade schema."""
     # ### commands auto generated by Alembic - please adjust! ###
-    op.drop_index(op.f('ix_soal_jawaban_langkah_jawaban_id'), table_name='soal_jawaban_langkah')
     op.drop_table('soal_jawaban_langkah')
-    op.drop_index(op.f('ix_soal_opsi_soal_id'), table_name='soal_opsi')
     op.drop_table('soal_opsi')
-    op.drop_index(op.f('ix_soal_langkah_soal_id'), table_name='soal_langkah')
     op.drop_table('soal_langkah')
-    op.drop_index(op.f('ix_soal_jawaban_student_id'), table_name='soal_jawaban')
-    op.drop_index(op.f('ix_soal_jawaban_soal_id'), table_name='soal_jawaban')
+    op.drop_index('ix_soal_jawaban_student_soal', table_name='soal_jawaban')
+    op.drop_index('ix_soal_jawaban_pending_eval', table_name='soal_jawaban', postgresql_where=sa.text('is_correct = FALSE AND evaluated_at IS NULL'))
     op.drop_table('soal_jawaban')
     op.drop_index(op.f('ix_soal_stimulus_id'), table_name='soal')
     op.drop_index(op.f('ix_soal_quiz_request_id'), table_name='soal')
+    op.drop_index('ix_soal_quiz_req_id', table_name='soal')
     op.drop_index(op.f('ix_soal_chapter_id'), table_name='soal')
     op.drop_table('soal')
     op.drop_index(op.f('ix_soal_stimulus_quiz_request_id'), table_name='soal_stimulus')
     op.drop_index(op.f('ix_soal_stimulus_chapter_id'), table_name='soal_stimulus')
     op.drop_table('soal_stimulus')
     op.drop_table('quiz_request_chapters')
-    op.drop_index('ix_quiz_progress_student_request', table_name='quiz_progress')
+    op.drop_index('ix_quiz_progress_student_id', table_name='quiz_progress')
+    op.drop_index('ix_quiz_progress_stuck_processing', table_name='quiz_progress', postgresql_where=sa.text("review_status IN ('PROCESSING', 'FAILED')"))
+    op.drop_index('ix_quiz_progress_sse_check', table_name='quiz_progress')
     op.drop_table('quiz_progress')
     op.drop_index('ix_job_status', table_name='jobs')
     op.drop_index('ix_job_chapter', table_name='jobs')
     op.drop_table('jobs')
     op.drop_index('ix_chapter_progress_user_chapter', table_name='chapters_progress')
     op.drop_table('chapters_progress')
+    op.drop_table('chapter_kb')
     op.drop_index('ix_block_chapter_order', table_name='blocks')
     op.drop_table('blocks')
+    op.drop_index('ix_block_embeddings_chapter', table_name='block_embeddings')
+    op.drop_table('block_embeddings')
     op.drop_index(op.f('ix_quiz_requests_module_id'), table_name='quiz_requests')
+    op.drop_index('ix_quiz_requests_classroom_status_start', table_name='quiz_requests')
     op.drop_index(op.f('ix_quiz_requests_classroom_id'), table_name='quiz_requests')
     op.drop_index('ix_quiz_request_status', table_name='quiz_requests')
     op.drop_table('quiz_requests')
     op.drop_index(op.f('ix_modules_progress_student_id'), table_name='modules_progress')
     op.drop_index(op.f('ix_modules_progress_module_id'), table_name='modules_progress')
     op.drop_table('modules_progress')
+    op.drop_index('ix_chat_messages_session', table_name='chat_messages')
+    op.drop_table('chat_messages')
     op.drop_index(op.f('ix_chapters_module_id'), table_name='chapters')
     op.drop_index('ix_chapter_module', table_name='chapters')
     op.drop_table('chapters')
@@ -443,6 +515,8 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_modules_classroom_id'), table_name='modules')
     op.drop_index('idx_modules_title_trgm', table_name='modules', postgresql_using='gin', postgresql_ops={'title': 'gin_trgm_ops'})
     op.drop_table('modules')
+    op.drop_index('ix_chat_sessions_student_classroom', table_name='chat_sessions')
+    op.drop_table('chat_sessions')
     op.drop_index(op.f('ix_classrooms_teacher_id'), table_name='classrooms')
     op.drop_index(op.f('ix_classrooms_code'), table_name='classrooms')
     op.drop_table('classrooms')

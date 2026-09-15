@@ -1,0 +1,319 @@
+{
+  "info": {
+    "name": "Lydera API - Clean Automated Flow",
+    "description": "Koleksi Postman Lydera otomatis & tanpa ribet copy-paste ID/Token.\n\nLANGKAH CEPAT:\n1. Jalankan script SQL 1-Click Seed di DBeaver sekali saja.\n2. Klik Send request secara berurutan dari atas ke bawah. Semua Token, Classroom ID, Module ID, Chapter ID, dan Session ID otomatis tersimpan ke variabel Postman.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api" },
+    { "key": "teacher_token", "value": "" },
+    { "key": "student_token", "value": "" },
+    { "key": "classroom_id", "value": "" },
+    { "key": "classroom_code", "value": "" },
+    { "key": "module_id", "value": "" },
+    { "key": "chapter_id", "value": "" },
+    { "key": "job_id", "value": "" },
+    { "key": "session_id", "value": "" },
+    { "key": "city_id", "value": "1" },
+    { "key": "school_id", "value": "1" },
+    { "key": "classroom_type_id", "value": "1" },
+    { "key": "fase_id", "value": "1" },
+    { "key": "cp_id", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "1. Autentikasi & Akun",
+      "item": [
+        {
+          "name": "1. Register Guru",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/teachers",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"guru@test.com\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\",\n  \"role\": \"teacher\"\n}"
+            }
+          }
+        },
+        {
+          "name": "2. Register Siswa",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/students",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"siswa@test.com\",\n  \"password\": \"password123\",\n  \"confirm_password\": \"password123\",\n  \"role\": \"student\"\n}"
+            }
+          }
+        },
+        {
+          "name": "3. Login Guru (Auto-save Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res && res.data) {",
+                  "    pm.collectionVariables.set('teacher_token', res.data);",
+                  "    console.log('Teacher Token tersimpan:', res.data);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"guru@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"teacher\"\n}"
+            }
+          }
+        },
+        {
+          "name": "4. Login Siswa (Auto-save Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res && res.data) {",
+                  "    pm.collectionVariables.set('student_token', res.data);",
+                  "    console.log('Student Token tersimpan:', res.data);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"siswa@test.com\",\n  \"password\": \"password123\",\n  \"role\": \"student\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Kelas & Modul",
+      "item": [
+        {
+          "name": "1. Buat Kelas (Auto-save ID & Code)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res && res.data) {",
+                  "    pm.collectionVariables.set('classroom_id', res.data.id);",
+                  "    pm.collectionVariables.set('classroom_code', res.data.code);",
+                  "    console.log('Classroom ID:', res.data.id, 'Code:', res.data.code);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacher_token}}" }
+            ],
+            "url": "{{base_url}}/classrooms",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kelas 10 Matematika\",\n  \"classroom_type_id\": {{classroom_type_id}},\n  \"school_id\": {{school_id}},\n  \"grade\": 10\n}"
+            }
+          }
+        },
+        {
+          "name": "2. Siswa Join Kelas",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student_token}}" }
+            ],
+            "url": "{{base_url}}/classrooms/join",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"{{classroom_code}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "3. Buat Modul (Auto-save Module ID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res && res.data) {",
+                  "    pm.collectionVariables.set('module_id', res.data.id);",
+                  "    console.log('Module ID tersimpan:', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{teacher_token}}" }
+            ],
+            "url": "{{base_url}}/modules",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Kalkulus Dasar\",\n  \"description\": \"Modul Pembelajaran Turunan Fungsi\",\n  \"fase_id\": {{fase_id}},\n  \"classroom_id\": {{classroom_id}},\n  \"status\": \"draft\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Chapter & MinerU Pipeline",
+      "item": [
+        {
+          "name": "1. Upload Chapter PDF (Auto-save Chapter & Job ID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res && res.data) {",
+                  "    pm.collectionVariables.set('chapter_id', res.data.chapter_id);",
+                  "    pm.collectionVariables.set('job_id', res.data.job_id);",
+                  "    console.log('Chapter ID:', res.data.chapter_id, 'Job ID:', res.data.job_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": "{{base_url}}/chapters",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "module_id", "value": "{{module_id}}", "type": "text" },
+                { "key": "number", "value": "1", "type": "text" },
+                { "key": "title", "value": "Turunan Fungsi Aljabar", "type": "text" },
+                { "key": "cp_id", "value": "{{cp_id}}", "type": "text" },
+                { "key": "file", "type": "file", "src": "", "description": "Pilih file PDF materi modul di sini" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Cek Status Job MinerU (SSE Stream)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": "{{base_url}}/chapters/jobs/{{job_id}}/stream"
+          }
+        },
+        {
+          "name": "3. Publish Modul (Setelah MinerU Done)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": "{{base_url}}/modules/publish/{{module_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Chatbot RAG",
+      "item": [
+        {
+          "name": "1. Reindex Chapter (Embeddings ke pgvector)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{teacher_token}}" }],
+            "url": "{{base_url}}/chatbot/chapters/{{chapter_id}}/reindex"
+          }
+        },
+        {
+          "name": "2. Buat Sesi Chat Siswa (Auto-save Session ID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res && res.data) {",
+                  "    pm.collectionVariables.set('session_id', res.data.id);",
+                  "    console.log('Session ID tersimpan:', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student_token}}" }
+            ],
+            "url": "{{base_url}}/chatbot/sessions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"classroom_id\": {{classroom_id}}\n}"
+            }
+          }
+        },
+        {
+          "name": "3. Tanya Chatbot - Pertanyaan Inti",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student_token}}" }
+            ],
+            "url": "{{base_url}}/chatbot/sessions/{{session_id}}/messages",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Apa pengertian dan rumus dasar turunan fungsi?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "4. Tanya Chatbot - Pertanyaan di Luar Topik (Scope Gate)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{student_token}}" }
+            ],
+            "url": "{{base_url}}/chatbot/sessions/{{session_id}}/messages",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Kapan proklamasi kemerdekaan Indonesia?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "5. Ambil Histori Chat",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{student_token}}" }],
+            "url": "{{base_url}}/chatbot/sessions/{{session_id}}/messages"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -34,9 +34,16 @@ class ClassroomRepository(ClassroomRepositoryInterface):
                 async with self.db.begin_nested():
                     await self.db.flush()
                 break
-            except IntegrityError:
-                self.db.expunge(new_classroom)
-                continue
+            except IntegrityError as e:
+                # begin_nested() sudah otomatis melepas new_classroom dari session begitu SAVEPOINT
+                # rollback -- tidak perlu (dan tidak boleh) expunge manual lagi di sini.
+                # Cuma retry (generate kode baru) kalau memang tabrakan kode unik -- pelanggaran
+                # constraint lain (mis. school_id/classroom_type_id tidak ada) harus gagal cepat,
+                # bukan infinite-loop generate kode baru yang tidak akan pernah menyelesaikan
+                # masalah aslinya.
+                if getattr(e.orig, "constraint_name", None) == "ix_classrooms_code":
+                    continue
+                raise
         await self.db.refresh(new_classroom,["classroom_type"])
         return new_classroom
 

@@ -24,6 +24,8 @@ dependencies = [
     "psycopg[binary]>=3.2.0",
     "taskiq[reload]>=0.12.6",
     "taskiq-redis>=1.2.3",
+    "pgvector>=0.3.6",
+    "httpx>=0.27.0",
 ]
 
 # Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.

@@ -38,6 +38,10 @@ from app.domains.quizz.models.soal import Soal
 from app.domains.quizz.models.soal_langkah import SoalLangkah
 from app.domains.quizz.models.soal_opsi import SoalOpsi
 from app.domains.quizz.models.soal_stimulus import SoalStimulus
+from app.domains.chatbot.models.chapter_kb import ChapterKb
+from app.domains.chatbot.models.block_embedding import BlockEmbedding
+from app.domains.chatbot.models.chat_session import ChatSession
+from app.domains.chatbot.models.chat_message import ChatMessage
 # add every new domain's models import here
 
 config = context.config
