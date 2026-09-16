@@ -14,7 +14,7 @@ from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest, Soa
 paths.setup()
 
 from app.core.redis import get_redis_client
-import quiz_pipeline
+from quiz import quiz_pipeline
 
 
 TTL_3_MINUTES = 180

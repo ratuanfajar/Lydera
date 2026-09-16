@@ -1,3 +1,7 @@
+
+import app.utils.paths as paths
+paths.setup()
+
 from contextlib import asynccontextmanager
 import re
 
@@ -8,7 +12,7 @@ from pathlib import Path
 from app.core.config import settings
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
-import app.utils.paths as paths
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import app.core.model_registry
@@ -61,7 +65,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
-paths.setup()
+
 
 app.add_middleware(
     CORSMiddleware,

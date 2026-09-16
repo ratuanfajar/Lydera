@@ -5,8 +5,8 @@ from pathlib import Path
 
 from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
-import config
-import jsonutil
+from annotation import config
+from quiz import jsonutil
 
 RETRYABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError)
 MAX_RETRIES = 5

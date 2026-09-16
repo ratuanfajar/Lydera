@@ -1,9 +1,10 @@
 from pathlib import Path
 
-import formula
-import image
-import llm
-import table
+# import formula
+# import image
+# import llm
+# import table
+from annotation import formula, image, llm, table
 
 FEEDBACK_TEMPLATE = (
     "<feedback_guru>\n{feedback}\n</feedback_guru>\n"

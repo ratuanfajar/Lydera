@@ -1,6 +1,4 @@
-import cache
-import config
-import llm
+from annotation import llm, config, cache
 
 SYSTEM = (
     "Anda mengubah notasi matematika LaTeX menjadi cara membacanya dalam Bahasa "

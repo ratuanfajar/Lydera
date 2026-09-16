@@ -29,8 +29,8 @@ from app.core.config import settings
 from app.utils import paths
 
 paths.setup()
-import config as ai_config  # noqa: E402  (ai-services/annotation/config.py, via paths.setup())
-import llm_ext  # noqa: E402  (ai-services/chatbot/llm_ext.py)
+from annotation import config as ai_config  # noqa: E402  (ai-services/annotation/config.py, via paths.setup())
+from chatbot import llm_ext  # noqa: E402  (ai-services/chatbot/llm_ext.py)
 
 _redis_sync = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
 

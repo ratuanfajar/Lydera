@@ -1,7 +1,7 @@
-import revise
-import segment as segment_module
-import validate
-from parallel import parallel_map
+from quiz import revise
+from quiz  import segment as segment_module
+from quiz  import validate
+from quiz.parallel import parallel_map
 
 
 def _soal_content_equal(original: dict, data: dict) -> bool:

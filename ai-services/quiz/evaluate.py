@@ -1,5 +1,4 @@
-import config
-import llm
+from annotation import config, llm 
 
 MAX_TOKENS = 2048
 

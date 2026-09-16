@@ -6,7 +6,7 @@ from app.utils import paths
 from app.domains.jobs.repositories.interface import JobRepositoryInterface
 from app.tasks.file_tasks import cleanup_module_files_task
 paths.setup()
-import annotation_regenerate
+from annotation import annotation_regenerate
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, Dict, List, Sequence
 from app.domains.contents.models import Block, Fase, Module, Chapter, Cp, ModuleStatus

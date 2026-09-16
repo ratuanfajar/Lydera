@@ -1,5 +1,5 @@
 import cache
-import config
+from annotation import config
 import llm
 
 SEGMENT_SYSTEM = (

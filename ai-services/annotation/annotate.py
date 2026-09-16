@@ -5,11 +5,8 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-import config
-import formula
-import image
-import table
-from preprocess import Route, preprocess
+from annotation import config, image, formula, table
+from annotation.preprocess import Route, preprocess
 
 
 @dataclass

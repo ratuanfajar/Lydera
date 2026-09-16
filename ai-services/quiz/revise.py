@@ -1,5 +1,4 @@
-import config
-import llm
+from annotation import config, llm
 
 REVISE_SOAL_MAX_TOKENS = 3072
 REVISE_STIMULUS_MAX_TOKENS = 1536

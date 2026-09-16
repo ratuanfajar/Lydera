@@ -5,7 +5,7 @@ import json
 import sys
 from dataclasses import asdict
 from pathlib import Path
-import annotate
+from annotation import annotate
 
 def content_lists(outputs_dir: Path) -> list[Path]:
     found = [p for p in outputs_dir.rglob("*_content_list.json") if "content_list_v2" not in p.name]

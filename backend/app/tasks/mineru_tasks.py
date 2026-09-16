@@ -8,9 +8,8 @@ from app.utils import paths
 paths.setup()
 
 from app.core.redis import get_redis_client
-import annotation_pipeline
-import batch
-import run_mineru
+from annotation import annotation_pipeline
+from annotation import run_mineru
 
 from app.core.taskiq import broker
 from app.core.config import settings

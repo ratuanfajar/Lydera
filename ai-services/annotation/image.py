@@ -1,6 +1,4 @@
-import cache
-import config
-import llm
+from annotation import config, llm, cache
 
 SYSTEM = (
     "Anda mendeskripsikan gambar dari buku matematika SMA untuk siswa tunanetra. "

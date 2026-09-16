@@ -24,13 +24,13 @@ from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStud
 from app.domains.quizz.schemas.quiz_request_student_response import QuestionAnswerStudentResponse, QuestionOptionResponse, QuestionStimulusStudentResponse, QuizRequestQuestionStudentResponse, QuizRequestStudentResponse
 from app.domains.quizz.models.quiz_progress import QuizReviewStatus
 from app.tasks.process_exam_review_tasks import process_exam_review_task
-import paths
+from app.utils import paths
 
 paths.setup()
 
-import evaluate as quiz_evaluate
-import quiz_regenerate
-from segment import Segment
+from quiz import evaluate as quiz_evaluate
+from quiz import quiz_regenerate
+from quiz.segment import Segment
 
 TTL_3_MINUTES = 180
 class QuizService:

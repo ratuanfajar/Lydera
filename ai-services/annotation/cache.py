@@ -2,7 +2,7 @@ import hashlib
 import os
 from pathlib import Path
 
-import config
+from annotation import config
 
 
 def get(namespace: str, *parts: str) -> str | None:

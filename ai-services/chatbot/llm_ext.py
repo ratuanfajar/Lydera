@@ -8,8 +8,8 @@ from functools import lru_cache
 
 from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
-import config
-import llm as annotation_llm
+from annotation import config
+from annotation import llm as annotation_llm
 
 RETRYABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError)
 MAX_RETRIES = 5

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import paths
+from quiz import paths
 
 paths.setup()
-import config
-import context
-import generate
-import segment
-import validate
+from annotation import config
+from quiz import context
+from quiz import generate
+from quiz import segment
+from quiz import validate
 from parallel import parallel_map
 
 

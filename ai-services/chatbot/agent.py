@@ -12,13 +12,13 @@ from __future__ import annotations
 import json
 from typing import Callable
 
-import config
-import external_tools
-import jsonutil
-import llm_ext
-import scope_gate
-import tools
-from citations import verify_citations
+from annotation import config
+from chatbot import external_tools
+from quiz import jsonutil
+from chatbot import llm_ext
+from chatbot import scope_gate
+from chatbot import tools
+from chatbot.citations import verify_citations
 
 SYSTEM_PROMPT = (
     "Anda adalah asisten belajar matematika untuk siswa tunanetra (jawaban dibacakan pembaca "

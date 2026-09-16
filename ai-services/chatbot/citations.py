@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 
-import trusted_domains
+from chatbot import trusted_domains
 
 _DIGITS = re.compile(r"\d+")
 

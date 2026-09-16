@@ -6,9 +6,9 @@ from __future__ import annotations
 
 import httpx
 
-import cache
-import config
-import trusted_domains
+from annotation import cache
+from annotation import config
+from chatbot import trusted_domains
 
 TIMEOUT = 15.0
 

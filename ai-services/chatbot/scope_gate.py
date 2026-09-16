@@ -34,9 +34,9 @@ from __future__ import annotations
 
 import re
 
-import config
-import jsonutil
-import llm as annotation_llm
+from annotation import config
+from quiz import jsonutil
+from annotation import llm as annotation_llm
 
 CLASSIFIER_SYSTEM = (
     "Anda menentukan apakah pertanyaan siswa masih relevan dengan materi yang tersedia di kelasnya. "

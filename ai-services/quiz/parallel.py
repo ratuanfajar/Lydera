@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor
 
-import config
+from annotation import config
 
 
 def parallel_map(fn, items: list) -> list:

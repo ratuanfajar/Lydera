@@ -7,7 +7,7 @@ import re
 import sys
 from pathlib import Path
 
-import config
+from annotation import config
 
 DEBUG_SUFFIXES = (
     "_content_list_v2.json",

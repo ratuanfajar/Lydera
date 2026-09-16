@@ -14,10 +14,10 @@ from app.utils import paths
 from app.domains.chatbot.schemas.chat import ChatSessionResponseWithMessage
 
 paths.setup()
-import agent as chatbot_agent  # noqa: E402  (ai-services/chatbot/agent.py)
-import chunk as chatbot_chunk  # noqa: E402  (ai-services/chatbot/chunk.py)
-import llm_ext  # noqa: E402  (ai-services/chatbot/llm_ext.py)
-import config as ai_config  # noqa: E402
+from chatbot import agent as chatbot_agent  # noqa: E402  (ai-services/chatbot/agent.py)
+from chatbot import chunk as chatbot_chunk  # noqa: E402  (ai-services/chatbot/chunk.py)
+from chatbot import llm_ext  # noqa: E402  (ai-services/chatbot/llm_ext.py)
+from annotation import config as ai_config  # noqa: E402
 
 
 def _history_key(session_id: int) -> str:

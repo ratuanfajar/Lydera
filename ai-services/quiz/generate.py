@@ -1,4 +1,4 @@
-import config
+from annotation import config
 import llm
 
 LOTS_MAX_TOKENS = 1536

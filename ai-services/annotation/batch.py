@@ -7,8 +7,7 @@ from pathlib import Path
 
 from pypdf import PdfReader
 
-import config
-import run_mineru
+from annotation import config, run_mineru
 
 DEFAULT_MAX_PAGES = 3
 
