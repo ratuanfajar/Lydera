@@ -5,6 +5,7 @@ class BlockResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int | None = None
+    chapter_id: int
     reading_order: int
     block_type: str
     readable_text: str
@@ -20,4 +21,4 @@ class BlockResponse(BaseModel):
     def image_url(self) -> str | None:
         if not self.image_file:
             return None
-        return f"{settings.BASE_URL}/static/annotations/{self.id}/raw-{self.id}/auto/images/{self.image_file}"
+        return f"{settings.BASE_URL}/static/annotations/{self.chapter_id}/raw-{self.chapter_id}/auto/images/{self.image_file}"
