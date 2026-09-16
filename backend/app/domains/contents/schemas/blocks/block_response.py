@@ -1,5 +1,5 @@
-from pydantic import BaseModel, ConfigDict
-
+from pydantic import BaseModel, ConfigDict, computed_field
+from app.core.config import settings
 
 class BlockResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -14,3 +14,10 @@ class BlockResponse(BaseModel):
     source_markup: str | None
     caption: str | None
     image_file: str | None
+
+    @computed_field
+    @property
+    def image_url(self) -> str | None:
+        if not self.image_filename:
+            return None
+        return f"{settings.BASE_URL}/static/annotations/{self.id}/raw-{self.id}/auto/images/{self.image_filename}"

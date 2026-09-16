@@ -5,7 +5,8 @@ from fastapi import APIRouter, FastAPI, Request
 import logging
 import sys
 from pathlib import Path
-
+from app.core.config import settings
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 import app.utils.paths as paths
 from fastapi import FastAPI
@@ -66,6 +67,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/static/annotations", StaticFiles(directory=settings.OUTPUT_DIR), name="annotations")
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: Request, exc: StarletteHTTPException):

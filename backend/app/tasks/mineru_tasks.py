@@ -126,6 +126,7 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
 
             # 4. Success
             annotation_paths = [str(path) for path in list_json_paths]
+            print(annotation_paths)
             await repo.update_job_status(job, "done", blocks_total=total_blocks)
             await db.commit()
             await publish_progress(redis, job_id, "done", 100, f"Successfully processed {total_blocks} blocks.", relative_json_paths)
