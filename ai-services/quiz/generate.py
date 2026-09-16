@@ -1,5 +1,4 @@
 import config
-import jsonutil
 import llm
 
 LOTS_MAX_TOKENS = 1536
@@ -43,8 +42,10 @@ def generate_soal(segment, chapter_summary: str, bloom_level: int, feedback: str
     `feedback` diisi kalau ini regenerasi atas koreksi guru (cluster HOTS), kosong untuk generate awal."""
     prompt = build_prompt(segment, chapter_summary, bloom_level, feedback)
     max_tokens = HOTS_MAX_TOKENS if bloom_level >= 4 else LOTS_MAX_TOKENS
-    raw = llm.complete_text(SYSTEM, prompt, model=config.QUIZ_MODEL, max_tokens=max_tokens)
-    data = jsonutil.parse_json(raw)
+    data = llm.complete_json(
+        SYSTEM, prompt, model=config.QUIZ_MODEL, max_tokens=max_tokens,
+        required_keys=["question_text", "options", "correct_option", "langkah", "kesimpulan", "stimulus"],
+    )
     data["bloom_level"] = bloom_level
     data["reading_order_start"] = segment.reading_order_start
     data["reading_order_end"] = segment.reading_order_end
