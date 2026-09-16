@@ -21,6 +21,7 @@ from app.domains.contents.schemas.chapters.ingest_annonated_request import Inges
 from app.tasks.progress_tasks import enqueue_module_progress_job
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateDetailResponse
 from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
+import annotation_regenerate
 
 from app.domains.contents.schemas import (
     BlockResponse, RegenerateRequest, RegenerateResponse, 

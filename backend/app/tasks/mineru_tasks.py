@@ -8,8 +8,8 @@ from app.utils import paths
 paths.setup()
 
 from app.core.redis import get_redis_client
+import annotation_pipeline
 import batch
-import pipeline
 import run_mineru
 
 from app.core.taskiq import broker
@@ -106,7 +106,7 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
     
             # 2. Run Pipeline aggregation
             await publish_progress(redis, job_id, "running", 75, "Aggregating extracted output...")
-            list_json_paths = await asyncio.to_thread(pipeline.run, out_dir)
+            list_json_paths = await asyncio.to_thread(annotation_pipeline.run, out_dir)
 
             # 3. Database Ingestion
             await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")

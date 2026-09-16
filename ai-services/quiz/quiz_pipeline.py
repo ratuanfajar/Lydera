@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
 import paths
 
 paths.setup()
 
-import config
 import context
 import generate
 import segment
 import validate
+from parallel import parallel_map
 
 
 def compute_for_chapter(chapter_id, blocks, hots_count, lots_count, on_progress=None) -> list[tuple[dict, dict]]:
@@ -31,7 +30,7 @@ def compute_for_chapter(chapter_id, blocks, hots_count, lots_count, on_progress=
     if not segments:
         raise RuntimeError(f"chapter {chapter_id}: tidak ada sub-bab berpola 'A. ...' untuk dijadikan soal")
 
-    summaries = _parallel_map(context.summarize_segment, segments)
+    summaries = parallel_map(context.summarize_segment, segments)
     chapter_summary = context.summarize_chapter(summaries)
 
     plan = _allocate(segments, hots_count, lots_count)
@@ -77,16 +76,6 @@ def _generate_and_validate(item: tuple, chapter_summary: str) -> tuple[dict, dic
     stim_text = (data.get("stimulus") or {}).get("readable_text", "")
     result = validate.validate_soal(seg, data["question_text"], data["options"], data["correct_option"], stim_text)
     return data, result
-
-
-def _parallel_map(fn, items: list) -> list:
-    """Sama seperti `[fn(item) for item in items]`, cuma dieksekusi paralel sebesar LLM_MAX_WORKERS.
-    Urutan hasil tetap sama seperti sekuensial (pool.map, bukan as_completed)."""
-    workers = max(1, min(config.LLM_MAX_WORKERS, len(items)))
-    if workers == 1:
-        return [fn(item) for item in items]
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        return list(pool.map(fn, items))
 
 
 def _allocate(segments, hots_count, lots_count) -> list[tuple]:
