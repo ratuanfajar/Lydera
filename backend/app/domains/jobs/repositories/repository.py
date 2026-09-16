@@ -1,11 +1,10 @@
-from ast import Module
-
 from app.domains.jobs.repositories.interface import JobRepositoryInterface
 from app.core.db import AsyncSession
 from sqlalchemy import select
 from app.domains.jobs.models import Job
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.contents.models.chapter import Chapter
+from app.domains.contents.models.module import Module
 
 class JobRepository(JobRepositoryInterface):
     def __init__(self, db: AsyncSession):

@@ -42,6 +42,7 @@ from app.domains.chatbot.models.chapter_kb import ChapterKb
 from app.domains.chatbot.models.block_embedding import BlockEmbedding
 from app.domains.chatbot.models.chat_session import ChatSession
 from app.domains.chatbot.models.chat_message import ChatMessage
+from app.domains.otp.models.otp import OtpVerificationCode
 # add every new domain's models import here
 
 config = context.config

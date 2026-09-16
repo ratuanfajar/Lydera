@@ -21,6 +21,10 @@ class BadRequestException(AppException):
     status_code = 400
     detail = "Bad Request"
 
+class TooManyRequestException(AppException):
+    status_code = 429
+    detail = "Too many request"
+
 
 class ForbiddenException(AppException):
     status_code = 403

@@ -1,7 +1,9 @@
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 import os
+from pydantic import EmailStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 env_file = ".env.test" if os.getenv("APP_ENV") == "test" else ".env"
@@ -62,3 +64,17 @@ class Settings(BaseSettings):
             return os.getenv("DB_URL")
         return self.DB_URL
 settings = Settings()
+
+class EmailSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file="backend/.env", env_file_encoding="utf-8", extra="ignore")
+
+    EMAIL_FROM : EmailStr = os.getenv('EMAIL_FROM', "no-reply-lydera@gmail.com")
+    EMAIL_FROM_NAME : str = os.getenv('EMAIL_FROM_NAME', "Lydera App")
+    SMTP_HOST : Optional[str] = os.getenv('SMTP_HOST')
+    SMTP_PORT : int = os.getenv('SMTP_PORT')
+    SMTP_USER : Optional[str] = os.getenv('SMTP_USER')
+    SMTP_PASS : Optional[str] = os.getenv('SMTP_PASS')
+    SMTP_TLS : bool = os.getenv('SMTP_TLS', True)
+    PROVIDER: str = os.getenv('PROVIDER')
+
+email_settings = EmailSettings()

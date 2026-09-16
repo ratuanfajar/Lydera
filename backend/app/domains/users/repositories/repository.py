@@ -1,5 +1,5 @@
 from pydantic import EmailStr
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import joinedload, selectinload
 from app.core.security import hash_password
 from app.domains.users.repositories.interface import UserRepositoryInterface, TeacherRepositoryInterface, StudentRepositoryInterface
@@ -14,6 +14,7 @@ from app.domains.classrooms.models.classroom import Classroom
 from app.domains.users.models.student import student_classrooms
 from app.domains.quizz.models.quiz_request import QuizRequest, QuizRequestStatus
 from app.domains.quizz.models.quiz_progress import QuizProgress
+from app.core.exceptions import NotFoundException
 
 
 class UserRepository(UserRepositoryInterface):
@@ -53,6 +54,18 @@ class UserRepository(UserRepositoryInterface):
         )
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
+
+    async def update_password(self, user_id:int, password: str) -> bool:
+        stmt = (
+            update(User)
+            .where(User.id == user_id)
+            .values(password=password)
+        )
+        result = await self.db.execute(stmt)
+
+        if result.rowcount == 0:
+            raise NotFoundException("User tidak ditemukan")
+        return True
     
 
 class TeacherRepository(TeacherRepositoryInterface):

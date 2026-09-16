@@ -24,6 +24,7 @@ from app.domains.users.router import router_user, router_student, router_teacher
 from app.domains.classrooms.router import router_classrooms, router_classrooms_types
 from app.domains.contents.router import router_blocks, router_chapters, router_fases, router_modules
 from app.domains.quizz.router import router_teacher_quizz, router_student_quizz
+from app.domains.otp.router import router_reset_password
 from app.core.redis import close_redis_client, get_redis_client
 from app.domains.chatbot.router import router_chatbot
 
@@ -42,6 +43,7 @@ api_router.include_router(router_modules)
 api_router.include_router(router_chapters)
 api_router.include_router(router_fases)
 api_router.include_router(router_chatbot)
+api_router.include_router(router_reset_password)
 
 
 

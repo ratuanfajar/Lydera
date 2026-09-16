@@ -22,4 +22,8 @@ class User(Base):
         cascade="all, delete-orphan"
     )
 
+    otp_verification_code: Mapped["OtpVerificationCode"] = relationship(
+        back_populates="user"
+    )
+
 
