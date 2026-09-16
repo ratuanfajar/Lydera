@@ -11,8 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_AI_OUTPUT_DIR = PROJECT_ROOT / "ai-services" / "annotation" / "output"
 
 class Settings(BaseSettings):
-    BASE_URL: str = "http://localhost:8003"
-    
+    BASE_URL: str = os.getenv("BASE_URL", "http://localhost:8003")
     model_config = SettingsConfigDict(env_file="backend/.env", env_file_encoding="utf-8", extra="ignore")
 
     # Application
