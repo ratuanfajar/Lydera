@@ -18,6 +18,6 @@ class BlockResponse(BaseModel):
     @computed_field
     @property
     def image_url(self) -> str | None:
-        if not self.image_filename:
+        if not self.image_file:
             return None
-        return f"{settings.BASE_URL}/static/annotations/{self.id}/raw-{self.id}/auto/images/{self.image_filename}"
+        return f"{settings.BASE_URL}/static/annotations/{self.id}/raw-{self.id}/auto/images/{self.image_file}"
