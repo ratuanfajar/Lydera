@@ -40,6 +40,7 @@ class ChatAnswerResponse(BaseModel):
     status: str  # out_of_scope | answered
     message: str
     sources: list[SourceCitation] | None = None
+    suggested_questions: list[str] | None = None
     scope_klass: str
 
 

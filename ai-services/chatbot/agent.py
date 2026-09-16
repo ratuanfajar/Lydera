@@ -26,6 +26,12 @@ SYSTEM_PROMPT = (
     "pengetahuan umum Anda sendiri, meskipun Anda tahu jawabannya. Kalau tidak ada satupun tool "
     "yang mengembalikan informasi relevan, WAJIB akui tidak menemukan jawabannya -- jangan "
     "menutupi itu dengan pengetahuan umum.\n\n"
+    "Kalau pertanyaan siswa MAJEMUK (beberapa sub-pertanyaan digabung) dan SEBAGIAN bukan "
+    "matematika (mis. pemrograman/coding, mata pelajaran lain): JAWAB PENUH bagian matematikanya "
+    "(pakai tool seperti biasa), lalu satu kalimat singkat menyatakan bagian lain di luar cakupan "
+    "chatbot ini. JANGAN panggil tool apapun untuk bagian non-matematika itu, walau Anda tahu "
+    "jawabannya. Tutup dengan 1-2 pertanyaan rujukan (suggested_questions di compose_answer) "
+    "seputar materi yang tersedia, supaya siswa tahu apa yang masih bisa ditanyakan.\n\n"
     "search_module untuk pertanyaan ini SUDAH otomatis dipanggilkan sistem -- cek dulu hasilnya di "
     "riwayat percakapan sebelum manggil tool lain. Kalau hasilnya sudah cukup, LANGSUNG compose_answer, "
     "tidak perlu manggil search_module lagi. Kalau belum cukup, urutan tool berikutnya WAJIB diikuti:\n"
@@ -91,6 +97,7 @@ def run(
             "status": "out_of_scope",
             "message": OUT_OF_SCOPE_MESSAGE,
             "sources": None,
+            "suggested_questions": None,
             "tool_calls": [],
             "scope": scope,
         }
@@ -134,6 +141,7 @@ def run(
                 "status": "answered",
                 "message": NO_SOURCE_FALLBACK,
                 "sources": [],
+                "suggested_questions": None,
                 "tool_calls": tool_call_log,
                 "scope": scope,
             }
@@ -155,6 +163,7 @@ def run(
         "status": "answered",
         "message": "Maaf, butuh waktu lebih lama untuk merangkai jawaban ini. Coba tanyakan lebih spesifik ya.",
         "sources": [],
+        "suggested_questions": None,
         "tool_calls": tool_call_log,
         "scope": scope,
     }
@@ -173,6 +182,7 @@ def _force_compose(messages: list[dict], tool_outputs: dict[str, str], tool_call
             "status": "answered",
             "message": NO_SOURCE_FALLBACK,
             "sources": [],
+            "suggested_questions": None,
             "tool_calls": tool_call_log,
             "scope": scope,
         }
@@ -235,6 +245,7 @@ def _finalize(compose_call, tool_outputs: dict[str, str], tool_call_log: list[di
 
     sources = verify_citations(args.get("sources", []), tool_outputs)
     verified = [s for s in sources if s.get("verified")]
+    suggested_questions = args.get("suggested_questions") or None
 
     # Enforcement di KODE, bukan cuma instruksi prompt -- tanpa source yang benar-benar
     # terverifikasi ke isi tool result, jawaban model tidak boleh diteruskan ke siswa apa adanya
@@ -244,6 +255,7 @@ def _finalize(compose_call, tool_outputs: dict[str, str], tool_call_log: list[di
             "status": "answered",
             "message": NO_SOURCE_FALLBACK,
             "sources": sources,
+            "suggested_questions": None,
             "tool_calls": tool_call_log,
             "scope": scope,
         }
@@ -252,6 +264,7 @@ def _finalize(compose_call, tool_outputs: dict[str, str], tool_call_log: list[di
         "status": "answered",
         "message": args.get("summary", ""),
         "sources": sources,
+        "suggested_questions": suggested_questions,
         "tool_calls": tool_call_log,
         "scope": scope,
     }
