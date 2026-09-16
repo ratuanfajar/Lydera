@@ -117,6 +117,16 @@ TOOLS_SCHEMA = [
                             "mengalir biasa (tanpa bullet/markdown) -- dibacakan pembaca layar."
                         ),
                     },
+                    "suggested_questions": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": (
+                            "OPSIONAL, isi 1-2 pertanyaan rujukan seputar materi yang benar-benar "
+                            "tersedia (dari hasil search_module) -- WAJIB diisi kalau pertanyaan "
+                            "siswa majemuk dan sebagian di luar cakupan, supaya siswa tahu apa yang "
+                            "masih bisa ditanyakan. Kosongkan kalau tidak perlu."
+                        ),
+                    },
                 },
                 "required": ["sources", "summary"],
             },

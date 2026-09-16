@@ -6,7 +6,6 @@ sumber mentah, bukan dipercaya begitu saja dari output LLM."""
 from __future__ import annotations
 
 import re
-from difflib import SequenceMatcher
 
 import trusted_domains
 
@@ -26,26 +25,36 @@ def _lookup_raw_content(reference: str, tool_outputs: dict[str, str]) -> str:
     return ""
 
 
-def fuzzy_contains(needle: str, haystack: str, threshold: float = 0.85) -> bool:
-    """True kalau `needle` (evidence yang diklaim) cukup mirip salah satu potongan `haystack`
-    (konten asli tool). Tidak butuh exact match karena LLM boleh merapikan spasi/tanda baca kecil,
-    tapi tetap harus jelas berasal dari sana, bukan dikarang."""
-    needle = needle.strip().lower()
-    haystack = haystack.lower()
-    if not needle:
-        return False
-    if needle in haystack:
-        return True
+_WHITESPACE = re.compile(r"\s+")
+_LEADING_NUMBERING = re.compile(r"^(?:\d+|[ivxIVX]+|[a-zA-Z])[.)]\s*")
+_WORD = re.compile(r"\w+")
 
-    window = len(needle)
-    step = max(1, window // 4)
-    best = 0.0
-    for start in range(0, max(1, len(haystack) - window + 1), step):
-        chunk = haystack[start : start + window]
-        best = max(best, SequenceMatcher(None, needle, chunk).ratio())
-        if best >= threshold:
-            return True
-    return best >= threshold
+
+def _normalize(text: str) -> str:
+    """Konten mentah dari PDF/OCR penuh `\\n\\n` dan penomoran ("1. ", "I. ") -- LLM WAJAR
+    merapikannya jadi kalimat mengalir biasa saat mengutip (mis. ganti newline jadi ": "). Itu
+    bukan tanda kutipan dikarang, cuma beda representasi whitespace/format. Disamakan dulu sebelum
+    dibandingkan, supaya perbandingan tidak jatuh gara-gara ini -- bukan pelonggaran syarat konten,
+    cuma menghilangkan noise format yang tidak relevan ke isi."""
+    text = _LEADING_NUMBERING.sub("", text.strip())
+    text = _WHITESPACE.sub(" ", text)
+    return text.strip()
+
+
+def fuzzy_contains(needle: str, haystack: str, threshold: float = 0.75) -> bool:
+    """True kalau kata-kata di `needle` (evidence yang diklaim) sebagian besar (>= threshold)
+    beneran ada di `haystack` (konten asli tool). Dipilih overlap KATA, bukan kemiripan karakter
+    berurutan (`SequenceMatcher`) -- LLM WAJAR meringkas/menggabungkan beberapa kalimat sumber jadi
+    satu kalimat kutipan (buang kata sambung, satukan 2 poin jadi 1), yang mengubah urutan/struktur
+    karakter cukup jauh walau isinya identik. Overlap kata tetap ketat soal ISI (kata yang tidak
+    pernah ada di sumber = jelas dikarang, langsung menjatuhkan skor), tapi tidak peduli urutan/
+    penggabungan kalimat."""
+    needle_words = [w for w in _WORD.findall(_normalize(needle).lower()) if len(w) > 2]
+    haystack_words = set(w for w in _WORD.findall(_normalize(haystack).lower()) if len(w) > 2)
+    if not needle_words:
+        return False
+    matched = sum(1 for w in needle_words if w in haystack_words)
+    return (matched / len(needle_words)) >= threshold
 
 
 def verify_citations(sources: list[dict], tool_outputs: dict[str, str]) -> list[dict]:

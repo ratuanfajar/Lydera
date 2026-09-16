@@ -82,7 +82,11 @@ def search_similar_chunks_cached(classroom_id: int, query: str, top_k: int) -> l
 
     results = [
         {
-            "reference": str(row[0]),
+            # `reference` = block_ids[0] (BUKAN block_embeddings.id) -- 1 chunk = 1 block, jadi
+            # tidak ada alasan 2 penomoran beda hidup berdampingan. Model kemarin ketuker milih
+            # block_ids alih-alih reference karena dua-duanya sama-sama "angka block" yang masuk
+            # akal buat mereka -- sekarang keduanya SELALU sama, ketuker atau tidak hasilnya benar.
+            "reference": str(row[1][0]),
             "block_ids": row[1],
             "heading": row[2],
             "text": row[3],

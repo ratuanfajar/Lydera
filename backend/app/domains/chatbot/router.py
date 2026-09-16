@@ -109,6 +109,7 @@ async def ask_question(
             "status": result["status"],
             "message": result["message"],
             "sources": result.get("sources"),
+            "suggested_questions": result.get("suggested_questions"),
             "scope_klass": result["scope"]["klass"],
         },
     )
