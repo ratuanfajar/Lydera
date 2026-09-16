@@ -50,4 +50,4 @@ class JobRepository(JobRepositoryInterface):
             )
         )
         result = await self.db.execute(stmt)
-        return list(result.all())
+        return [(row.pdf_path, row.out_dir) for row in result.all()]

@@ -198,15 +198,22 @@ class ContentRepository(ContentRepositoryInterface):
         return module
 
     async def delete_module_teacher(self, module_id:int, classroom_id: int, teacher_id: int) -> bool:
+        classroom_subquery = (
+            select(Classroom.id)
+            .where(
+                Classroom.id == classroom_id,
+                Classroom.teacher_id == teacher_id
+            )
+        )
+
         stmt = (
-            delete(Module)    
-            .join(Classroom, Module.classroom_id == Classroom.id)
+            delete(Module)
             .where(
                 Module.id == module_id,
-                Module.classroom_id == classroom_id,
-                Classroom.teacher_id == teacher_id,
+                Module.classroom_id.in_(classroom_subquery)
             )
-        )  
+        )
+        
         result = await self.db.execute(stmt)
         await self.db.flush()
         return result.rowcount > 0

@@ -47,8 +47,7 @@ class PasswordResetService:
     async def verify_otp(self, email: str, code: str) -> str:
         otp_record = await self.otp_repo.get_valid_otp(email, code)
         if not otp_record:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, 
+            raise BadRequestException(
                 detail="Invalid or expired OTP code"
             )
 
@@ -62,9 +61,8 @@ class PasswordResetService:
         email = await self.token_repo.get_email_by_token(token)
 
         if not email:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, 
-                detail="Invalid or expired reset token"
+            raise BadRequestException(
+                detail="Invalid or expired OTP code"
             )
         
         user = await self.user_repo.get_by_email(email)

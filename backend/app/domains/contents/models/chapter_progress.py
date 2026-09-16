@@ -7,8 +7,8 @@ class ChapterProgress(Base):
     __tablename__ = "chapters_progress"
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    chapter_id: Mapped[int] = mapped_column(ForeignKey("chapters.id"))
-    student_id: Mapped[int] = mapped_column(ForeignKey("students.id"))
+    chapter_id: Mapped[int] = mapped_column(ForeignKey("chapters.id", ondelete="CASCADE"))
+    student_id: Mapped[int] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"))
     is_done: Mapped[bool] = mapped_column(default=False)
 
     completed_at: Mapped[datetime | None] = mapped_column(

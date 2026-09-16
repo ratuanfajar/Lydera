@@ -49,8 +49,8 @@ class ResetTokenRepository(ResetTokenRepositoryInterface):
         await self.redis.setex(name=f"reset_token:{token}", time=ttl_seconds, value=email)
 
     async def get_email_by_token(self, token: str) -> str | None:
-        email_bytes = await self.redis.get(f"reset_token:{token}")
-        return email_bytes.decode("utf-8") if email_bytes else None
+        email = await self.redis.get(f"reset_token:{token}")
+        return email if email else None
 
     async def delete_token(self, token: str) -> None:
         await self.redis.delete(f"reset_token:{token}")

@@ -143,7 +143,7 @@ async def get_module_teacher(
 
 @router_teacher.delete(
     "/modules/{module_id}",
-    response_model=Response[TeacherModuleResponse],
+    response_model=Response[bool],
     description="Requires the Teacher role.",
 )
 async def delete_module_teacher(
@@ -157,7 +157,6 @@ async def delete_module_teacher(
         query.classroom_id,
         module_id
     )
-
     return Response(
         message="Berhasil menghapus data module",
         data=result
