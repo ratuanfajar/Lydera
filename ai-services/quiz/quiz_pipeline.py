@@ -4,7 +4,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import paths
 
 paths.setup()
-
+import config
 import context
 import generate
 import segment

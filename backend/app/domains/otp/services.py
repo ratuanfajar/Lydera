@@ -69,7 +69,7 @@ class PasswordResetService:
 
         try:
             hashed_pw = hash_password(new_password)
-            await self.user_repo.update_password(user_id=user.id, hashed_password=hashed_pw)
+            await self.user_repo.update_password(user_id=user.id, password=hashed_pw)
 
             await self.token_repo.delete_token(token)
 
