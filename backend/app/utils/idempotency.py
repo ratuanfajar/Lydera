@@ -4,7 +4,7 @@ from redis.asyncio import Redis
 
 def generate_idempotency_key(
     teacher_id: int, classroom_id: int, module_id: int, title: str, chapters: list[dict], 
-    max_duration_minutes : int,
+    max_duration_minutes : int, max_retry : int,
     start_time : str,
     end_time : str
 ) -> str:
@@ -16,6 +16,7 @@ def generate_idempotency_key(
         "title": title.strip().lower(),
         "chapters": sorted_chapters,
         "max_duration_minutes" : max_duration_minutes,
+        "max_retry" : max_retry,
         "start_time" : start_time,
         "end_time" : end_time
     }

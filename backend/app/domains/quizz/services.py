@@ -77,7 +77,7 @@ class QuizService:
         chapter_ids = [c.chapter_id for c in dto.chapters]
 
         idem_key = generate_idempotency_key(
-            teacher_id, dto.classroom_id, dto.module_id, dto.title, chapter_dicts, dto.max_duration_minutes,
+            teacher_id, dto.classroom_id, dto.module_id, dto.title, chapter_dicts, dto.max_duration_minutes, dto.max_retry,
             dto.start_time.isoformat(),
             dto.end_time.isoformat(),
         )
@@ -96,9 +96,9 @@ class QuizService:
             raise BadRequestException(err_msg)
 
         try:
-            quiz_request = await self.repo.create_quiz_request(dto.module_id, dto.title, classroom_id=dto.classroom_id, max_duration_minutes=dto.max_duration_minutes,
+            quiz_request = await self.repo.create_quiz_request(dto.module_id, dto.title, classroom_id=dto.classroom_id, max_duration_minutes=dto.max_duration_minutes, max_retry=dto.max_retry,                                                        
                 start_time=dto.start_time,
-                end_time=dto.end_time,)
+                end_time=dto.end_time)
             await self.repo.bulk_link_chapters(quiz_request, dto.chapters)
             await self.repo.db.commit()
 

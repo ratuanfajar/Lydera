@@ -101,13 +101,14 @@ class QuizRepository(QuizRepositoryInterface):
         await self.db.flush()
         return quiz
     
-    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int,max_duration_minutes: int, start_time: datetime, end_time: datetime) -> QuizRequest:
+    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int,max_duration_minutes: int, max_retry:int, start_time: datetime, end_time: datetime) -> QuizRequest:
         new_request = QuizRequest(
             module_id=module_id,
             classroom_id=classroom_id,
             title=title,
             status="queued",
             max_duration_minutes=max_duration_minutes,
+            max_retry=max_retry,
             start_time=start_time,
             end_time=end_time,
         )

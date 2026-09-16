@@ -22,7 +22,7 @@ class QuizRepositoryInterface(ABC):
     @abstractmethod
     async def validate_quiz_request(self, quiz_request_id:int, teacher_id: int, classroom_id: int) -> bool: raise NotImplementedError
     @abstractmethod
-    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int,max_duration_minutes: int, start_time: datetime, end_time: datetime) -> QuizRequest: raise NotImplementedError
+    async def create_quiz_request(self, module_id: int, title:str, classroom_id:int,max_duration_minutes: int, max_retry:int, start_time: datetime, end_time: datetime) -> QuizRequest: raise NotImplementedError
     @abstractmethod
     async def bulk_link_chapters(self, quiz_request_id: int, chapters: list[QuizChapterRequest]) -> None:
         raise NotImplementedError

@@ -15,6 +15,7 @@ class QuizRequestCreate(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     chapters: list[QuizChapterRequest] = Field(min_items=1)
     max_duration_minutes: int = Field(..., gt=0, description="Durasi pengerjaan dalam menit (> 0)")
+    max_retry: int | None = Field(default=1, gt=0, description="Max pengulangan pengerjaan")
     start_time: datetime
     end_time: datetime
 
