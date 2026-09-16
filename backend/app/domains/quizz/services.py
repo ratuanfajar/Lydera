@@ -12,7 +12,7 @@ import paths
 paths.setup()
 
 import evaluate as quiz_evaluate
-import regenerate as quiz_regenerate
+import quiz_regenerate
 from segment import Segment
 
 
@@ -95,42 +95,55 @@ class QuizService:
             await self.db.rollback()
             raise e
 
-    async def regenerate_cluster(self, stimulus_id: int, feedback: str) -> list[Soal]:
-        """Feedback guru memicu LLM meregenerasi satu cluster HOTS penuh (stimulus + semua soal yang
-        berbagi stimulus itu). Guru approve draft hasilnya sebelum final -- review_status dikembalikan
-        ke 'pending', bukan otomatis final."""
-        stimulus = await self.repo.get_stimulus_by_id(stimulus_id)
-        if stimulus is None:
-            raise NotFoundException(f"stimulus_id={stimulus_id} tidak ditemukan")
+    async def regenerate_cluster(self, soal_id: int, feedback: str) -> list[Soal]:
+        """Feedback guru untuk SATU soal memicu edit soal itu (bukan generate ulang dari nol --
+        lihat `ai-services/quiz/revise.py`). Kalau perbaikannya ternyata perlu sampai ke stimulus
+        (shared ke soal lain di cluster), stimulus ikut direvisi dan SEMUA soal di cluster
+        di-recheck konsistensinya -- kalau tidak, cuma soal yang dikritik yang tersentuh, stimulus
+        dan soal lain di cluster tetap utuh. Guru approve draft hasilnya sebelum final --
+        review_status dikembalikan ke 'pending', bukan otomatis final."""
+        target_soal = await self.repo.get_soal_by_id(soal_id)
+        if target_soal is None:
+            raise NotFoundException("soal tidak ditemukan")
+        if target_soal.stimulus_id is None:
+            raise BadRequestException("soal ini tidak punya stimulus, edit langsung lewat PATCH /soal/{id}")
 
-        cluster = await self.repo.get_soal_by_stimulus(stimulus_id)
-        if not cluster:
-            raise NotFoundException(f"tidak ada soal untuk stimulus_id={stimulus_id}")
+        stimulus = await self.repo.get_stimulus_by_id(target_soal.stimulus_id)
+        cluster = await self.repo.get_soal_by_stimulus(target_soal.stimulus_id)
+        sibling_soal = [s for s in cluster if s.id != soal_id]
 
         all_blocks = await self.repo.get_blocks_for_chapter(stimulus.chapter_id)
         blocks_as_rows = [
             {"reading_order": b.reading_order, "block_type": b.block_type, "readable_text": b.readable_text}
             for b in all_blocks
         ]
-        soal_bloom_levels = [(soal.id, soal.bloom_level) for soal in cluster]
+
+        def to_dict(s: Soal) -> dict:
+            return {
+                "id": s.id,
+                "question_text": s.question_text,
+                "options": {o.label: o.opsi_text for o in s.opsi},
+                "correct_option": s.correct_option,
+                "langkah": [l.teks for l in sorted(s.langkah, key=lambda l: l.urutan)],
+                "kesimpulan": s.kesimpulan,
+            }
 
         try:
-            results = await asyncio.to_thread(
-                quiz_regenerate.compute_cluster,
+            result = await asyncio.to_thread(
+                quiz_regenerate.compute_regeneration,
                 stimulus.chapter_id, blocks_as_rows,
                 stimulus.source_reading_order_start, stimulus.source_reading_order_end,
-                soal_bloom_levels, feedback,
+                stimulus.readable_text, to_dict(target_soal), [to_dict(s) for s in sibling_soal], feedback,
             )
         except Exception as exc:
             raise BadRequestException(f"regenerasi gagal, coba lagi: {exc}")
 
         try:
-            new_stimulus_text = (results[0][1].get("stimulus") or {}).get("readable_text", "")
-            if new_stimulus_text:
-                await self.repo.update_stimulus_text(stimulus, new_stimulus_text)
+            if result["new_stimulus_text"]:
+                await self.repo.update_stimulus_text(stimulus, result["new_stimulus_text"])
 
-            for soal_id, data, val in results:
-                soal = await self.repo.get_soal_by_id(soal_id)
+            for sid, data, val in result["soal_updates"]:
+                soal = await self.repo.get_soal_by_id(sid)
                 soal.question_text = data["question_text"]
                 soal.correct_option = data["correct_option"]
                 soal.kesimpulan = data["kesimpulan"]
@@ -142,11 +155,11 @@ class QuizService:
                         f"Validasi independen sampai ke jawaban {val['derived_option']}, berbeda dari "
                         f"jawaban Generation ({data['correct_option']})."
                     )
-                await self.repo.replace_soal_opsi(soal_id, data["options"])
-                await self.repo.replace_soal_langkah(soal_id, data["langkah"])
+                await self.repo.replace_soal_opsi(sid, data["options"])
+                await self.repo.replace_soal_langkah(sid, data["langkah"])
 
             await self.db.commit()
-            return await self.repo.get_soal_by_stimulus(stimulus_id)
+            return await self.repo.get_soal_by_stimulus(target_soal.stimulus_id)
         except Exception as e:
             await self.db.rollback()
             raise e
@@ -243,7 +256,7 @@ class QuizService:
 
     async def _evaluate_one(self, soal: Soal, jawaban: SoalJawaban) -> dict:
         """Bangun Segment sumber dari rentang block soal ini, lalu jalankan Chain 5 di thread
-        terpisah (sama seperti `regenerate_cluster` memanggil `compute_cluster`)."""
+        terpisah (sama seperti `regenerate_cluster` memanggil `compute_regeneration`)."""
         blocks = await self.repo.get_blocks_for_chapter(soal.chapter_id)
         seg_blocks = [b for b in blocks if soal.source_reading_order_start <= b.reading_order <= soal.source_reading_order_end]
         seg = Segment(

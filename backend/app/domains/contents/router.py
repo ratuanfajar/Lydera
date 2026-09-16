@@ -21,7 +21,7 @@ from app.domains.contents.schemas.chapters.ingest_annonated_request import Inges
 from app.tasks.progress_tasks import enqueue_module_progress_job
 paths.setup()
 from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
-import regenerate
+import annotation_regenerate
 
 from app.domains.contents.schemas import (
     BlockResponse, RegenerateRequest, RegenerateResponse, 
@@ -75,7 +75,7 @@ async def regenerate_block(
         if job:
             image_path = _find_image(Path(job.out_dir), block.image_file)
 
-    new_text = regenerate.regenerate(
+    new_text = annotation_regenerate.regenerate(
         block.block_type, payload.feedback,
         source_markup=block.source_markup or "",
         image_path=image_path,

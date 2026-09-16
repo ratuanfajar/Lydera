@@ -35,7 +35,7 @@ Kalau `uv run uvicorn ...` gagal dengan error `Failed to canonicalize script pat
 Layanan AI anotasi (`ai-services/annotation/`) dan quiz generator (`ai-services/quiz/`) murni komputasi — tidak ada satu pun modulnya yang menyentuh DB. Backend yang membaca/menulis lewat repository masing-masing domain:
 
 - **Anotasi**: `app/tasks/mineru_tasks.py` menjalankan `run_mineru.run_async` (progress streaming) lalu `pipeline.run` (annotate), kemudian memanggil `ContentService.ingest_annotated_json` untuk menyimpan block ke DB.
-- **Quiz generator**: `app/tasks/quiz_tasks.py` membaca block bab dari DB, memanggil `quiz_pipeline.compute_for_chapter` (segmentasi, ringkas, generate, validate — lihat `ai-services/README.md`), lalu menyimpan tiap soal lewat `QuizRepository.save_soal`. Regenerasi cluster HOTS (`QuizService.regenerate_cluster`) memanggil `regenerate.compute_cluster` secara sinkron di request handler (bukan lewat task, karena hanya satu cluster, bukan satu bab penuh).
+- **Quiz generator**: `app/tasks/quiz_tasks.py` membaca block bab dari DB, memanggil `quiz_pipeline.compute_for_chapter` (segmentasi, ringkas, generate, validate — lihat `ai-services/README.md`), lalu menyimpan tiap soal lewat `QuizRepository.save_soal`. Regenerasi soal HOTS (`QuizService.regenerate_cluster`) memanggil `quiz_regenerate.compute_regeneration` secara sinkron di request handler (bukan lewat task, karena scope-nya kecil -- satu soal, atau kalau stimulus ikut berubah, cluster soal yang berbagi stimulus itu).
 
 Kedua AI-service ini dijalankan lewat `asyncio.to_thread` dari task/service (fungsinya sinkron, memanggil LLM/MinerU) — bukan diimpor sebagai library async.
 

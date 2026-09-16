@@ -104,7 +104,7 @@ Soal shape:
 39. **PATCH /soal/{soal_id}** — role teacher. Only for standalone soal (`stimulus_id` null, typically LOTS). Body (all optional): `{ question_text?, options?: {label:text}, correct_option?, langkah?: [string], kesimpulan? }`. Returns updated soal.
 40. **POST /soal/{soal_id}/approve** — role teacher. Returns `{ id, review_status: "approved" }`.
 41. **POST /soal/{soal_id}/reject** — role teacher. Returns `{ id, review_status: "rejected" }`.
-42. **POST /soal/{soal_id}/regenerate** — role teacher. Only for HOTS soal (has `stimulus_id`) — regenerates entire cluster. Body: `{ "feedback": string }`. 400 if no stimulus. Returns regenerated cluster `Soal[]`.
+42. **POST /soal/{soal_id}/regenerate** — role teacher. Only for HOTS soal (has `stimulus_id`). Body: `{ "feedback": string }`. Edits the critiqued soal based on its old content (not a from-scratch regenerate). If the fix only concerns that soal, only it changes. If it actually requires changing the shared stimulus, the stimulus is updated too and every soal sharing it gets re-checked for consistency — but only the ones whose content actually needed adjusting are touched/saved; unaffected sibling soal stay untouched. 400 if no stimulus. Returns the full cluster `Soal[]` (touched and untouched soal alike).
 
 ## Misc
 

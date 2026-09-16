@@ -4,7 +4,6 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Path as FastAPIPath, status
 
-from app.core.exceptions import BadRequestException
 from app.core.response import Response, get_response_message, COMMON_VALIDATION_RESPONSES
 from app.core.route import WrappedRoute
 from app.core.security import Roles
@@ -221,10 +220,5 @@ async def regenerate_soal(
     payload: Annotated[SoalRegenerateRequest, Body()],
     service: QuizService = Depends(get_quiz_service),
 ):
-    soal = await service.get_soal(soal_id)
-    if soal.stimulus_id is None:
-        from app.core.exceptions import BadRequestException
-        raise BadRequestException("soal ini tidak punya stimulus, edit langsung lewat PATCH /soal/{id}")
-
-    updated = await service.regenerate_cluster(soal.stimulus_id, payload.feedback)
+    updated = await service.regenerate_cluster(soal_id, payload.feedback)
     return Response(message=get_response_message(), data=[_to_soal_response(s) for s in updated])
