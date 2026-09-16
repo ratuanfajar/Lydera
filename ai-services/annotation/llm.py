@@ -6,10 +6,16 @@ from pathlib import Path
 from openai import APIConnectionError, APITimeoutError, InternalServerError, OpenAI, RateLimitError
 
 import config
+import jsonutil
 
 RETRYABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError)
 MAX_RETRIES = 5
 BACKOFF_BASE = 2
+
+JSON_FORMAT_REMINDER = (
+    "\n\nPENTING: keluarkan HANYA satu objek JSON valid sesuai format yang diminta di atas -- "
+    "tanpa markdown, tanpa teks lain, dan wajib sertakan SEMUA field yang diminta."
+)
 
 
 @lru_cache(maxsize=1)
@@ -59,6 +65,27 @@ def complete_vision(system: str, user: str, image_path: Path, model: str | None 
         ],
     )
     return (response.choices[0].message.content or "").strip()
+
+
+def complete_json(system: str, user: str, *, model: str | None = None, max_tokens: int | None = None,
+                   required_keys: list[str] | None = None) -> dict:
+    """Sama seperti `complete_text` tapi hasilnya diparse+divalidasi sebagai JSON. Kalau parse
+    gagal atau ada `required_keys` yang hilang (model keluar kosong/salah format -- bisa karena
+    feedback adversarial atau sekadar model meleset), retry SEKALI dengan reminder format yang
+    lebih tegas ditempel ke prompt. Kalau masih gagal, raise ValueError dengan pesan bersih --
+    bukan JSONDecodeError/KeyError mentah yang bisa bocor ke response API."""
+    for attempt in range(2):
+        raw = complete_text(system, user, model=model, max_tokens=max_tokens)
+        try:
+            data = jsonutil.parse_json(raw)
+            missing = [k for k in (required_keys or []) if k not in data]
+            if not missing:
+                return data
+        except Exception:
+            missing = required_keys or ["<valid JSON>"]
+        if attempt == 0:
+            user = user + JSON_FORMAT_REMINDER
+    raise ValueError(f"model tidak mengeluarkan JSON dengan format yang diharapkan setelah retry (field hilang: {missing})")
 
 
 def _data_uri(image_path: Path) -> str:

@@ -1,5 +1,4 @@
 import config
-import jsonutil
 import llm
 
 MAX_TOKENS = 3072
@@ -26,8 +25,7 @@ def build_prompt(segment, question_text: str, options: dict, stimulus_text: str 
 def validate_soal(segment, question_text: str, options: dict, correct_option: str, stimulus_text: str = "") -> dict:
     """Chain 4: re-derive jawaban independen dari sumber yang sama, bandingkan ke hasil Generation. Tidak dicache."""
     prompt = build_prompt(segment, question_text, options, stimulus_text)
-    raw = llm.complete_text(SYSTEM, prompt, model=config.QUIZ_MODEL, max_tokens=MAX_TOKENS)
-    derived = jsonutil.parse_json(raw)
+    derived = llm.complete_json(SYSTEM, prompt, model=config.QUIZ_MODEL, max_tokens=MAX_TOKENS, required_keys=["correct_option"])
     return {
         "matches": derived.get("correct_option") == correct_option,
         "derived_option": derived.get("correct_option"),
