@@ -480,9 +480,9 @@ class QuizRepository(QuizRepositoryInterface):
         jawaban.is_correct = is_correct
 
         jawaban.langkah.clear()
-        for item in langkah:
+        for index, step_text in enumerate(langkah, start=1):
             jawaban.langkah.append(
-                SoalJawabanLangkah(urutan=item.urutan, teks=item.teks)
+                SoalJawabanLangkah(urutan=index, teks=step_text)
             )
 
     async def get_soal_jawaban(self, soal_id: int, student_id: int) -> SoalJawaban | None:
