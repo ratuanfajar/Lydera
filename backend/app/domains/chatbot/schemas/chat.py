@@ -19,7 +19,7 @@ class ChatSessionResponseWithMessage(BaseModel):
 
     id: int
     classroom_id: int
-    first_message: str
+    first_message: str | None
 
 
 class ChatAskRequest(BaseModel):

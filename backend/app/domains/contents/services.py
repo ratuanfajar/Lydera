@@ -5,6 +5,7 @@ from sqlalchemy import select
 from app.utils import paths
 from app.domains.jobs.repositories.interface import JobRepositoryInterface
 from app.tasks.file_tasks import cleanup_module_files_task
+from app.domains.contents.schemas.cp_response import CpResponse
 paths.setup()
 from annotation import annotation_regenerate
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -94,13 +95,11 @@ class ContentService:
     async def publish_module(self, module_id: int, teacher_id:int) -> bool:
         return await self.repo.publish_module(module_id, teacher_id)
     
-    async def get_cps_by_module_id(self, module_id: int) -> Sequence[Cp]:
-        module = await self.repo.get_module_by_id(module_id)
-        if not module:
-            raise NotFoundException("modul tidak ditemukan")
-        if module.fase_id is None:
-            return []
-        return await self.repo.get_cps_by_fase_id(module.fase_id)
+    async def get_cps_by_fase_id(self, fase_id: int) -> List[CpResponse]:
+        cps = await self.repo.get_cps_by_fase_id(fase_id)
+        if not cps:
+            raise NotFoundException("cps tidak ditemukan")
+        return [CpResponse.model_validate(c) for c in cps]
 
     async def create_module(self, title: str, description: str, status: ModuleStatus, classroom_id: int, teacher_id:int, fase_id: int | None) -> Module:
         module = await self.repo.create_module_teacher(title, description, status, classroom_id, teacher_id, fase_id)

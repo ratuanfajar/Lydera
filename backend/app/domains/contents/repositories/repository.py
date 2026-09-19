@@ -82,7 +82,7 @@ class ContentRepository(ContentRepositoryInterface):
         stmt = select(Fase).order_by(Fase.kode)
         result = await self.db.scalars(stmt)
         return result.all()
-
+    
     # Module
     async def get_all_modules_student(
     self,
@@ -276,7 +276,7 @@ class ContentRepository(ContentRepositoryInterface):
 
     # Cps
     async def get_cps_by_fase_id(self, fase_id: int) -> Sequence[Cp]:
-        stmt = select(Cp).where(Cp.fase_id == fase_id).order_by(Cp.domain)
+        stmt = select(Cp).where(Cp.fase_id == fase_id)
         result = await self.db.scalars(stmt)
         return result.all()
 

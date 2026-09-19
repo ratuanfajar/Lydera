@@ -129,6 +129,33 @@ async def publish_module(
         data=result
     )
 
+
+# ==========================================
+# CP ROUTER
+# ==========================================
+router_cps = APIRouter(prefix="/cp", tags=["cp"], route_class=WrappedRoute)
+@router_cps.get(
+    "/{fase_id}",
+    description="List of cp",
+    response_model=Response[list[CpResponse]],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES
+)
+async def get_cps_by_fase_id(
+    fase_id: Annotated[
+        int,
+        Path(description="Fase id",),
+    ],
+    content_service: ContentService = Depends(get_content_service),
+):
+    result = await content_service.get_cps_by_fase_id(fase_id)
+    return Response(
+        message="Cp loaded successfully",
+        data=result
+        )
+
+
+
 # ==========================================
 # CHAPTER ROUTER
 # ==========================================
@@ -205,7 +232,7 @@ async def create_chapter(
     "/preview",
     description="Requires the TEACHER role.",
     response_model=Response[list[BlockPreviewResponse]],
-    status_code=status.HTTP_201_CREATED,
+    status_code=status.HTTP_200_OK,
     responses=COMMON_VALIDATION_RESPONSES
 )
 async def preview_chapter(

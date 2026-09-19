@@ -13,7 +13,6 @@ class Cp(Base):
     fase_id: Mapped[int] = mapped_column(ForeignKey("fase.id"), nullable=False, index=True)
     domain: Mapped[str] = mapped_column(String, nullable=False)
     cp_text: Mapped[str] = mapped_column(Text, nullable=False)
-
     __table_args__ = (
         CheckConstraint(
             "domain IN ('Bilangan', 'Aljabar dan Fungsi', 'Pengukuran', 'Geometri', 'Analisis Data dan Peluang', 'Fungsi', 'Kalkulus')",
