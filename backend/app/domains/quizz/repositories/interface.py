@@ -52,6 +52,9 @@ class QuizRepositoryInterface(ABC):
     async def get_quiz_progress(self, quiz_request_id: int, student_id: int) -> QuizProgress | None: raise NotImplementedError
 
     @abstractmethod
+    async def clear_student_answers(self, quiz_id, student_id) -> None: raise NotImplementedError
+    
+    @abstractmethod
     async def update_soal_jawaban(
         self,
         jawaban_id:int,

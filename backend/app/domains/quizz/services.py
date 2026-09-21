@@ -441,11 +441,8 @@ class QuizService:
         if now < quiz.start_time or now > quiz.end_time:
             raise BadRequestException("Sesi kuis tidak sedang aktif.")
 
-        if progress.is_done:
-            raise BadRequestException("Kuis ini telah selesai dikerjakan.")
-
         session_active = False
-        if progress.started_at is not None:
+        if progress.started_at is not None and not progress.is_done:
             session_duration = timedelta(minutes=quiz.max_duration_minutes)
             session_deadline = min(progress.started_at + session_duration, quiz.end_time)
 
@@ -457,7 +454,12 @@ class QuizService:
                 raise BadRequestException("Anda telah mencapai batas maksimal percobaan kuis")
 
             progress.attempt_count += 1
+            progress.completed_at = None
+            progress.is_done = False
             progress.started_at = now
+            progress.review_status = QuizReviewStatus.PENDING
+            # await self.repo.clear_student_answers(quiz_id, student_id)
+
             await self.repo.db.commit()
 
         target_end_time = min(

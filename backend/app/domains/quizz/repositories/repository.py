@@ -155,8 +155,7 @@ class QuizRepository(QuizRepositoryInterface):
         await self.db.flush()
 
         return result.rowcount > 0
-
-        
+  
     def _get_soal_count(self) -> Label[int]:
         """Synchronous subquery builder returning question count per quiz_request."""
         return (
@@ -201,14 +200,32 @@ class QuizRepository(QuizRepositoryInterface):
 
         soal_count_subquery = self._get_soal_count()
         
-        progress_join = and_(
-            QuizProgress.quiz_request_id == QuizRequest.id,
-            QuizProgress.student_id == student_id
+        progress_rank_sub = (
+            select(
+                QuizProgress.id.label("progress_id"),
+                QuizProgress.quiz_request_id.label("quiz_request_id"),
+                func.row_number().over(
+                    partition_by=QuizProgress.quiz_request_id,
+                    order_by=QuizProgress.attempt_count.desc()
+                ).label("rn")
+            )
+            .where(QuizProgress.student_id == student_id)
+            .subquery("latest_progress_rn")
         )
 
         stmt = (
             select(QuizRequest, soal_count_subquery)
-            .outerjoin(QuizProgress, progress_join)
+            .outerjoin(
+                progress_rank_sub,
+                and_(
+                    QuizRequest.id == progress_rank_sub.c.quiz_request_id,
+                    progress_rank_sub.c.rn == 1
+                )
+            )
+            .outerjoin(
+                QuizProgress,
+                QuizProgress.id == progress_rank_sub.c.progress_id
+            )
             .where(
                 QuizRequest.classroom_id == classroom_id,
                 QuizRequest.status_published == QuizRequestStatus.PUBLISH
@@ -436,6 +453,17 @@ class QuizRepository(QuizRepositoryInterface):
         )
         return list((await self.db.scalars(stmt)).all())
     # SoalJawaban (jawaban siswa)
+
+    async def clear_student_answers(self, quiz_id: int, student_id: int) -> None:
+        """Deletes all student answers (and automatically cascades to steps) for a given quiz."""
+        soal_ids_subquery = select(Soal.id).where(Soal.quiz_request_id == quiz_id)
+
+        stmt = delete(SoalJawaban).where(
+            SoalJawaban.student_id == student_id,
+            SoalJawaban.soal_id.in_(soal_ids_subquery),
+        )
+        await self.db.execute(stmt)
+
     async def get_or_create_quiz_progress(self, student_id: int, quiz_id: int) -> tuple[QuizRequest, QuizProgress] :
         quiz = await self.db.get(QuizRequest, quiz_id)
         if not quiz:
@@ -443,8 +471,9 @@ class QuizRepository(QuizRepositoryInterface):
         stmt = select(QuizProgress).where(
             QuizProgress.quiz_request_id == quiz_id,
             QuizProgress.student_id == student_id
-        )
-        progress = (await self.db.scalars(stmt)).one_or_none()
+        ).order_by(QuizProgress.id.desc()).limit(1)
+        
+        progress = (await self.db.scalars(stmt)).first()
 
         if not progress:
             progress = QuizProgress(
@@ -528,12 +557,17 @@ class QuizRepository(QuizRepositoryInterface):
 
     async def get_quiz_progress(self, quiz_request_id: int, student_id: int) -> Optional[QuizProgress]:
         """Fetches the progress record for a specific student and quiz request."""
-        stmt = select(QuizProgress).where(
-            QuizProgress.quiz_request_id == quiz_request_id,
-            QuizProgress.student_id == student_id,
+        stmt = (
+            select(QuizProgress)
+            .where(
+                QuizProgress.quiz_request_id == quiz_request_id,
+                QuizProgress.student_id == student_id,
+            )
+            .order_by(QuizProgress.attempt_count.desc())
+            .limit(1)
         )
         result = await self.db.scalars(stmt)
-        return result.one_or_none()
+        return result.first()
 
     async def save_evaluation(self, jawaban: SoalJawaban, divergence_step: int | None,
                                diagnosis: str, personalized_justification: str) -> None:

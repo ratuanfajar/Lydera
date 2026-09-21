@@ -45,7 +45,7 @@ class QuizRequest(Base):
     # Relationships
     module: Mapped["Module"] = relationship(back_populates="quiz_requests")
     classroom: Mapped["Classroom"] = relationship(back_populates="quiz_requests")
-    quiz_progress: Mapped["QuizProgress"] = relationship(back_populates="quiz_request")
+    quiz_progress: Mapped[List["QuizProgress"]] = relationship(back_populates="quiz_request")
     # hots_count/lots_count ditentukan per bab (guru menentukan sendiri alokasinya tiap bab), bukan
     # satu angka gabungan untuk seluruh request -- makanya butuh association object
     # (QuizRequestChapter) yang punya kolom sendiri, bukan `secondary=` biasa.
