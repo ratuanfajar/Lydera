@@ -17,7 +17,7 @@ from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery,
 from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
 from app.domains.quizz.schemas.quiz_request_create import QuizRequestCreate
 from app.utils.idempotency import generate_idempotency_key
-from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
+from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload, SoalCreateRequest, SoalDataCreateRequest, StimulusCreateRequest
 from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
@@ -71,6 +71,65 @@ class QuizService:
         return True
 
     # -- Write (dengan commit) --
+    def _build_soal_requests(self, cached_questions: list[dict]) -> list[SoalCreateRequest]:
+        """Helper to reconstruct SoalCreateRequest objects from cached JSON dicts."""
+        items_to_save: list[SoalCreateRequest] = []
+
+        for item in cached_questions:
+            data_dict = item.get("data", item)
+
+            # Normalize options: ensure dict format
+            raw_options = data_dict.get("options", {})
+            if isinstance(raw_options, list):
+                options_dict = {
+                    opt.get("label"): opt.get("opsi_text") or opt.get("text", "")
+                    for opt in raw_options
+                    if isinstance(opt, dict)
+                }
+            else:
+                options_dict = raw_options
+
+            # Normalize langkah: extract step strings
+            raw_langkah = data_dict.get("langkah", [])
+            langkah_list = [
+                step.get("teks", "") if isinstance(step, dict) else step
+                for step in raw_langkah
+            ]
+
+            # Reconstruct stimulus payload
+            stimulus_payload = None
+            raw_stimulus = data_dict.get("stimulus")
+            if raw_stimulus and isinstance(raw_stimulus, dict):
+                stimulus_payload = StimulusCreateRequest(
+                    source_markup=raw_stimulus.get("source_markup", ""),
+                    readable_text=raw_stimulus.get("readable_text", ""),
+                    source_reading_order_start=raw_stimulus.get("source_reading_order_start"),
+                    source_reading_order_end=raw_stimulus.get("source_reading_order_end"),
+                )
+
+            data_payload = SoalDataCreateRequest(
+                bloom_level=data_dict.get("bloom_level", 3),
+                question_text=data_dict.get("question_text", ""),
+                correct_option=data_dict.get("correct_option", ""),
+                options=options_dict,
+                langkah=langkah_list,
+                kesimpulan=data_dict.get("kesimpulan", ""),
+                reading_order_start=data_dict.get("reading_order_start", 0),
+                reading_order_end=data_dict.get("reading_order_end", 0),
+                stimulus=stimulus_payload,
+            )
+
+            items_to_save.append(
+                SoalCreateRequest(
+                    chapter_id=item.get("chapter_id"),
+                    data=data_payload,
+                    review_priority=item.get("review_priority", "normal"),
+                    validation_notes=item.get("validation_notes"),
+                )
+            )
+
+        return items_to_save
+
     async def create_quiz_request(self, teacher_id: int, dto: QuizRequestCreate) -> tuple[int, str, bool, str]:
         """Validasi module/chapter, buat quiz_request + link tiap bab dengan target soal-nya sendiri.
         Pemrosesan sesungguhnya (generate + validate) dijalankan async lewat quiz_tasks.py."""
@@ -83,35 +142,51 @@ class QuizService:
             dto.end_time.isoformat(),
         )
 
-        cached_job = await self.redis.get(idem_key)
-        if cached_job:
-            await self.redis.expire(idem_key, TTL_3_MINUTES)
-            data = json.loads(cached_job)
-            return data["quiz_request_id"], data["status"], True, idem_key
-        
         is_valid, err_msg = await self.repo.validate_ownership_and_hierarchy(
             teacher_id, dto.classroom_id, dto.module_id, chapter_ids
         )
-
+        
         if not is_valid:
             raise BadRequestException(err_msg)
 
         try:
-            quiz_request = await self.repo.create_quiz_request(dto.module_id, dto.title, classroom_id=dto.classroom_id, max_duration_minutes=dto.max_duration_minutes, max_retry=dto.max_retry,                                                        
+            quiz_request_id = await self.repo.create_quiz_request(
+                dto.module_id,
+                dto.title,
+                classroom_id=dto.classroom_id,
+                max_duration_minutes=dto.max_duration_minutes,
+                max_retry=dto.max_retry,
                 start_time=dto.start_time,
-                end_time=dto.end_time)
-            await self.repo.bulk_link_chapters(quiz_request, dto.chapters)
+                end_time=dto.end_time,
+            )
+            await self.repo.bulk_link_chapters(quiz_request_id, dto.chapters)
             await self.repo.db.commit()
-
         except Exception as e:
             await self.repo.db.rollback()
             raise e
 
-        job_meta = {"quiz_request_id": quiz_request, "status": "queued"}
-        await self.redis.set(idem_key, json.dumps(job_meta), ex=TTL_3_MINUTES)
-        await self.redis.set(f"quiz_idem_map:{quiz_request}", idem_key, ex=TTL_3_MINUTES)
+        cached_content = await self.redis.get(f"quiz_content_cache:{idem_key}")
 
-        return quiz_request, "queued", False, idem_key
+        if cached_content:
+            parsed_questions = json.loads(cached_content)
+            items_to_save = self._build_soal_requests(parsed_questions)
+
+            await self.repo.save_quiz_data(
+                quiz_request_id=quiz_request_id,
+                classroom_id=dto.classroom_id,
+                status_val="done",
+                items=items_to_save,
+            )
+
+            result_key = f"quiz_result:{quiz_request_id}"
+            await self.redis.set(result_key, json.dumps(parsed_questions), ex=TTL_3_MINUTES)
+
+            return quiz_request_id, "done", True, idem_key
+
+        job_meta = {"quiz_request_id": quiz_request_id, "status": "queued"}
+        await self.redis.set(idem_key, json.dumps(job_meta), ex=TTL_3_MINUTES)
+
+        return quiz_request_id, "queued", False, idem_key
 
     async def update_quiz_settings(
         self,

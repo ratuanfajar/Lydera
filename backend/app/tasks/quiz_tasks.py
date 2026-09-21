@@ -160,7 +160,8 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
 
             # 6. Update Redis status & output payload
             done_meta = json.dumps({"quiz_request_id": quiz_request_id, "status": "done"})
-            await redis.set(result_key, json.dumps(serialized_questions), ex=TTL_3_MINUTES)
+            cache_content_key = f"quiz_content_cache:{idem_key}"
+            await redis.set(cache_content_key, json.dumps(serialized_questions), ex=TTL_3_MINUTES)
             await redis.set(idem_key, done_meta, ex=TTL_3_MINUTES)
             await redis.expire(map_key, TTL_3_MINUTES)
 
