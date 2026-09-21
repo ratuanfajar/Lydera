@@ -1,7 +1,7 @@
 from typing import List, Optional, Sequence
 from datetime import datetime, timezone
 
-from sqlalchemy import Label, and_, delete, func, insert, or_, select
+from sqlalchemy import Label, and_, delete, func, insert, or_, select, text
 from sqlalchemy.orm import contains_eager, joinedload, selectinload
 
 from app.core.db import AsyncSession
@@ -454,15 +454,47 @@ class QuizRepository(QuizRepositoryInterface):
         return list((await self.db.scalars(stmt)).all())
     # SoalJawaban (jawaban siswa)
 
-    async def clear_student_answers(self, quiz_id: int, student_id: int) -> None:
-        """Deletes all student answers (and automatically cascades to steps) for a given quiz."""
-        soal_ids_subquery = select(Soal.id).where(Soal.quiz_request_id == quiz_id)
-
-        stmt = delete(SoalJawaban).where(
-            SoalJawaban.student_id == student_id,
-            SoalJawaban.soal_id.in_(soal_ids_subquery),
+    async def add_step(self, soal_id : int, student_id:int, step:str) -> bool: 
+        raw_sql = text("""
+            WITH target_jawaban AS (
+                INSERT INTO soal_jawaban (soal_id, student_id)
+                VALUES (:soal_id, :student_id)
+                ON CONFLICT (soal_id, student_id)
+                DO UPDATE SET student_id = EXCLUDED.student_id  -- Dummy update to guarantee RETURNING id on conflict
+                RETURNING id
+            ),
+            next_seq AS (
+                SELECT COALESCE(MAX(urutan), 0) + 1 AS next_urutan
+                FROM soal_jawaban_langkah
+                WHERE jawaban_id = (SELECT id FROM target_jawaban)
+            )
+            INSERT INTO soal_jawaban_langkah (jawaban_id, urutan, teks)
+            SELECT 
+                (SELECT id FROM target_jawaban), 
+                (SELECT next_urutan FROM next_seq), 
+                :teks
+            RETURNING id, jawaban_id, urutan, teks;
+        """)
+        result = await self.db.execute(
+            raw_sql,
+            {"soal_id":soal_id, "student_id":student_id,"teks":step}
         )
-        await self.db.execute(stmt)
+        await self.db.flush()
+        return result.rowcount > 0
+
+    async def remove_step(self, step_id:int, student_id:int) -> bool:
+        stmt = (
+            delete(SoalJawabanLangkah)
+            .where(
+                SoalJawabanLangkah.id == step_id,
+                SoalJawabanLangkah.jawaban_id.in_(
+                    select(SoalJawaban.id).where(SoalJawaban.student_id == student_id)
+                ),
+            )
+        )
+        result = await self.db.execute(stmt)
+        await self.db.flush()
+        return result.rowcount > 0
 
     async def get_or_create_quiz_progress(self, student_id: int, quiz_id: int) -> tuple[QuizRequest, QuizProgress] :
         quiz = await self.db.get(QuizRequest, quiz_id)
@@ -500,7 +532,9 @@ class QuizRepository(QuizRepositoryInterface):
             progress.completed_at = datetime.now(timezone.utc)
             await self.db.commit()
 
-    async def update_soal_jawaban(self, jawaban_id:int, selected_option: str, is_correct: bool, langkah: list[str]) -> None:
+    async def update_soal_jawaban(self, jawaban_id:int, selected_option: str, is_correct: bool,
+                                #    langkah: list[str]
+                                   ) -> None:
         jawaban = await self.db.get(SoalJawaban, jawaban_id)
         if not jawaban:
             return
@@ -508,16 +542,16 @@ class QuizRepository(QuizRepositoryInterface):
         jawaban.selected_option = selected_option
         jawaban.is_correct = is_correct
 
-        await self.db.execute(
-            delete(SoalJawabanLangkah).where(SoalJawabanLangkah.jawaban_id == jawaban_id)
-        )
+        # await self.db.execute(
+        #     delete(SoalJawabanLangkah).where(SoalJawabanLangkah.jawaban_id == jawaban_id)
+        # )
 
-        if langkah:
-            new_steps = [
-                {"jawaban_id": jawaban_id, "urutan": index, "teks": step_text}
-                for index, step_text in enumerate(langkah, start=1)
-            ]
-            await self.db.execute(insert(SoalJawabanLangkah), new_steps)
+        # if langkah:
+        #     new_steps = [
+        #         {"jawaban_id": jawaban_id, "urutan": index, "teks": step_text}
+        #         for index, step_text in enumerate(langkah, start=1)
+        #     ]
+        #     await self.db.execute(insert(SoalJawabanLangkah), new_steps)
 
     async def get_soal_jawaban(self, soal_id: int, student_id: int) -> SoalJawaban | None:
         stmt = (
@@ -529,7 +563,9 @@ class QuizRepository(QuizRepositoryInterface):
         return result.first()
 
     async def create_soal_jawaban(self, soal_id: int, student_id: int, selected_option: str,
-    is_correct: bool, langkah: list[str]) -> int:
+    is_correct: bool, 
+    # langkah: list[str]
+    ) -> int:
         jawaban = SoalJawaban(
             soal_id=soal_id,
             student_id=student_id,
@@ -539,8 +575,8 @@ class QuizRepository(QuizRepositoryInterface):
         self.db.add(jawaban)
         await self.db.flush()
 
-        for urutan, teks in enumerate(langkah, start=1):
-            self.db.add(SoalJawabanLangkah(jawaban_id=jawaban.id, urutan=urutan, teks=teks))
+        # for urutan, teks in enumerate(langkah, start=1):
+        #     self.db.add(SoalJawabanLangkah(jawaban_id=jawaban.id, urutan=urutan, teks=teks))
         await self.db.flush()
 
         return jawaban.id

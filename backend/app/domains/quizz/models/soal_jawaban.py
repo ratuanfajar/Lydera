@@ -12,8 +12,8 @@ class SoalJawaban(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     soal_id: Mapped[int] = mapped_column(ForeignKey("soal.id", ondelete="CASCADE"), nullable=False)
     student_id: Mapped[int] = mapped_column(ForeignKey("students.id", ondelete="CASCADE"), nullable=False)
-    selected_option: Mapped[str] = mapped_column(CHAR(1), nullable=False)
-    is_correct: Mapped[bool] = mapped_column(nullable=False)
+    selected_option: Mapped[str | None] = mapped_column(CHAR(1), nullable=True)
+    is_correct: Mapped[bool] = mapped_column(nullable=True, default=False)
     # created_at (dari Base/TimestampMixin) merangkap sebagai waktu submit -- tidak perlu kolom sendiri.
 
     # Diisi belakangan oleh Chain 5 (evaluate_scratchwork), hanya untuk jawaban salah --

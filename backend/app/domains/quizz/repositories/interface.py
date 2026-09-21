@@ -52,7 +52,10 @@ class QuizRepositoryInterface(ABC):
     async def get_quiz_progress(self, quiz_request_id: int, student_id: int) -> QuizProgress | None: raise NotImplementedError
 
     @abstractmethod
-    async def clear_student_answers(self, quiz_id, student_id) -> None: raise NotImplementedError
+    async def add_step(self, soal_id : int, student_id:int, text:str) -> bool: raise NotImplementedError
+
+    @abstractmethod
+    async def remove_step(self, step_id:int, student_id:int) -> bool: raise NotImplementedError
     
     @abstractmethod
     async def update_soal_jawaban(
@@ -60,7 +63,7 @@ class QuizRepositoryInterface(ABC):
         jawaban_id:int,
         selected_option: str,
         is_correct: bool,
-        langkah: list[str]
+        # langkah: list[str]
     ) -> None: raise NotImplementedError
 
     @abstractmethod
@@ -102,7 +105,9 @@ class QuizRepositoryInterface(ABC):
     async def get_soal_jawaban(self, soal_id: int, student_id: int) -> SoalJawaban | None: raise NotImplementedError
     @abstractmethod
     async def create_soal_jawaban(self, soal_id: int, student_id: int, selected_option: str,
-        is_correct: bool, langkah: list[str]) -> int:
+        is_correct: bool, 
+        # langkah: list[str]
+        ) -> int:
         raise NotImplementedError
     @abstractmethod
     async def get_jawaban_for_request(self, quiz_request_id: int, student_id: int) -> Sequence[SoalJawaban]:

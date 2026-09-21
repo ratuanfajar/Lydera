@@ -3,7 +3,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class SoalSubmitRequest(BaseModel):
     selected_option: str = Field(pattern="^[A-D]$")
-    langkah: list[str] | None = []
+    # langkah: list[str] | None = []
 
 class SoalJawabanLangkahResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

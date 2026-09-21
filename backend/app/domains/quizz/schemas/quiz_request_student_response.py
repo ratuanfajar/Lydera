@@ -61,7 +61,7 @@ class QuestionAnswerStudentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     soal_id: int
-    selected_option: str
+    selected_option: str | None
     steps: list[QuestionStudentSteps] = Field(validation_alias="langkah")
     
 class QuizRequestQuestionStudentResponse(BaseModel):

@@ -40,6 +40,7 @@ from app.domains.quizz.schemas.quiz_delete_request import QuizDeleteRequest
 from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
 from app.domains.quizz.schemas.quiz_request_student_response import QuizRequestStudentResponse
+from app.domains.quizz.schemas.step_request import AddStepRequest
 
 
 def _to_soal_response(soal: Soal) -> SoalResponse:
@@ -358,12 +359,9 @@ async def get_my_quiz_results(
     return Response(message=get_response_message(), data=results)
 
 @router_student_quizz.post(
-    "/soal/{soal_id}/submit",
+    "/soal/{soal_id}/select-option",
     description=(
-        "Requires the STUDENT role. Simpan jawaban + langkah pengerjaan siswa untuk satu soal. "
-        "Tidak ada evaluasi LLM di sini -- justifikasi untuk jawaban salah baru dihitung saat "
-        "siswa minta hasil lewat GET /quiz-requests/{id}/my-results. Satu siswa cuma bisa submit "
-        "sekali per soal."
+        "Requires the STUDENT role. Simpan jawaban siswa untuk satu soal. "
     ),
     response_model=Response[SoalSubmitResponse],
     status_code=status.HTTP_201_CREATED,
@@ -377,3 +375,38 @@ async def submit_soal_answer(
 ):
     await service.submit_answer(soal_id, student.profile_id, payload)
     return Response(message=get_response_message(), data={"soal_id": soal_id, "status": "saved"})
+
+@router_student_quizz.post(
+    "/soal/{soal_id}/steps",
+    description=(
+        "Requires the STUDENT role. Simpan langkah pengerjaan siswa untuk satu soal."
+    ),
+    response_model=Response[bool],
+    status_code=status.HTTP_201_CREATED,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def submit_step_soal_answer(
+    student: Roles(Role.STUDENT),
+    soal_id: Annotated[int, FastAPIPath()],
+    payload: Annotated[AddStepRequest, Body()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    result = await service.add_step(payload, soal_id, student.profile_id)
+    return Response(message=get_response_message(), data=result)
+
+@router_student_quizz.delete(
+    "/steps/{step_id}",
+    description=(
+        "Requires the STUDENT role. Hapus langkah pengerjaan."
+    ),
+    response_model=Response[bool],
+    status_code=status.HTTP_201_CREATED,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def delete_step_soal_answer(
+    student: Roles(Role.STUDENT),
+    step_id: Annotated[int, FastAPIPath()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    result = await service.delete_step(step_id, student.profile_id)
+    return Response(message="Berhasil hapus step", data=result)

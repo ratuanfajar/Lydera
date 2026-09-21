@@ -25,6 +25,7 @@ from app.domains.quizz.schemas.quiz_request_student_response import QuestionAnsw
 from app.domains.quizz.models.quiz_progress import QuizReviewStatus
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.utils import paths
+from app.domains.quizz.schemas.step_request import AddStepRequest
 
 paths.setup()
 
@@ -438,6 +439,9 @@ class QuizService:
         now = datetime.now(timezone.utc)
         quiz, progress = await self.repo.get_or_create_quiz_progress(student_id, quiz_id)
 
+        if quiz.status_published == QuizRequestStatus.DRAFT:
+            raise BadRequestException("Sesi kuis belum di publik")
+
         if now < quiz.start_time or now > quiz.end_time:
             raise BadRequestException("Sesi kuis tidak sedang aktif.")
 
@@ -541,7 +545,7 @@ class QuizService:
         return True
     
     async def submit_answer(self, soal_id: int, student_id: int, payload: SoalSubmitRequest) -> None:
-        """Simpan jawaban + langkah pengerjaan siswa untuk satu soal. Tidak ada panggilan LLM di
+        """Simpan jawaban siswa untuk satu soal. Tidak ada panggilan LLM di
         sini -- evaluasi (untuk yang salah) baru dijalankan saat siswa minta hasil akhir kuis lewat
         `get_quiz_results`."""
         soal = await self.repo.get_soal_by_id(soal_id)
@@ -553,7 +557,7 @@ class QuizService:
             raise BadRequestException("Sesi kuis telah selesai, jawaban tidak dapat diubah.")
 
         existing = await self.repo.get_soal_jawaban(soal_id, student_id)
-        is_correct = payload.selected_option.upper() == soal.correct_option.upper()
+        is_correct = payload.selected_option.upper()  == soal.correct_option.upper()
         print(f"existing : {existing is not None}")
         if existing is not None:
             try:
@@ -561,7 +565,7 @@ class QuizService:
                     jawaban_id=existing.id,
                     selected_option=payload.selected_option,
                     is_correct=is_correct,
-                    langkah=payload.langkah,
+                    # langkah=payload.langkah,
                 )
                 await self.db.commit()
             except Exception as e:
@@ -570,7 +574,9 @@ class QuizService:
         else:
             try:
                 await self.db.commit()
-                await self.repo.create_soal_jawaban(soal_id, student_id, payload.selected_option, is_correct, payload.langkah)
+                await self.repo.create_soal_jawaban(soal_id, student_id, payload.selected_option, is_correct, 
+                                                    # payload.langkah
+                                                    )
                 await self.db.commit()
             except Exception as e:
                 await self.db.rollback()
@@ -702,3 +708,29 @@ class QuizService:
             seg, soal.question_text, options, soal.correct_option, correct_langkah, soal.kesimpulan,
             jawaban.selected_option, student_langkah,
         )
+
+    async def add_step(self, dto: AddStepRequest, soal_id:int , student_id:int):
+        try:
+            success = await self.repo.add_step(soal_id, student_id, dto.step)
+            await self.db.commit()
+            return success
+
+        except Exception as e:
+            await self.db.rollback()
+            raise e
+        
+    async def delete_step(self, step_id:int, student_id:int):
+        try:
+            success = await self.repo.remove_step(step_id, student_id)
+
+            if not success:
+                await self.db.rollback()
+                return False
+            
+            await self.db.commit()
+            return True
+
+        except Exception as e:
+            await self.db.rollback()
+            raise e
+
