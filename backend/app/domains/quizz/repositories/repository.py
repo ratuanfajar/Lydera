@@ -479,11 +479,16 @@ class QuizRepository(QuizRepositoryInterface):
         jawaban.selected_option = selected_option
         jawaban.is_correct = is_correct
 
-        jawaban.langkah.clear()
-        for index, step_text in enumerate(langkah, start=1):
-            jawaban.langkah.append(
-                SoalJawabanLangkah(urutan=index, teks=step_text)
-            )
+        await self.db.execute(
+            delete(SoalJawabanLangkah).where(SoalJawabanLangkah.jawaban_id == jawaban_id)
+        )
+
+        if langkah:
+            new_steps = [
+                {"jawaban_id": jawaban_id, "urutan": index, "teks": step_text}
+                for index, step_text in enumerate(langkah, start=1)
+            ]
+            await self.db.execute(insert(SoalJawabanLangkah), new_steps)
 
     async def get_soal_jawaban(self, soal_id: int, student_id: int) -> SoalJawaban | None:
         stmt = (

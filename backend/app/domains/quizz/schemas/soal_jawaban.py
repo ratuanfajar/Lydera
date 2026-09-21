@@ -1,10 +1,15 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SoalSubmitRequest(BaseModel):
     selected_option: str = Field(pattern="^[A-D]$")
     langkah: list[str] | None = []
 
+class SoalJawabanLangkahResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id:int
+    urutan:int
+    teks:str
 
 class SoalSubmitResponse(BaseModel):
     soal_id: int
@@ -24,3 +29,4 @@ class QuizResultItem(BaseModel):
     correct_option: str
     is_correct: bool | None
     justification: SoalJustification | None
+    langkah: list[SoalJawabanLangkahResponse]

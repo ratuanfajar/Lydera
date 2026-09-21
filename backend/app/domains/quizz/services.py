@@ -28,6 +28,7 @@ from app.utils import paths
 
 paths.setup()
 
+from app.domains.quizz.schemas.soal_jawaban import SoalJawabanLangkahResponse
 from quiz import evaluate as quiz_evaluate
 from quiz import quiz_regenerate
 from quiz.segment import Segment
@@ -465,7 +466,7 @@ class QuizService:
     async def submit_answer(self, soal_id: int, student_id: int, payload: SoalSubmitRequest) -> None:
         """Simpan jawaban + langkah pengerjaan siswa untuk satu soal. Tidak ada panggilan LLM di
         sini -- evaluasi (untuk yang salah) baru dijalankan saat siswa minta hasil akhir kuis lewat
-        `get_quiz_results`. Satu siswa cuma bisa submit sekali per soal (unique constraint DB)."""
+        `get_quiz_results`."""
         soal = await self.repo.get_soal_by_id(soal_id)
         if soal is None:
             raise NotFoundException("soal tidak ditemukan")
@@ -476,9 +477,8 @@ class QuizService:
 
         existing = await self.repo.get_soal_jawaban(soal_id, student_id)
         is_correct = payload.selected_option.upper() == soal.correct_option.upper()
+        print(f"existing : {existing is not None}")
         if existing is not None:
-            if existing.selected_option == payload.selected_option and self._are_steps_equal(existing.langkah, payload.langkah):
-                return
             try:
                 await self.repo.update_soal_jawaban(
                     jawaban_id=existing.id,
@@ -583,6 +583,8 @@ class QuizService:
         for soal in soal_list:
             jawaban = jawaban_by_soal.get(soal.id)
             justification = None
+            if jawaban is not None:
+                jawaban.langkah
             if jawaban is not None and not jawaban.is_correct:
                 justification = SoalJustification(
                     divergence_step=jawaban.divergence_step,
@@ -596,6 +598,10 @@ class QuizService:
                 correct_option=soal.correct_option,
                 is_correct=jawaban.is_correct if jawaban else None,
                 justification=justification,
+                langkah = [
+                    SoalJawabanLangkahResponse.model_validate(step)
+                        for step in (jawaban.langkah if jawaban and jawaban.langkah else [])
+                ]
             ))
         return results
 
