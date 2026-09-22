@@ -21,7 +21,7 @@ from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
 from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
-from app.domains.quizz.schemas.quiz_request_student_response import QuestionAnswerStudentResponse, QuestionOptionResponse, QuestionStimulusStudentResponse, QuizRequestQuestionStudentResponse, QuizRequestStudentResponse
+from app.domains.quizz.schemas.quiz_request_student_response import QuestionAnswerStudentResponse, QuestionOptionResponse, QuestionStimulusStudentResponse, QuestionStudentSteps, QuizRequestQuestionStudentResponse, QuizRequestStudentResponse
 from app.domains.quizz.models.quiz_progress import QuizReviewStatus
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.utils import paths
@@ -133,7 +133,7 @@ class QuizService:
 
     async def create_quiz_request(self, teacher_id: int, dto: QuizRequestCreate) -> tuple[int, str, bool, str]:
         """Validasi module/chapter, buat quiz_request + link tiap bab dengan target soal-nya sendiri.
-        Pemrosesan sesungguhnya (generate + validate) dijalankan async lewat quiz_tasks.py."""
+        Pemrosesan sesungguhnya (generate + validate) dijalankan async lewat quiz_tasks.py."""        
         chapter_dicts = [c.model_dump() for c in dto.chapters]
         chapter_ids = [c.chapter_id for c in dto.chapters]
 
@@ -709,11 +709,12 @@ class QuizService:
             jawaban.selected_option, student_langkah,
         )
 
-    async def add_step(self, dto: AddStepRequest, soal_id:int , student_id:int):
+    async def add_step(self, dto: AddStepRequest, soal_id:int , student_id:int)-> QuestionStudentSteps:
         try:
-            success = await self.repo.add_step(soal_id, student_id, dto.step)
+            row_data = await self.repo.add_step(soal_id, student_id, dto.step)
+            step_model = QuestionStudentSteps.model_validate(row_data)
             await self.db.commit()
-            return success
+            return step_model
 
         except Exception as e:
             await self.db.rollback()

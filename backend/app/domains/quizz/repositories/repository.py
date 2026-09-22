@@ -452,15 +452,16 @@ class QuizRepository(QuizRepositoryInterface):
             .order_by(Soal.id.asc())
         )
         return list((await self.db.scalars(stmt)).all())
-    # SoalJawaban (jawaban siswa)
 
-    async def add_step(self, soal_id : int, student_id:int, step:str) -> bool: 
+    # SoalJawaban (jawaban siswa)
+    
+    async def add_step(self, soal_id : int, student_id:int, step:str) -> dict: 
         raw_sql = text("""
             WITH target_jawaban AS (
                 INSERT INTO soal_jawaban (soal_id, student_id)
                 VALUES (:soal_id, :student_id)
                 ON CONFLICT (soal_id, student_id)
-                DO UPDATE SET student_id = EXCLUDED.student_id  -- Dummy update to guarantee RETURNING id on conflict
+                DO UPDATE SET soal_id = EXCLUDED.soal_id 
                 RETURNING id
             ),
             next_seq AS (
@@ -473,14 +474,15 @@ class QuizRepository(QuizRepositoryInterface):
                 (SELECT id FROM target_jawaban), 
                 (SELECT next_urutan FROM next_seq), 
                 :teks
-            RETURNING id, jawaban_id, urutan, teks;
+            RETURNING id, urutan, teks;
         """)
         result = await self.db.execute(
             raw_sql,
             {"soal_id":soal_id, "student_id":student_id,"teks":step}
         )
         await self.db.flush()
-        return result.rowcount > 0
+        row = result.mappings().one()
+        return dict(row)
 
     async def remove_step(self, step_id:int, student_id:int) -> bool:
         stmt = (

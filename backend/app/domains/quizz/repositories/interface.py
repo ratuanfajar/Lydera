@@ -52,7 +52,7 @@ class QuizRepositoryInterface(ABC):
     async def get_quiz_progress(self, quiz_request_id: int, student_id: int) -> QuizProgress | None: raise NotImplementedError
 
     @abstractmethod
-    async def add_step(self, soal_id : int, student_id:int, text:str) -> bool: raise NotImplementedError
+    async def add_step(self, soal_id : int, student_id:int, text:str) -> dict: raise NotImplementedError
 
     @abstractmethod
     async def remove_step(self, step_id:int, student_id:int) -> bool: raise NotImplementedError

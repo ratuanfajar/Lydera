@@ -39,7 +39,7 @@ from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 from app.domains.quizz.schemas.quiz_delete_request import QuizDeleteRequest
 from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
-from app.domains.quizz.schemas.quiz_request_student_response import QuizRequestStudentResponse
+from app.domains.quizz.schemas.quiz_request_student_response import QuestionStudentSteps, QuizRequestStudentResponse
 from app.domains.quizz.schemas.step_request import AddStepRequest
 
 
@@ -381,7 +381,7 @@ async def submit_soal_answer(
     description=(
         "Requires the STUDENT role. Simpan langkah pengerjaan siswa untuk satu soal."
     ),
-    response_model=Response[bool],
+    response_model=Response[QuestionStudentSteps],
     status_code=status.HTTP_201_CREATED,
     responses=COMMON_VALIDATION_RESPONSES,
 )
