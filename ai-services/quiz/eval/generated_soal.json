@@ -1,0 +1,812 @@
+{
+  "bab1": [
+    {
+      "soal": {
+        "analisis_level": "Soal ini menguji ingatan langsung terhadap istilah domain, kodomain, dan range, tanpa perlu perhitungan atau penalaran baru. Siswa cukup mengenali definisi yang tepat dari materi, sehingga sesuai dengan level Bloom C1.",
+        "question_text": "Dalam materi fungsi, himpunan yang menyatakan semua kemungkinan keluaran dari suatu fungsi disebut ...",
+        "options": {
+          "A": "range",
+          "B": "domain",
+          "C": "kodomain",
+          "D": "relasi"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Ingat kembali bahwa domain adalah himpunan masukan.",
+          "Ingat kembali bahwa range adalah himpunan keluaran yang benar-benar dihasilkan fungsi."
+        ],
+        "kesimpulan": "Jadi, himpunan yang menyatakan semua kemungkinan keluaran dari suatu fungsi adalah range.",
+        "stimulus": null,
+        "bloom_level": 1,
+        "reading_order_start": 36,
+        "reading_order_end": 146,
+        "type_soal": "LOTS",
+        "level_kognitif": "C1"
+      },
+      "validasi": {
+        "matches": false,
+        "derived_option": "C",
+        "derived_langkah": [
+          "Dari materi sumber bagian Masalah Kedua, masukan disebut domain, semua kemungkinan keluaran disebut kodomain, dan keluaran aktual disebut range.",
+          "Pertanyaan menyebutkan himpunan semua kemungkinan keluaran, sehingga sesuai definisi kodomain."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C2 karena siswa hanya perlu memahami dan mengenali makna domain dan range dari konteks fungsi, bukan melakukan perhitungan atau prosedur baru. Fokusnya adalah memilih pernyataan yang paling tepat tentang himpunan masukan dan keluaran berdasarkan definisi pada materi.",
+        "question_text": "Perhatikan pernyataan berikut tentang suatu fungsi.\\n\\n\"Domain adalah himpunan semua nilai masukan, sedangkan range adalah himpunan semua nilai keluaran yang benar-benar dihasilkan fungsi.\"\\n\\nPernyataan mana yang paling tepat menjelaskan kalimat tersebut dengan kata-kata lain?",
+        "options": {
+          "A": "Domain memuat semua nilai x yang boleh masuk, sedangkan range memuat semua nilai y yang keluar dari fungsi.",
+          "B": "Domain memuat semua nilai hasil akhir, sedangkan range memuat semua nilai awal yang masuk ke fungsi.",
+          "C": "Domain memuat semua pasangan berurutan, sedangkan range memuat semua sumbu pada grafik fungsi.",
+          "D": "Domain memuat semua nilai pada kodomain, sedangkan range memuat semua nilai yang tidak digunakan fungsi."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Domain adalah himpunan nilai masukan, yaitu nilai x yang diterima fungsi.",
+          "Range adalah himpunan nilai keluaran, yaitu nilai y yang benar-benar dihasilkan fungsi."
+        ],
+        "kesimpulan": "Pernyataan yang tepat adalah A, karena domain menyatakan masukan dan range menyatakan keluaran fungsi.",
+        "stimulus": null,
+        "bloom_level": 2,
+        "reading_order_start": 36,
+        "reading_order_end": 146,
+        "type_soal": "LOTS",
+        "level_kognitif": "C2"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber, domain didefinisikan sebagai himpunan semua nilai masukan (input) ke fungsi, sedangkan range adalah himpunan nilai keluaran (output) yang benar-benar dihasilkan.",
+          "Pernyataan A paling tepat karena menyebut domain sebagai semua nilai x yang boleh masuk dan range sebagai semua nilai y yang keluar, sesuai definisi masukan dan keluaran aktual fungsi."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa menerapkan langsung kriteria fungsi pada himpunan pasangan berurutan: setiap input harus memiliki tepat satu output. Ini sesuai C3 karena siswa tidak sekadar mengingat definisi, tetapi menggunakan prosedur untuk memeriksa relasi baru dan memilih yang memenuhi syarat fungsi.",
+        "question_text": "Manakah relasi berikut yang merupakan fungsi?",
+        "options": {
+          "A": "{(1, 2), (2, 3), (3, 4), (4, 5)}",
+          "B": "{(1, 2), (2, 3), (2, 4), (4, 5)}",
+          "C": "{(1, 2), (1, 3), (3, 4), (4, 5)}",
+          "D": "{(1, 2), (2, 3), (3, 4), (3, 5)}"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Periksa setiap pasangan berurutan dan lihat apakah ada satu input yang dipasangkan dengan lebih dari satu output.",
+          "Relasi pada pilihan A memiliki setiap input yang berbeda dan masing-masing tepat satu output, sehingga merupakan fungsi."
+        ],
+        "kesimpulan": "Relasi yang merupakan fungsi adalah pilihan A.",
+        "stimulus": null,
+        "bloom_level": 3,
+        "reading_order_start": 36,
+        "reading_order_end": 146,
+        "type_soal": "LOTS",
+        "level_kognitif": "C3"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Suatu relasi merupakan fungsi jika setiap anggota himpunan masukan (x) dipetakan tepat ke satu anggota himpunan keluaran (y), sesuai definisi fungsi sebagai relasi yang lebih spesifik dari relasi umum.",
+          "Periksa setiap opsi: Opsi A memiliki x unik (1,2,3,4) masing-masing ke satu y; Opsi B,C,D masing-masing memiliki x yang sama (2,1,3) dipetakan ke dua y berbeda sehingga bukan fungsi."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa mengingat definisi langsung tentang syarat komposisi fungsi, yaitu hubungan antara range fungsi kedua dan domain fungsi pertama. Tidak ada perhitungan atau penalaran baru, sehingga jelas berada pada level C1.",
+        "question_text": "Manakah pernyataan yang tepat tentang syarat dua fungsi f dan g dapat dikomposisikan sebagai f komposisi g?",
+        "options": {
+          "A": "Range dari g merupakan himpunan bagian dari domain dari f.",
+          "B": "Domain dari g merupakan himpunan bagian dari range dari f.",
+          "C": "Domain dari f merupakan himpunan bagian dari range dari g.",
+          "D": "Range dari f merupakan himpunan bagian dari domain dari g."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Ingat definisi komposisi fungsi f komposisi g.",
+          "Cek syaratnya, yaitu range dari g harus menjadi himpunan bagian dari domain dari f."
+        ],
+        "kesimpulan": "Jadi, syarat yang tepat adalah range dari g merupakan himpunan bagian dari domain dari f.",
+        "stimulus": null,
+        "bloom_level": 1,
+        "reading_order_start": 147,
+        "reading_order_end": 301,
+        "type_soal": "LOTS",
+        "level_kognitif": "C1"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber bagian Syarat Komposisi Fungsi dinyatakan bahwa dua fungsi f dan g dapat dikomposisikan sebagai f ∘ g jika range g merupakan himpunan bagian dari domain f.",
+          "Pernyataan ini langsung sesuai dengan pilihan A, sedangkan pilihan lain tidak sesuai dengan syarat yang diberikan dalam materi."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C2 karena hanya menuntut siswa memahami dan mengenali syarat komposisi fungsi berdasarkan definisi yang sudah diberikan, tanpa perlu menghitung nilai fungsi atau menerapkan prosedur baru. Fokusnya adalah memilih pernyataan yang paling tepat sebagai parafrase konsep, bukan menyelesaikan perhitungan.",
+        "question_text": "Manakah pernyataan yang paling tepat tentang syarat dua fungsi f dan g dapat dikomposisikan menjadi f ∘ g?",
+        "options": {
+          "A": "Range dari g harus merupakan himpunan bagian dari domain f.",
+          "B": "Domain dari g harus merupakan himpunan bagian dari domain f.",
+          "C": "Range dari f harus merupakan himpunan bagian dari domain g.",
+          "D": "Domain dari f harus merupakan himpunan bagian dari range g."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Komposisi f ∘ g berarti keluaran dari g menjadi masukan bagi f.",
+          "Agar masukan itu boleh digunakan, nilai keluaran g harus berada dalam domain f."
+        ],
+        "kesimpulan": "Jadi, syarat yang benar adalah range dari g merupakan himpunan bagian dari domain f.",
+        "stimulus": null,
+        "bloom_level": 2,
+        "reading_order_start": 147,
+        "reading_order_end": 301,
+        "type_soal": "LOTS",
+        "level_kognitif": "C2"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber bagian Syarat Komposisi Fungsi: dua fungsi f dan g dapat dikomposisikan sebagai f ∘ g jika range g merupakan himpunan bagian dari domain f.",
+          "Pernyataan ini langsung sesuai dengan opsi A, sedangkan opsi lain tidak disebutkan sebagai syarat dalam materi."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa menerapkan langsung definisi komposisi fungsi, yaitu menghitung g(2) lalu memasukkannya ke f, sehingga berada pada level C3 (menerapkan), bukan sekadar mengingat definisi atau menafsirkan konsep. Angka dan fungsi yang dipakai baru, dan penyelesaiannya cukup dengan satu prosedur inti dari materi.",
+        "question_text": "Jika f(x) = 3x - 2 dan g(x) = x + 4, tentukan nilai (f ∘ g)(2).",
+        "options": {
+          "A": "16",
+          "B": "18",
+          "C": "20",
+          "D": "22"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Hitung g(2) = 2 + 4 = 6.",
+          "Substitusikan hasilnya ke fungsi f, sehingga (f ∘ g)(2) = f(6) = 3(6) - 2 = 16."
+        ],
+        "kesimpulan": "Jadi, nilai (f ∘ g)(2) adalah 16.",
+        "stimulus": null,
+        "bloom_level": 3,
+        "reading_order_start": 147,
+        "reading_order_end": 301,
+        "type_soal": "LOTS",
+        "level_kognitif": "C3"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "(f o g)(2) = f(g(2))",
+          "g(2)=6 lalu f(6)=3*6-2=16"
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa menganalisis alasan di balik sebuah kesimpulan tentang fungsi, bukan sekadar mengingat definisi. Siswa harus membedakan apakah masalahnya terletak pada keluaran yang sama atau pada satu masukan yang memiliki lebih dari satu keluaran.",
+        "question_text": "Perhatikan data suhu mesin pada tiap menit berikut: (1, 40), (2, 43), (3, 43), (4, 46), (4, 48). Seorang siswa menyimpulkan bahwa relasi ini bukan fungsi karena nilai keluaran 43 muncul dua kali. Pernyataan mana yang paling tepat untuk menganalisis kesimpulan siswa tersebut?",
+        "options": {
+          "A": "Kesimpulan siswa keliru; relasi bukan fungsi karena masukan 4 dipasangkan ke dua keluaran.",
+          "B": "Kesimpulan siswa benar; relasi bukan fungsi karena keluaran 43 muncul dua kali pada data.",
+          "C": "Kesimpulan siswa benar; relasi bukan fungsi karena setiap keluaran harus berbeda satu sama lain.",
+          "D": "Kesimpulan siswa keliru; relasi adalah fungsi karena nilai keluaran boleh muncul berulang."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Periksa syarat fungsi: setiap masukan harus memiliki tepat satu keluaran.",
+          "Pada data, masukan 4 memiliki dua keluaran, yaitu 46 dan 48, sehingga relasi bukan fungsi. Keluaran 43 yang muncul dua kali tidak menjadi alasan relasi bukan fungsi."
+        ],
+        "kesimpulan": "Relasi pada data tersebut bukan fungsi karena ada satu masukan yang memiliki lebih dari satu keluaran.",
+        "stimulus": {
+          "readable_text": "Data suhu mesin pada tiap menit dicatat sebagai pasangan berurutan: (1, 40), (2, 43), (3, 43), (4, 46), (4, 48)."
+        },
+        "bloom_level": 4,
+        "reading_order_start": 36,
+        "reading_order_end": 146,
+        "type_soal": "HOTS",
+        "level_kognitif": "C4"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Relasi adalah fungsi jika setiap masukan (input) tepat dipetakan ke satu keluaran (output).",
+          "Pada pasangan (1,40), (2,43), (3,43), (4,46), (4,48) terlihat masukan 4 dipetakan ke dua keluaran berbeda yaitu 46 dan 48.",
+          "Karena satu masukan memiliki lebih dari satu keluaran, relasi ini bukan fungsi.",
+          "Alasan siswa bahwa keluaran 43 muncul dua kali salah, karena keluaran boleh berulang selama setiap masukan hanya ke satu keluaran.",
+          "Jadi kesimpulan siswa keliru dan alasan yang tepat adalah masukan 4 dipasangkan ke dua keluaran."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa membandingkan beberapa cara pemeriksaan relasi dan menilai mana yang paling valid berdasarkan definisi fungsi. Ini berada pada level C5 karena siswa harus mengevaluasi klaim yang mirip, bukan hanya mengingat definisi atau menghitung hasil.",
+        "question_text": "Berdasarkan data pada stimulus, manakah strategi pemeriksaan yang paling valid untuk memastikan relasi tersebut merupakan fungsi?",
+        "options": {
+          "A": "Periksa nilai x pada data, lalu pastikan setiap input hanya memiliki satu output.",
+          "B": "Periksa nilai y pada data, lalu pastikan setiap output hanya muncul satu kali.",
+          "C": "Periksa bentuk grafiknya, lalu pastikan titik-titik tampak membentuk garis lurus.",
+          "D": "Periksa letak titiknya, lalu pastikan semua titik berada di kuadran I."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Definisi fungsi menyatakan bahwa setiap input x harus dipasangkan dengan tepat satu output y.",
+          "Pada data stimulus, strategi yang paling tepat adalah memeriksa apakah ada satu nilai x yang dipasangkan ke lebih dari satu nilai y. Jika tidak ada, relasi merupakan fungsi."
+        ],
+        "kesimpulan": "Strategi yang paling valid adalah memeriksa nilai x dan memastikan setiap input hanya memiliki satu output.",
+        "stimulus": {
+          "readable_text": "Seorang guru menampilkan data hubungan waktu x dan suhu y dalam diagram Kartesius. Titik-titik datanya adalah (1, 3), (2, 3), (3, 4), dan (4, 4). Guru ingin memastikan apakah relasi ini merupakan fungsi."
+        },
+        "bloom_level": 5,
+        "reading_order_start": 36,
+        "reading_order_end": 146,
+        "type_soal": "HOTS",
+        "level_kognitif": "C5"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Relasi merupakan fungsi jika setiap anggota himpunan input (nilai x) dipetakan tepat ke satu anggota himpunan output (nilai y).",
+          "Periksa data (1,3), (2,3), (3,4), (4,4): setiap x memiliki tepat satu y, sehingga relasi adalah fungsi (y sama boleh muncul lebih dari sekali untuk x berbeda)."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa membedah dua operasi fungsi berurutan, menghitung hasil masing-masing komposisi, lalu membandingkan keduanya untuk menentukan mana yang sesuai dengan konteks. Ini melampaui prosedur substitusi biasa karena siswa harus menganalisis pengaruh urutan komposisi terhadap hasil akhir.",
+        "question_text": "Dalam konteks pembelian meja belajar, fungsi t(x) menyatakan harga meja setelah pajak 7,5%, sedangkan fungsi f(x) menyatakan harga setelah biaya angkut Rp20.000,00. Jika harga awal meja adalah x rupiah, pernyataan mana yang benar tentang komposisi fungsi dan total biayanya?",
+        "options": {
+          "A": "f komposisi t dari x = 1,075x + 20.000, dan hasilnya Rp1.500,00 lebih kecil daripada t komposisi f dari x.",
+          "B": "t komposisi f dari x = 1,075x + 20.000, dan hasilnya Rp1.500,00 lebih kecil daripada f komposisi t dari x.",
+          "C": "f komposisi t dari x = 1,075x + 21.500, dan hasilnya Rp1.500,00 lebih kecil daripada t komposisi f dari x.",
+          "D": "t komposisi f dari x = 1,075x + 21.500, dan hasilnya Rp1.500,00 lebih kecil daripada f komposisi t dari x."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Tentukan f komposisi t dari x: t(x) = 1,075x, lalu f(t(x)) = 1,075x + 20.000.",
+          "Tentukan t komposisi f dari x: f(x) = x + 20.000, lalu t(f(x)) = 1,075(x + 20.000) = 1,075x + 21.500. Selisih keduanya Rp1.500,00, sehingga f komposisi t lebih kecil."
+        ],
+        "kesimpulan": "Komposisi yang benar adalah f komposisi t dari x = 1,075x + 20.000, dan hasilnya Rp1.500,00 lebih kecil daripada t komposisi f dari x.",
+        "stimulus": {
+          "readable_text": "Anton membeli meja belajar dengan harga awal x rupiah. Toko mengenakan pajak pembelian 7,5% dari harga meja dan biaya angkut Rp20.000,00. Fungsi t(x) menyatakan harga meja setelah pajak, sedangkan fungsi f(x) menyatakan harga setelah biaya angkut."
+        },
+        "bloom_level": 4,
+        "reading_order_start": 147,
+        "reading_order_end": 301,
+        "type_soal": "HOTS",
+        "level_kognitif": "C4"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Definisikan t(x) = 1,075x sebagai harga setelah pajak 7,5% dan f(x) = x + 20.000 sebagai harga setelah biaya angkut.",
+          "Hitung f ∘ t (x) = 1,075x + 20.000 dan t ∘ f (x) = 1,075x + 21.500; selisih 1.500 menunjukkan f ∘ t lebih kecil."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada C5 karena siswa harus menilai beberapa pendekatan yang mungkin untuk membandingkan dua skema promo, lalu memilih pendekatan yang paling valid berdasarkan sifat komposisi fungsi. Siswa tidak cukup menghitung hasil akhir, tetapi harus mengevaluasi kelebihan dan kelemahan tiap cara sebelum menentukan yang paling tepat.",
+        "question_text": "Di sebuah toko pakaian, harga awal sebuah jaket adalah x rupiah. Toko menyiapkan dua skema promo untuk dievaluasi: skema pertama diskon 30 persen lalu potongan Rp10.000,00, sedangkan skema kedua potongan Rp10.000,00 lalu diskon 30 persen. Manakah pendekatan yang paling valid untuk menilai apakah kedua skema itu memberi harga akhir yang sama untuk semua harga awal?",
+        "options": {
+          "A": "Hitung satu harga contoh saja; jika hasilnya sama, kedua skema promo pasti sama untuk semua harga awal.",
+          "B": "Buat dua fungsi promo lalu bandingkan komposisinya pada harga umum x; urutan promo perlu diperiksa karena komposisi tidak selalu komutatif.",
+          "C": "Gabungkan diskon 30 persen dan potongan Rp10.000,00 menjadi satu potongan tetap, lalu gunakan hasil itu untuk semua harga awal.",
+          "D": "Tukar urutan promo secara bebas karena diskon persen dan potongan rupiah selalu memberi hasil akhir yang sama."
+        },
+        "correct_option": "B",
+        "langkah": [
+          "Misalkan promo diskon 30 persen dan potongan Rp10.000,00 dinyatakan sebagai dua fungsi yang berbeda.",
+          "Untuk menilai kesamaan hasil, bandingkan komposisi kedua urutan pada harga umum x, bukan hanya pada satu contoh harga.",
+          "Urutan promo harus diperiksa karena komposisi fungsi secara umum tidak komutatif, sehingga hasil kedua skema dapat berbeda."
+        ],
+        "kesimpulan": "Pendekatan yang paling tepat adalah membentuk dan membandingkan komposisi fungsi pada x umum, yaitu opsi B.",
+        "stimulus": {
+          "readable_text": "Di sebuah toko pakaian, harga awal sebuah jaket adalah x rupiah. Toko menyiapkan dua skema promo untuk dievaluasi: skema pertama diskon 30 persen lalu potongan Rp10.000,00, sedangkan skema kedua potongan Rp10.000,00 lalu diskon 30 persen. Pemilik toko ingin mengetahui apakah kedua skema memberi harga akhir yang sama untuk semua harga awal."
+        },
+        "bloom_level": 5,
+        "reading_order_start": 147,
+        "reading_order_end": 301,
+        "type_soal": "HOTS",
+        "level_kognitif": "C5"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "B",
+        "derived_langkah": [
+          "Modelkan skema pertama sebagai komposisi fungsi diskon 30% dilanjutkan potongan Rp10.000 dan skema kedua sebagai potongan Rp10.000 dilanjutkan diskon 30%",
+          "Bandingkan kedua komposisi pada variabel umum x karena komposisi fungsi tidak selalu komutatif sesuai Eksplorasi 1.5"
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa menganalisis tabel hubungan untuk menentukan sifat fungsi asal, lalu menelusuri dampaknya pada relasi kebalikan. Siswa harus membedakan fungsi, injektif, dan kemungkinan invers dari pola data, bukan hanya mengingat definisi.",
+        "question_text": "Perhatikan stimulus berikut.\\n\\nBerdasarkan tabel hubungan jumlah buku komik yang dibeli dan biaya totalnya, pernyataan yang paling tepat adalah ...",
+        "options": {
+          "A": "Relasi asal merupakan fungsi, tetapi tidak injektif, sehingga relasi baliknya bukan fungsi.",
+          "B": "Relasi asal merupakan fungsi bijektif, sehingga relasi baliknya juga merupakan fungsi.",
+          "C": "Relasi asal bukan fungsi, karena satu biaya total memetakan ke dua jumlah buku komik.",
+          "D": "Relasi asal surjektif, sehingga relasi baliknya selalu merupakan fungsi."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Dari tabel, setiap jumlah buku komik memiliki tepat satu biaya total, jadi relasi asal merupakan fungsi.",
+          "Biaya total Rp24.000,00 muncul untuk dua input berbeda, sehingga relasi asal tidak injektif. Karena fungsi invers memerlukan fungsi bijektif, relasi baliknya bukan fungsi."
+        ],
+        "kesimpulan": "Relasi asal adalah fungsi, tetapi tidak injektif, sehingga relasi baliknya tidak membentuk fungsi invers.",
+        "stimulus": {
+          "readable_text": "Tabel hubungan jumlah buku komik yang dibeli dan biaya totalnya:\\n1 buku -> Rp12.000,00\\n2 buku -> Rp24.000,00\\n3 buku -> Rp24.000,00\\n4 buku -> Rp36.000,00"
+        },
+        "bloom_level": 4,
+        "reading_order_start": 302,
+        "reading_order_end": 439,
+        "type_soal": "HOTS",
+        "level_kognitif": "C4"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Tabel menunjukkan jumlah buku sebagai masukan dan biaya sebagai keluaran: setiap jumlah buku memetakan tepat satu biaya, sehingga relasi asal adalah fungsi.",
+          "Biaya Rp24.000,00 diperoleh dari dua jumlah buku berbeda (2 dan 3), sehingga fungsi tidak injektif.",
+          "Fungsi invers hanya ada jika fungsi asal bijektif (injektif dan surjektif). Karena tidak injektif, relasi balik bukan fungsi (satu masukan balik memiliki dua keluaran).",
+          "Opsi B salah karena bukan bijektif; opsi C salah karena relasi asal adalah fungsi; opsi D salah karena surjektif saja tidak cukup tanpa injektif."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa mengevaluasi beberapa cara penyelesaian dan memilih pendekatan yang paling valid untuk menemukan harga awal dari harga akhir, sehingga tidak cukup hanya menghitung hasil akhir. Siswa harus menilai urutan invers, ketepatan model fungsi, dan kesesuaian langkah dengan konsep komposisi fungsi invers.",
+        "question_text": "Sebuah toko menerapkan diskon 40% lalu potongan harga Rp15.000,00. Harga akhir sebuah pakaian adalah Rp45.000,00. Tiga siswa memberi pendapat berikut untuk mencari harga awal.\\n\\nManakah pendapat yang paling tepat?\\n\\nA. Harga awal dicari dengan membalik urutan proses, yaitu memakai invers dari potongan Rp15.000,00 lalu invers dari diskon 40%, karena invers komposisi fungsi dibalik urutannya.\\n\\nB. Harga awal dicari dengan menambahkan Rp15.000,00 lalu mengurangi 40% dari hasilnya, karena operasi kebalikan boleh dilakukan dalam urutan yang sama.\\n\\nC. Harga awal dicari dengan mengurangkan Rp15.000,00 lalu menambah 40% dari hasilnya, karena diskon 40% sama dengan pengurangan tetap.\\n\\nD. Harga awal dicari dengan menjumlahkan Rp45.000,00 dan Rp15.000,00 lalu mengalikan 60%, karena harga akhir selalu menjadi 60% dari jumlah awal.",
+        "options": {
+          "A": "Harga awal dicari dengan membalik urutan proses, yaitu memakai invers dari potongan Rp15.000,00 lalu invers dari diskon 40%, karena invers komposisi fungsi dibalik urutannya.",
+          "B": "Harga awal dicari dengan menambahkan Rp15.000,00 lalu mengurangi 40% dari hasilnya, karena operasi kebalikan boleh dilakukan dalam urutan yang sama.",
+          "C": "Harga awal dicari dengan mengurangkan Rp15.000,00 lalu menambah 40% dari hasilnya, karena diskon 40% sama dengan pengurangan tetap.",
+          "D": "Harga awal dicari dengan menjumlahkan Rp45.000,00 dan Rp15.000,00 lalu mengalikan 60%, karena harga akhir selalu menjadi 60% dari jumlah awal."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Misalkan fungsi pertama adalah diskon 40%, sehingga harga menjadi 60% dari harga awal.",
+          "Fungsi kedua adalah potongan tetap Rp15.000,00. Untuk mencari harga awal dari harga akhir, proses dibalik: pertama tambah Rp15.000,00, lalu bagi 0,6 atau gunakan invers diskon 40%.",
+          "Pendapat A paling tepat karena sesuai dengan sifat invers komposisi fungsi, yaitu urutan invers dibalik."
+        ],
+        "kesimpulan": "Pendapat yang paling tepat adalah A, karena saat mencari fungsi invers dari proses berurutan, langkahnya harus dibalik.",
+        "stimulus": {
+          "readable_text": "Sebuah toko menerapkan diskon 40% lalu potongan harga Rp15.000,00. Harga akhir sebuah pakaian adalah Rp45.000,00."
+        },
+        "bloom_level": 5,
+        "reading_order_start": 302,
+        "reading_order_end": 439,
+        "type_soal": "HOTS",
+        "level_kognitif": "C5"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Fungsi asal adalah komposisi g ◦ f dengan f = diskon 40% (kalikan 0,6) lalu g = potong Rp15.000 (kurangi 15.000); harga akhir y = g(f(x)) = 45.000.",
+          "Invers komposisi (g ◦ f)^-1 = f^-1 ◦ g^-1, sehingga mulai dari y, terapkan invers g (tambah 15.000) lalu invers f (bagi 0,6 atau kali 5/3) untuk memperoleh x."
+        ]
+      }
+    }
+  ],
+  "bab2": [
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C1 karena menanyakan fakta langsung dari materi tanpa perlu perhitungan atau penalaran kasus baru. Siswa cukup mengingat definisi hubungan dasar pada lingkaran untuk memilih jawaban yang tepat.",
+        "question_text": "Manakah pernyataan yang sesuai dengan Teorema Thales pada lingkaran?",
+        "options": {
+          "A": "Sudut keliling yang menghadap diameter selalu siku-siku.",
+          "B": "Sudut pusat yang menghadap diameter selalu dua kali lipat.",
+          "C": "Sudut keliling yang menghadap busur sama selalu sama besar.",
+          "D": "Garis singgung selalu sejajar dengan jari-jari di titik singgung."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Ingat kembali isi Teorema Thales pada lingkaran.",
+          "Cocokkan pernyataan yang menyebut sudut keliling yang menghadap diameter."
+        ],
+        "kesimpulan": "Pernyataan yang benar adalah sudut keliling yang menghadap diameter selalu siku-siku.",
+        "stimulus": null,
+        "bloom_level": 1,
+        "reading_order_start": 46,
+        "reading_order_end": 189,
+        "type_soal": "LOTS",
+        "level_kognitif": "C1"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi, Teorema Thales berbunyi: jika AB diameter maka sudut ACB siku-siku",
+          "Pernyataan ini sama dengan sudut keliling yang menghadap diameter selalu siku-siku"
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C2 karena siswa hanya diminta mengenali hubungan konsep yang sudah ada di materi, yaitu hubungan sudut pusat dan sudut keliling pada busur yang sama. Tidak ada langkah menghitung atau menerapkan prosedur baru, hanya pemahaman dan identifikasi pernyataan yang tepat.",
+        "question_text": "Perhatikan dua sudut pada lingkaran yang menghadap busur yang sama. Pernyataan yang tepat tentang hubungan keduanya adalah ...",
+        "options": {
+          "A": "sudut pusat besarnya dua kali sudut keliling",
+          "B": "sudut pusat besarnya sama dengan sudut keliling",
+          "C": "sudut keliling besarnya dua kali sudut pusat",
+          "D": "sudut keliling selalu lebih besar dari sudut pusat"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Sudut pusat dan sudut keliling yang menghadap busur yang sama memiliki hubungan khusus.",
+          "Berdasarkan materi, sudut pusat besarnya dua kali sudut keliling."
+        ],
+        "kesimpulan": "Jadi, pernyataan yang tepat adalah sudut pusat besarnya dua kali sudut keliling.",
+        "stimulus": null,
+        "bloom_level": 2,
+        "reading_order_start": 46,
+        "reading_order_end": 189,
+        "type_soal": "LOTS",
+        "level_kognitif": "C2"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber, sudut pusat adalah sudut di pusat lingkaran dengan kaki jari-jari, sedangkan sudut keliling adalah sudut di keliling dengan kaki tali busur, dan keduanya menghadap busur yang sama.",
+          "Temuan dan rangkuman menyatakan sudut pusat besarnya dua kali sudut keliling yang menghadap busur sama (terbukti melalui kasus 1-4 termasuk diameter dan segitiga sama kaki)."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C3 karena siswa harus menerapkan langsung hubungan sudut pusat dan sudut keliling pada busur yang sama untuk kasus baru dengan angka baru. Penyelesaiannya hanya memerlukan satu prosedur inti, yaitu menggunakan rumus sudut pusat = 2 × sudut keliling.",
+        "question_text": "Pada sebuah lingkaran, sudut keliling yang menghadap busur yang sama dengan sudut pusat besarnya 35 derajat. Berapakah besar sudut pusat tersebut?",
+        "options": {
+          "A": "70 derajat",
+          "B": "45 derajat",
+          "C": "105 derajat",
+          "D": "140 derajat"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Gunakan sifat bahwa sudut pusat besarnya dua kali sudut keliling yang menghadap busur yang sama.",
+          "Hitung 2 × 35 derajat = 70 derajat."
+        ],
+        "kesimpulan": "Jadi, besar sudut pusat tersebut adalah 70 derajat.",
+        "stimulus": null,
+        "bloom_level": 3,
+        "reading_order_start": 46,
+        "reading_order_end": 189,
+        "type_soal": "LOTS",
+        "level_kognitif": "C3"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber, sudut pusat yang menghadap busur yang sama besarnya dua kali sudut keliling (temuan dan rangkuman poin 2).",
+          "Sudut keliling diberikan 35 derajat, maka sudut pusat = 2 × 35 = 70 derajat."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C1 karena hanya menanyakan fakta langsung dari materi, yaitu definisi garis singgung lingkaran. Tidak ada perhitungan, penalaran kasus, atau penerapan konsep baru yang harus diolah.",
+        "question_text": "Manakah pernyataan yang paling tepat tentang garis singgung lingkaran?",
+        "options": {
+          "A": "Garis yang memotong lingkaran di satu titik",
+          "B": "Garis yang memotong lingkaran di dua titik",
+          "C": "Garis yang melalui pusat dan memotong lingkaran",
+          "D": "Garis yang berada di dalam lingkaran"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Dari materi, garis singgung adalah garis yang berpotongan dengan lingkaran di satu titik.",
+          "Jadi, pernyataan yang tepat adalah garis yang memotong lingkaran di satu titik."
+        ],
+        "kesimpulan": "Garis singgung lingkaran adalah garis yang memotong lingkaran di satu titik.",
+        "stimulus": null,
+        "bloom_level": 1,
+        "reading_order_start": 190,
+        "reading_order_end": 301,
+        "type_soal": "LOTS",
+        "level_kognitif": "C1"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber, garis singgung didefinisikan sebagai garis yang berpotongan dengan lingkaran di tepat satu titik (titik singgung), seperti disebutkan pada Eksplorasi 2.2 dan Rangkuman poin 1.",
+          "Opsi B adalah definisi garis sekan (memotong di dua titik), opsi C dan D tidak sesuai dengan sifat garis singgung yang dijelaskan (tegak lurus jari-jari di titik singgung dan berada di luar lingkaran)."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa memahami makna konsep garis singgung dengan mengenali ciri yang tepat dari beberapa pernyataan yang mirip, bukan menghitung panjang atau menerapkan rumus. Untuk menjawab benar, siswa harus membedakan sifat garis singgung dari garis sekan dan hubungan garis singgung dengan jari-jari di titik singgung.",
+        "question_text": "Pernyataan yang paling tepat tentang garis singgung lingkaran adalah ...",
+        "options": {
+          "A": "garis yang menyentuh lingkaran pada satu titik dan tegak lurus jari-jari di titik itu",
+          "B": "garis yang memotong lingkaran pada dua titik dan melalui pusat lingkaran",
+          "C": "garis yang melalui dua titik pada lingkaran dan sejajar jari-jari",
+          "D": "garis yang menyentuh lingkaran pada satu titik dan sejajar jari-jari di titik itu"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Garis singgung lingkaran hanya bersentuhan dengan lingkaran pada satu titik.",
+          "Pada titik singgung, garis singgung tegak lurus jari-jari yang ditarik ke titik tersebut."
+        ],
+        "kesimpulan": "Jadi, garis singgung adalah garis yang menyentuh lingkaran pada satu titik dan tegak lurus jari-jari di titik singgung.",
+        "stimulus": null,
+        "bloom_level": 2,
+        "reading_order_start": 190,
+        "reading_order_end": 301,
+        "type_soal": "LOTS",
+        "level_kognitif": "C2"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber, garis singgung didefinisikan menyentuh lingkaran tepat di satu titik yang disebut titik singgung.",
+          "Materi juga menyatakan bahwa garis singgung tegak lurus terhadap jari-jari lingkaran di titik singgung tersebut, sehingga sudutnya 90 derajat."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C3 karena siswa harus menerapkan langsung sifat garis singgung dan jari-jari dengan rumus yang sesuai untuk menghitung panjang garis singgung dari titik luar. Tidak cukup hanya mengingat definisi, siswa perlu memilih prosedur yang tepat lalu melakukan perhitungan.",
+        "question_text": "Sebuah lingkaran berpusat di O memiliki jari-jari 9 cm. Titik P berada 15 cm dari pusat O. Jika PT adalah garis singgung lingkaran di titik T, berapakah panjang PT?",
+        "options": {
+          "A": "12 cm",
+          "B": "6 cm",
+          "C": "9 cm",
+          "D": "18 cm"
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Karena OT adalah jari-jari dan PT garis singgung di titik T, maka OT tegak lurus PT sehingga segitiga OTP siku-siku.",
+          "Gunakan Teorema Pythagoras: PT = akar dari OP kuadrat dikurangi OT kuadrat = akar dari 15 kuadrat dikurangi 9 kuadrat = akar 144 = 12 cm."
+        ],
+        "kesimpulan": "Jadi, panjang PT adalah 12 cm.",
+        "stimulus": null,
+        "bloom_level": 3,
+        "reading_order_start": 190,
+        "reading_order_end": 301,
+        "type_soal": "LOTS",
+        "level_kognitif": "C3"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Garis singgung tegak lurus jari-jari di titik singgung T sehingga segitiga OTP siku-siku di T",
+          "Dengan Pythagoras: OP² = OT² + PT² maka PT = √(225 - 81) = 12 cm"
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C4 karena siswa harus menganalisis hubungan dua sudut pada busur yang sama, lalu membandingkan klaim teknisi dengan teorema yang tepat untuk menemukan letak kekeliruannya. Penyelesaiannya tidak cukup hanya mengenali istilah sudut pusat atau sudut keliling, tetapi harus menelusuri hubungan sebab-akibat antar-data pada stimulus.",
+        "question_text": "Pada kolam berbentuk lingkaran, titik B dan C adalah ujung busur yang sama. Di titik M pada tepi kolam, sudut BMC diukur tiga puluh lima derajat. Seorang teknisi di pusat O menyatakan bahwa sudut BOC juga tiga puluh lima derajat. Berdasarkan analisis hubungan sudut pada busur BC, manakah pernyataan yang paling tepat?",
+        "options": {
+          "A": "Pernyataan teknisi salah; sudut BOC harus tujuh puluh derajat karena sudut pusat dua kali sudut keliling pada busur BC.",
+          "B": "Pernyataan teknisi benar; sudut BOC sama dengan tiga puluh lima derajat karena menghadap busur BC yang sama.",
+          "C": "Pernyataan teknisi salah; sudut BOC harus tujuh belas koma lima derajat karena sudut pusat setengah sudut keliling.",
+          "D": "Pernyataan teknisi benar; sudut BOC hanya berubah jika panjang busur BC berubah, bukan jika titik sudutnya pindah."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Sudut BMC adalah sudut keliling yang menghadap busur BC.",
+          "Sudut BOC adalah sudut pusat yang menghadap busur BC yang sama.",
+          "Gunakan sifat pada lingkaran: sudut pusat besarnya dua kali sudut keliling pada busur yang sama.",
+          "Hitung sudut BOC = dua kali tiga puluh lima derajat = tujuh puluh derajat."
+        ],
+        "kesimpulan": "Jadi, pernyataan teknisi salah dan sudut BOC yang benar adalah tujuh puluh derajat.",
+        "stimulus": {
+          "readable_text": "Pada kolam berbentuk lingkaran, titik B dan C adalah ujung busur yang sama. Di titik M pada tepi kolam, sudut BMC diukur tiga puluh lima derajat. Seorang teknisi di pusat O menyatakan bahwa sudut BOC juga tiga puluh lima derajat."
+        },
+        "bloom_level": 4,
+        "reading_order_start": 46,
+        "reading_order_end": 189,
+        "type_soal": "HOTS",
+        "level_kognitif": "C4"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Sudut BMC di titik M pada keliling adalah sudut keliling yang menghadap busur BC sebesar 35 derajat.",
+          "Sudut BOC di pusat O adalah sudut pusat yang menghadap busur BC yang sama, sehingga besarnya dua kali sudut keliling yaitu 70 derajat; pernyataan teknisi salah."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa menilai beberapa cara penyelesaian yang tampak mirip, lalu memilih cara yang paling tepat dan paling efisien. Karena ada lebih dari satu klaim yang harus dibandingkan berdasarkan Teorema Thales dan sifat sudut pada lingkaran, tingkat berpikirnya berada pada evaluasi, bukan sekadar mengingat atau menghitung.",
+        "question_text": "Pada gambar, AB adalah diameter lingkaran dan titik C berada pada tepi lingkaran. Seorang siswa ingin menentukan besar sudut ACB. Cara manakah yang paling tepat?",
+        "options": {
+          "A": "Gunakan Teorema Thales; karena AB adalah diameter, sudut ACB adalah siku-siku.",
+          "B": "Gunakan sifat jari-jari; karena AC dan BC menuju titik C, sudut ACB selalu siku-siku.",
+          "C": "Gunakan segitiga sama kaki; karena AC sama dengan BC, sudut ACB sama besar dengan sudut lainnya.",
+          "D": "Gunakan sudut pusat AOB; karena sudut pusat pada diameter bernilai sembilan puluh derajat, maka sudut ACB adalah empat puluh lima derajat."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Perhatikan bahwa AB adalah diameter pada lingkaran.",
+          "Teorema Thales menyatakan bahwa sudut keliling yang menghadap diameter selalu siku-siku.",
+          "Jadi, sudut ACB bernilai sembilan puluh derajat, sehingga cara yang paling tepat adalah menggunakan Teorema Thales langsung."
+        ],
+        "kesimpulan": "Cara yang paling tepat adalah menggunakan Teorema Thales, sehingga sudut ACB siku-siku.",
+        "stimulus": {
+          "readable_text": "Pada gambar piring bundar, titik A dan B adalah ujung diameter, sedangkan titik C berada pada tepi piring. Seorang siswa ingin menentukan besar sudut ACB agar dudukan hiasan tepat."
+        },
+        "bloom_level": 5,
+        "reading_order_start": 46,
+        "reading_order_end": 189,
+        "type_soal": "HOTS",
+        "level_kognitif": "C5"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Dari materi sumber, Teorema Thales menyatakan bahwa jika AB adalah diameter lingkaran dan C berada pada keliling, maka sudut ACB adalah sudut siku-siku.",
+          "Sifat ini berlaku karena sudut keliling yang menghadap diameter selalu 90 derajat, sesuai ringkasan dan pembuktian kasus 4 dalam materi."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini menuntut siswa menganalisis hubungan antarunsur pada gambar, yaitu jari-jari, garis singgung, dan segitiga siku-siku, lalu menilai cara berpikir yang keliru. Siswa tidak cukup hanya menghitung; ia harus menentukan alasan yang tepat mengapa Teorema Pythagoras dipakai.",
+        "question_text": "Pada model cakrawala di stimulus, O adalah pusat bumi, B titik singgung, dan P posisi navigator. Diketahui OB = 7 cm dan OP = 25 cm. Seorang siswa menyatakan bahwa panjang PB dapat dicari dengan mengurangkan OP dan OB. Pernyataan yang paling tepat untuk membetulkan cara berpikir siswa adalah ....",
+        "options": {
+          "A": "PB ditentukan dengan Teorema Pythagoras karena segitiga OBP siku-siku di B, sehingga PB = akar dari dua puluh lima kuadrat dikurangi tujuh kuadrat.",
+          "B": "PB ditentukan dengan mengurangkan OP dan OB, sehingga panjangnya delapan belas cm.",
+          "C": "PB sama dengan OB karena garis singgung dan jari-jari selalu memiliki panjang yang sama.",
+          "D": "PB sama dengan OP karena garis singgung dari titik luar sejajar dengan jari-jari."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Karena PB adalah garis singgung di titik B, maka OB tegak lurus PB.",
+          "Segitiga OBP siku-siku di B, sehingga berlaku Teorema Pythagoras: PB = akar dari OP kuadrat dikurangi OB kuadrat.",
+          "Substitusi nilai memberi PB = akar dari 25 kuadrat dikurangi 7 kuadrat = akar 576 = 24 cm."
+        ],
+        "kesimpulan": "Jadi, panjang PB ditentukan dengan Teorema Pythagoras dan hasilnya 24 cm.",
+        "stimulus": {
+          "readable_text": "Pada penampang bumi untuk menghitung jarak cakrawala, O menyatakan pusat bumi, B titik singgung pada permukaan bumi, dan P posisi navigator di kapal. Pada model, OB = 7 cm dan OP = 25 cm. Garis PB menyinggung lingkaran di titik B."
+        },
+        "bloom_level": 4,
+        "reading_order_start": 190,
+        "reading_order_end": 301,
+        "type_soal": "HOTS",
+        "level_kognitif": "C4"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Garis singgung tegak lurus jari-jari pada titik singgung B sehingga segitiga OBP siku-siku di B",
+          "PB dihitung dengan Teorema Pythagoras: PB = akar(25² - 7²)"
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C5 karena siswa harus menilai beberapa strategi penyelesaian yang berbeda dan memilih pendekatan yang paling valid berdasarkan sifat garis singgung dan Teorema Pythagoras. Tugasnya bukan menghitung hasil akhir, melainkan mengevaluasi keefektifan dan ketepatan langkah penyelesaian.",
+        "question_text": "Bram ingin menentukan jarak cakrawala yang terlihat dari ruang kemudi kapal. Diketahui jari-jari Bumi 6.371 km dan ketinggian ruang kemudi 40 m. Pendekatan mana yang paling valid untuk menyelesaikan masalah ini?",
+        "options": {
+          "A": "Ubah tinggi kapal ke kilometer, lalu bentuk segitiga siku-siku antara pusat Bumi, titik singgung, dan kapal. Setelah itu gunakan Teorema Pythagoras untuk mencari jarak cakrawala.",
+          "B": "Gunakan perbandingan keliling Bumi dengan tinggi kapal, lalu tentukan jarak cakrawala dari bagian busur yang tampak dari kapal.",
+          "C": "Jumlahkan jari-jari Bumi dan tinggi kapal, lalu gunakan hasil penjumlahan itu sebagai jarak cakrawala karena kapal berada di atas permukaan laut.",
+          "D": "Kalikan jari-jari Bumi dengan tinggi kapal, lalu gunakan hasil kalinya sebagai panjang garis pandang ke cakrawala."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Garis pandang dari kapal ke cakrawala merupakan garis singgung, sehingga jari-jari Bumi ke titik singgung tegak lurus garis itu.",
+          "Setelah satuan disamakan, segitiga siku-siku yang terbentuk dapat diselesaikan dengan Teorema Pythagoras untuk memperoleh jarak cakrawala."
+        ],
+        "kesimpulan": "Pendekatan yang paling tepat adalah A, karena memanfaatkan sifat garis singgung dan Teorema Pythagoras pada segitiga siku-siku yang terbentuk.",
+        "stimulus": {
+          "readable_text": "Seorang navigator melihat pelabuhan di cakrawala dari ruang kemudi kapal. Jari-jari Bumi 6.371 km dan ruang kemudi kapal berada 40 m di atas permukaan laut. Navigator ingin menentukan jarak cakrawala yang terlihat."
+        },
+        "bloom_level": 5,
+        "reading_order_start": 190,
+        "reading_order_end": 301,
+        "type_soal": "HOTS",
+        "level_kognitif": "C5"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Ubah tinggi kapal 40 m menjadi 0,04 km agar satuan konsisten dengan jari-jari Bumi 6.371 km",
+          "Bentuk segitiga siku-siku dengan pusat Bumi sebagai titik sudut siku-siku (jari-jari tegak lurus garis singgung di titik singgung), lalu terapkan Teorema Pythagoras untuk memperoleh panjang garis singgung sebagai jarak cakrawala"
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada level C4 karena siswa harus membedah alasan yang digunakan pada situasi segiempat garis singgung, lalu menilai apakah kesimpulan itu sesuai dengan Teorema Pitot. Siswa tidak hanya menghitung nilai, tetapi juga menganalisis letak kekeliruan hubungan antar sisi yang dipakai.",
+        "question_text": "Berdasarkan stimulus, pernyataan mana yang paling tepat tentang kesimpulan siswa bahwa RS = 10 cm?",
+        "options": {
+          "A": "Kesimpulan itu benar, karena pada segiempat garis singgung sisi yang berhadapan selalu sama panjang.",
+          "B": "Kesimpulan itu salah, karena yang berlaku adalah jumlah dua sisi yang berhadapan sama panjang.",
+          "C": "Kesimpulan itu benar, karena diagonal segiempat garis singgung membagi bangun menjadi dua segitiga kongruen.",
+          "D": "Kesimpulan itu salah, karena sudut-sudut yang berhadapan pada segiempat garis singgung berjumlah 90°."
+        },
+        "correct_option": "B",
+        "langkah": [
+          "Pada segiempat garis singgung berlaku Teorema Pitot, yaitu jumlah dua sisi yang berhadapan sama panjang.",
+          "Dari data stimulus, PQ + RS = QR + SP, sehingga 8 + RS = 11 + 9.",
+          "Maka RS = 12 cm, jadi kesimpulan siswa bahwa RS = 10 cm tidak sesuai."
+        ],
+        "kesimpulan": "Kesimpulan siswa salah, karena pada segiempat garis singgung yang sama adalah jumlah sisi yang berhadapan, bukan masing-masing sisinya.",
+        "stimulus": {
+          "readable_text": "Pada denah kios, bentuk luarnya adalah segiempat garis singgung PQRS yang mengelilingi sebuah lingkaran. Diketahui panjang PQ = 8 cm, QR = 11 cm, dan SP = 9 cm. Seorang siswa menulis bahwa RS = 10 cm karena sisi yang berhadapan pada segiempat garis singgung selalu sama panjang."
+        },
+        "bloom_level": 4,
+        "reading_order_start": 302,
+        "reading_order_end": 413,
+        "type_soal": "HOTS",
+        "level_kognitif": "C4"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "B",
+        "derived_langkah": [
+          "Pada segiempat tali busur (garis singgung), panjang garis singgung dari titik luar sama, sehingga PQ + RS = QR + SP.",
+          "Dengan PQ=8, QR=11, SP=9 maka RS=12 (bukan 10), kesimpulan siswa salah karena yang berlaku adalah jumlah sisi berhadapan sama panjang."
+        ]
+      }
+    },
+    {
+      "soal": {
+        "analisis_level": "Soal ini berada pada C5 karena siswa harus menilai beberapa usulan pembuktian untuk kasus yang sama, lalu memilih pendekatan yang paling valid berdasarkan sifat-sifat lingkaran. Bukan sekadar menghitung hasil, tetapi membandingkan alasan dan menentukan metode yang paling tepat.",
+        "question_text": "Pada papan nama kafe berbentuk lingkaran, ada dua tali busur AB dan CD yang panjangnya sama. Pengrajin ingin membuktikan bahwa sudut pusat AOB sama besar dengan sudut COD. Usulan manakah yang paling valid dan efisien untuk tujuan itu?",
+        "options": {
+          "A": "Hubungkan O ke A, B, C, dan D. Karena OA sama dengan OC, OB sama dengan OD, dan AB sama dengan CD, segitiga OAB dan OCD kongruen, sehingga sudut AOB sama dengan sudut COD.",
+          "B": "Bandingkan langsung panjang AB dan CD. Karena kedua tali busur sama panjang, sudut pusat yang menghadapnya pasti sama besar tanpa perlu membandingkan ruas lain.",
+          "C": "Gunakan Teorema Thales pada salah satu tali busur. Jika salah satu sudut pada pusat tampak siku-siku, maka sudut pusat pada tali busur lain juga sama besar.",
+          "D": "Kurangi panjang diameter lingkaran dengan panjang AB dan CD. Jika hasilnya sama, maka sudut AOB dan sudut COD pasti sama besar."
+        },
+        "correct_option": "A",
+        "langkah": [
+          "Tarik ruas OA, OB, OC, dan OD sehingga terbentuk dua segitiga, yaitu segitiga OAB dan segitiga OCD.",
+          "Karena OA, OB, OC, dan OD adalah jari-jari lingkaran, maka OA = OC dan OB = OD. Diketahui pula AB = CD, sehingga kedua segitiga kongruen dengan kriteria SSS.",
+          "Dari kekongruenan segitiga, sudut yang bersesuaian sama besar. Jadi sudut AOB = sudut COD."
+        ],
+        "kesimpulan": "Pendekatan yang paling valid adalah membuktikan kekongruenan segitiga OAB dan OCD, lalu menyimpulkan sudut pusatnya sama besar.",
+        "stimulus": {
+          "readable_text": "Pada papan nama kafe berbentuk lingkaran, pengrajin memasang dua hiasan garis lurus AB dan CD pada keliling lingkaran. Hasil pengukuran menunjukkan bahwa AB sama panjang dengan CD. Pengrajin ingin menentukan apakah sudut pusat AOB sama besar dengan sudut COD."
+        },
+        "bloom_level": 5,
+        "reading_order_start": 302,
+        "reading_order_end": 413,
+        "type_soal": "HOTS",
+        "level_kognitif": "C5"
+      },
+      "validasi": {
+        "matches": true,
+        "derived_option": "A",
+        "derived_langkah": [
+          "Hubungkan O ke A, B, C, dan D sehingga terbentuk segitiga OAB dan OCD",
+          "OA = OC (jari-jari), OB = OD (jari-jari), AB = CD (diberikan) sehingga segitiga OAB kongruen segitiga OCD menurut sifat SSS",
+          "Akibatnya sudut AOB = sudut COD"
+        ]
+      }
+    }
+  ]
+}

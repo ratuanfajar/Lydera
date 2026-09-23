@@ -16,6 +16,6 @@ def convert_formula(latex: str) -> str:
         return ""
     cached = cache.get("formula", latex, config.TEXT_MODEL, config.PROMPT_VERSION)
     if cached is None:
-        cached = llm.complete_text(SYSTEM, latex)
+        cached = llm.complete_text(SYSTEM, latex, effort=config.TEXT_EFFORT)
         cache.put("formula", cached, latex, config.TEXT_MODEL, config.PROMPT_VERSION)
     return cached

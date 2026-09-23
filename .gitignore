@@ -8,6 +8,8 @@ __pycache__/
 .python-version
 
 .uv/
+.claude/
+.codex/
 
 ai-services/annotation/output/
 ai-services/annotation/.cache/

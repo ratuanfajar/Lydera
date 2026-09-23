@@ -36,8 +36,11 @@ Proyek memakai uv (Python 3.12). Dependensi dan virtual environment ada di root 
 Salin `.env.example` menjadi `.env` di folder `ai-services/`, isi minimal:
 
 ```
-OPENROUTER_API_KEY=...
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_ENDPOINT=https://<nama-resource>.openai.azure.com/
 ```
+
+Model yang dipakai adalah nama *deployment* di resource Azure itu: `gpt-5.4-mini` dan `text-embedding-3-large` (embedding).
 
 Perintah CLI dijalankan dari `ai-services/annotation/` atau `ai-services/quiz/` (sesuai fiturnya) memakai `uv run`.
 
@@ -47,23 +50,23 @@ Dibaca `config.py` dari `ai-services/.env`.
 
 | Variabel | Default | Keterangan |
 |---|---|---|
-| `OPENROUTER_API_KEY` | kosong | API Key OpenRouter |
-| `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` | Endpoint OpenRouter |
-| `MODEL` | `qwen/qwen3.7-flash` | Model default (teks dan vision) |
-| `TEXT_MODEL` | ikut `MODEL` | Override model teks (anotasi) |
-| `VISION_MODEL` | ikut `MODEL` | Override model vision (anotasi) |
-| `QUIZ_MODEL` | `openai/gpt-4o` | Model quiz generator |
+| `AZURE_OPENAI_API_KEY` | kosong | API Key resource Azure OpenAI |
+| `AZURE_OPENAI_ENDPOINT` | kosong | Endpoint resource (hanya host-nya yang dipakai; endpoint project tidak dipakai) |
+| `TEXT_MODEL` | `gpt-5.4-mini` | Model rumus (effort `none`) |
+| `VISION_MODEL` | `gpt-5.4-mini` | Model tabel dan gambar (effort `none`) |
+| `QUIZ_MODEL` | `gpt-5.4-mini` | Model quiz (effort `low`) |
+| `QUIZ_VALIDATOR_MODEL` | `grok-4.3` | Model validator di `validate_soal`, keluarga model lain dari `QUIZ_MODEL` |
 | `OUTPUT_DIR` | `annotation/output` | Lokasi hasil ekstraksi MinerU |
 | `CACHE_DIR` | `annotation/.cache` | Lokasi cache hasil MLLM |
 | `TEXT_MAX_TOKENS` | `512` | Batas token panggilan teks |
-| `VISION_MAX_TOKENS` | `1024` | Batas token panggilan vision |
+| `VISION_MAX_TOKENS` | `1800` | Batas token panggilan vision |
 | `LLM_MAX_WORKERS` | `4` | Jumlah panggilan LLM paralel (anotasi dan quiz generator) |
 
 Nama variabel di atas generik (tidak berprefiks proyek) — cek tidak bentrok kalau proses ini jalan berdampingan dengan layanan lain di mesin yang sama.
 
 `PROMPT_VERSION` (di `config.py`, bukan env) ikut jadi cache key — naikkan nilainya kalau format prompt berubah, supaya cache lama tidak terpakai.
 
-`QUIZ_MODEL` beda dari `TEXT_MODEL`/`VISION_MODEL` karena reasoning matematika HOTS butuh model lebih kuat dari model default anotasi. Detail perbandingan ada di `CONTRACT.md` bagian 5.
+Semua fitur memakai `gpt-5.4-mini`; bedanya di `reasoning_effort`: `none` untuk anotasi (transkripsi rumus/tabel/gambar), `low` untuk quiz dan chatbot (`config.REASONING_EFFORT`). Effort `none` pada tugas menalar jatuh akurasinya (validasi soal 4/12 di nano, 9/12 di mini).
 
 ## Modul (annotation/)
 
@@ -93,7 +96,7 @@ Field tiap blok: `block_type`, `reading_order`, `page`, `readable_text`, `review
 - `table.py`: tabel -> linearisasi teks (model vision, dari gambar tabel + HTML hasil OCR).
 - `image.py`: gambar/grafik -> deskripsi (model vision).
 
-**llm.py** — klien OpenRouter (SDK openai). `complete_text`, `complete_vision`. Reasoning dimatikan (`extra_body={"reasoning": {"enabled": False}}`). Gambar dikirim sebagai data URI base64.
+**llm.py** — klien Azure OpenAI (SDK openai, endpoint `/openai/v1/`). `complete_text`, `complete_vision`, `complete_json`. `complete_vision` meminta JSON `{"pengamatan": ..., "deskripsi": ...}` (model mencatat apa yang tampak dulu, baru menulis deskripsi) dan mengembalikan `deskripsi`; format prompt-nya ada di `vision_prompt.py`. Batas token dikirim sebagai `max_completion_tokens` dan effort sebagai `reasoning_effort` (rumus/tabel/gambar `none`, quiz dan chatbot `low`). Penolakan filter keamanan Azure (HTTP 400 `content_filter`) diubah jadi `ContentFilterError` (turunan `ValueError`). Gambar dikirim sebagai data URI base64.
 
 **cache.py** — cache berbasis file, key = hash(konten, model, `PROMPT_VERSION`). `get(namespace, *parts)` / `put(namespace, value, *parts)`. Tulis atomik. Menghapus `.cache/` membuat panggilan MLLM dihitung ulang.
 
@@ -122,19 +125,11 @@ regenerate(block_type, feedback, *, source_markup="", image_path=None, caption="
 
 Mencegah loss-in-the-middle di `generate.py`: segmen kecil diberi teks penuh, segmen lain cuma lewat ringkasannya. Bukan RAG — tidak ada vektorisasi atau similarity search; scope materi sudah ditentukan guru.
 
-<<<<<<< HEAD
-**generate.py** — `generate_soal(segment, chapter_summary, bloom_level, feedback="") -> dict`. Hasilkan satu soal (JSON: `question_text`, `options`, `correct_option`, `langkah`, `kesimpulan`, `stimulus`) dari satu segmen + ringkasan bab. Tidak dicache. `feedback` diisi saat regenerasi dari koreksi guru (lihat `annotation_regenerate.py`). Token budget beda LOTS/HOTS (`LOTS_MAX_TOKENS`/`HOTS_MAX_TOKENS`).
-
-**validate.py** — `validate_soal(segment, question_text, options, correct_option, stimulus_text="") -> dict`. LLM re-derive jawaban independen dari sumber yang sama (blind ke hasil Generation), kembalikan `{matches, derived_option, derived_langkah}`. Tidak dicache. `matches=False` bukan keputusan otomatis — validator sendiri bisa berhalusinasi, jadi hasil ini jadi sinyal untuk guru (lihat `CONTRACT.md` bagian 5).
-
-**annotation_regenerate.py** — `compute_cluster(chapter_id, all_blocks, reading_order_start, reading_order_end, soal_bloom_levels, feedback) -> list[(soal_id, data, hasil_validasi)]`. Dipanggil backend (`QuizService.regenerate_cluster`) saat guru kasih feedback ke soal HOTS: regenerasi ulang seluruh cluster (soal itu + semua soal lain yang berbagi `soal_stimulus` sama). Tidak menyentuh DB -- backend yang membaca block dan menyimpan hasilnya.
-=======
 **generate.py** — `generate_soal(segment, chapter_summary, bloom_level, feedback="") -> dict`. Hasilkan satu soal (JSON: `question_text`, `options`, `correct_option`, `langkah`, `kesimpulan`, `stimulus`) dari satu segmen + ringkasan bab. Tidak dicache. Token budget beda LOTS/HOTS (`LOTS_MAX_TOKENS`/`HOTS_MAX_TOKENS`). Parameter `feedback` sudah tidak dipakai untuk regenerasi soal (itu sekarang lewat `quiz_regenerate.py`/`revise.py`, mengedit soal lama bukan generate dari nol) -- pemanggil saat ini (`quiz_pipeline.py`) selalu memanggilnya kosong.
 
-**validate.py** — `validate_soal(segment, question_text, options, correct_option, stimulus_text="") -> dict`. LLM re-derive jawaban independen dari sumber yang sama (blind ke hasil Generation), kembalikan `{matches, derived_option, derived_langkah}`. Tidak dicache. `matches=False` bukan keputusan otomatis — validator sendiri bisa berhalusinasi, jadi hasil ini jadi sinyal untuk guru (lihat `CONTRACT.md` bagian 5).
+**validate.py** — `validate_soal(segment, question_text, options, correct_option, stimulus_text="") -> dict`. LLM re-derive jawaban independen dari sumber yang sama (blind ke hasil Generation), pakai model dari keluarga lain dari generator (`QUIZ_VALIDATOR_MODEL` vs `QUIZ_MODEL`) -- validator satu keluarga dengan generator berisiko berkorelasi kesalahannya (self/family-preference bias di riset LLM-as-judge). Kembalikan `{matches, derived_option, derived_langkah}`. Tidak dicache. `matches=False` bukan keputusan otomatis — validator sendiri bisa berhalusinasi, jadi hasil ini jadi sinyal untuk guru (lihat `CONTRACT.md` bagian 5).
 
 **quiz_regenerate.py** — `compute_regeneration(chapter_id, all_blocks, reading_order_start, reading_order_end, stimulus_text, target_soal, sibling_soal, feedback) -> dict`. Dipanggil backend (`QuizService.regenerate_cluster`) saat guru kasih feedback ke satu soal HOTS. Mengedit soal itu berdasarkan konten lamanya (bukan generate dari nol -- lihat `revise.py`), dan LLM melapor balik apakah perbaikannya cukup di soal itu saja atau perlu sampai ke stimulus yang dipakai bersama beberapa soal. Kalau cukup satu soal, cuma itu yang tersentuh. Kalau stimulus ikut berubah, semua soal lain yang berbagi stimulus itu diperiksa ulang konsistensinya secara paralel -- yang isinya ternyata tidak berubah di-skip, tidak ikut disimpan ulang. Tidak menyentuh DB -- backend yang membaca block dan menyimpan hasilnya.
->>>>>>> 490dbb87391ac4c0813616856464ae7d21c81be5
 
 **quiz_pipeline.py** — `compute_for_chapter(chapter_id, blocks, hots_count, lots_count) -> list[(data, hasil_validasi)]`: segmentasi, ringkas, generate + validate tiap soal. Tidak menyentuh DB. Map (per segmen) dan Generation+Validation (per soal) dijalankan paralel sebesar `LLM_MAX_WORKERS` lewat `ThreadPoolExecutor`; urutan hasil tetap sama seperti sekuensial. Dipanggil backend lewat `backend/app/tasks/quiz_tasks.py` (async, taskiq).
 
@@ -165,13 +160,13 @@ siswa bertanya (sesi di-scope ke CLASSROOM, bukan satu chapter)
   -> simpan ke chat_messages (PostgreSQL) + histori hot di Redis (backend/app/domains/chatbot/services.py)
 ```
 
-Sama seperti quiz: modul `ai-services/chatbot/` murni komputasi + panggilan HTTP eksternal (OpenRouter, embedding provider, Wolfram, search API) -- tidak menyentuh PostgreSQL. `search_module` butuh pgvector, jadi backend menyuntikkan hasilnya lewat callable `search_module_executor` (`backend/app/domains/chatbot/sync_search.py`), bukan lewat data statis seperti `blocks` di quiz -- karena tool calling di sini interaktif (LLM yang memutuskan kapan dan berapa kali memanggil).
+Sama seperti quiz: modul `ai-services/chatbot/` murni komputasi + panggilan HTTP eksternal (Azure OpenAI, embedding provider, Wolfram, search API) -- tidak menyentuh PostgreSQL. `search_module` butuh pgvector, jadi backend menyuntikkan hasilnya lewat callable `search_module_executor` (`backend/app/domains/chatbot/sync_search.py`), bukan lewat data statis seperti `blocks` di quiz -- karena tool calling di sini interaktif (LLM yang memutuskan kapan dan berapa kali memanggil).
 
 ## Modul (chatbot/)
 
 **chunk.py** — `build_chunks(chapter_id, blocks) -> list[Chunk]`. SATU block DB = SATU chunk/vector -- tidak digabung beberapa block jadi satu blob, karena block sudah tersegmentasi rapi dari pipeline anotasi. Block non-heading diberi prefix heading terdekat sebagai konteks.
 
-**llm_ext.py** — `embed_texts`/`embed_text` (client embedding terpisah, lihat `EMBEDDING_*` di config), `chat_with_tools` (tool calling lewat OpenRouter, reuse client `annotation/llm.py`).
+**llm_ext.py** — `embed_texts`/`embed_text` (client embedding terpisah, lihat `EMBEDDING_*` di config), `chat_with_tools` (tool calling lewat Azure OpenAI, reuse client `annotation/llm.py`).
 
 **tools.py** — skema tool (format OpenAI function calling): `search_module`, `search_oer`, `query_wolfram_alpha`, `search_academic_web`, `compose_answer`.
 

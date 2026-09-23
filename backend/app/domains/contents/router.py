@@ -61,8 +61,11 @@ async def bulk_regenerate_special(
     content_service: ContentService = Depends(get_content_service),
     job_service: JobService = Depends(get_job_service)
 ):
-    result = await content_service.regenerate_special_blocks(payload, teacher.profile_id, job_service)
-    return Response(message="Special blocks regenerated via AI", data=result)
+    try:
+        result = await content_service.regenerate_special_blocks(payload, teacher.profile_id, job_service)
+        return Response(message="Special blocks regenerated via AI", data=result)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 # ==========================================
 # FASE ROUTER

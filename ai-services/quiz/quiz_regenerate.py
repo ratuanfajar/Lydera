@@ -5,9 +5,6 @@ from quiz.parallel import parallel_map
 
 
 def _soal_content_equal(original: dict, data: dict) -> bool:
-    """True kalau hasil revisi/recheck sama persis dengan soal aslinya -- dipakai supaya soal yang
-    ternyata tidak terdampak (dikembalikan apa adanya) tidak ikut divalidasi ulang atau disentuh
-    di DB (lihat `compute_regeneration`)."""
     return (
         original["question_text"] == data["question_text"]
         and original["options"] == data["options"]
@@ -20,22 +17,6 @@ def _soal_content_equal(original: dict, data: dict) -> bool:
 def compute_regeneration(chapter_id, all_blocks, reading_order_start, reading_order_end,
                           stimulus_text, target_soal: dict, sibling_soal: list[dict],
                           feedback: str) -> dict:
-    """Edit satu soal yang dikritik guru (bukan generate ulang dari nol -- lihat `revise.py`).
-    Kalau LLM menandai perubahan perlu sampai ke stimulus, stimulus direvisi lalu SEMUA soal di
-    cluster (termasuk target) di-recheck paralel terhadap stimulus baru. Kalau tidak, cuma
-    target_soal yang tersentuh -- stimulus dan soal lain di cluster sama sekali tidak diproses.
-
-    Soal yang hasil recheck-nya identik dengan versi lama (tidak terdampak, `revise.py` diminta
-    kembalikan apa adanya) di-skip total -- tidak divalidasi ulang, tidak masuk `soal_updates`,
-    sehingga pemanggil (backend) tidak menyentuhnya sama sekali di DB. Ini penting terutama di
-    jalur stimulus-berubah: dari beberapa soal yang berbagi satu stimulus, biasanya cuma sebagian
-    yang benar-benar butuh penyesuaian konten.
-
-    `target_soal`/`sibling_soal`: dict {id, question_text, options, correct_option, langkah,
-    kesimpulan}, dibangun pemanggil dari ORM object/row DB. Return:
-    {"new_stimulus_text": str|None, "soal_updates": [(soal_id, data, hasil_validasi), ...]} --
-    new_stimulus_text None berarti stimulus tidak berubah.
-    """
     seg_blocks = [b for b in all_blocks if reading_order_start <= b["reading_order"] <= reading_order_end]
     seg = segment_module.Segment(
         chapter_id=chapter_id,
@@ -52,10 +33,6 @@ def compute_regeneration(chapter_id, all_blocks, reading_order_start, reading_or
         val = validate.validate_soal(seg, edit["question_text"], edit["options"], edit["correct_option"], stimulus_text)
         return {"new_stimulus_text": None, "soal_updates": [(target_soal["id"], edit, val)]}
 
-    # Stimulus perlu berubah -- revisi stimulus, lalu recheck SEMUA soal di cluster (termasuk
-    # target) terhadap stimulus baru. Field soal dari `edit` di atas diabaikan sepenuhnya di sini
-    # (walau LLM diminta tidak mengubahnya saat needs_stimulus_change=true, kita tidak bergantung
-    # pada kepatuhan itu -- target diperlakukan identik dengan sibling, lewat recheck yang sama).
     new_stimulus_text = revise.revise_stimulus(seg, stimulus_text, feedback)
     all_soal = [target_soal] + sibling_soal
     rechecked = parallel_map(lambda s: revise.recheck_soal_for_new_stimulus(seg, new_stimulus_text, s), all_soal)
@@ -71,8 +48,6 @@ def compute_regeneration(chapter_id, all_blocks, reading_order_start, reading_or
 
 
 def regenerate_cluster(conn, soal_id, feedback) -> dict:
-    """Versi psycopg (CLI/testing manual): baca soal + stimulus + cluster dari DB, lalu panggil
-    `compute_regeneration`."""
     target_row = conn.execute("SELECT * FROM soal WHERE id = %s", (soal_id,)).fetchone()
     if target_row is None:
         raise ValueError(f"soal_id={soal_id} tidak ditemukan")

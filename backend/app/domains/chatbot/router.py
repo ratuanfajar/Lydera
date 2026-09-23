@@ -9,7 +9,7 @@ from app.core.route import WrappedRoute
 from app.core.security import Roles
 from app.utils.role import Role
 from app.domains.chatbot.depedencies import get_chatbot_service
-from app.core.exceptions import ForbiddenException
+from app.core.exceptions import BadRequestException, ForbiddenException
 from app.domains.chatbot.schemas import (
     ChatAnswerResponse,
     ChatAskRequest,
@@ -102,7 +102,10 @@ async def ask_question(
     payload: Annotated[ChatAskRequest, Body()],
     service: ChatbotService = Depends(get_chatbot_service),
 ):
-    result = await service.ask(session_id, student.profile_id, payload.question)
+    try:
+        result = await service.ask(session_id, student.profile_id, payload.question)
+    except ValueError as e:
+        raise BadRequestException(str(e))
     return Response(
         message=get_response_message(),
         data={

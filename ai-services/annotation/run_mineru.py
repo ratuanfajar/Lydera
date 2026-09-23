@@ -59,15 +59,7 @@ async def run_async(pdf: Path, out: Path, *, backend="pipeline", method="auto", 
     device="auto", vram=None, keep_debug=False,
     progress_callback=None
 ) -> int:
-    """Jalankan MinerU secara asynchronous dengan progress stream, lewat subprocess CLI.
-
-    Catatan: beda dari `run()` di bawah, fungsi ini masih memanggil `python -m mineru.cli.client`
-    lewat subprocess (bukan `do_parse` in-process) karena progress per-persentase diambil dari
-    parsing baris tqdm di stderr proses anak -- sesuatu yang tidak tersedia kalau MinerU dipanggil
-    langsung sebagai fungsi Python di proses yang sama. Konsekuensinya: fungsi ini masih kena
-    masalah reload model MinerU dari nol tiap window (lihat docstring `run()`) karena tiap panggilan
-    tetap subprocess baru. Belum diporting ke pendekatan in-process `run()`.
-    """
+    """Jalankan MinerU secara asynchronous dengan progress stream."""
     pdf = Path(pdf).resolve()
     out = Path(out).resolve()
     if not pdf.exists():
@@ -148,18 +140,7 @@ async def run_async(pdf: Path, out: Path, *, backend="pipeline", method="auto", 
 def run(pdf: Path, out: Path, *, backend="pipeline", method="auto", lang=None,
         start=None, end=None, no_formula=False, no_table=False,
         device="auto", vram=None, keep_debug=False) -> int:
-    """Jalankan MinerU sekali pada rentang halaman, in-process lewat `mineru.cli.common.do_parse`.
-
-    Dulu ini `subprocess.run(["-m", "mineru.cli.client", ...])`, yang ternyata (dikonfirmasi
-    langsung dari source mineru) menghidupkan lagi satu server FastAPI lokal per panggilan lewat
-    subprocess kedua, cuma buat memproses satu window lalu dimatikan lagi -- artinya seluruh model
-    MinerU (layout, OCR, formula, table) di-load ulang dari nol tiap window. `do_parse` adalah
-    fungsi Python biasa yang dipakai server itu sendiri; model-nya di-cache sebagai singleton di
-    dalam proses (lihat mineru/backend/pipeline/model_init.py -- `AtomModelSingleton`/
-    `MineruPipelineModel` pakai `__new__` + dict `_models`), jadi selama dipanggil dari proses yang
-    sama (annotation_worker.py, yang memang didesain long-running), window kedua dan seterusnya dalam satu bab
-    -- bahkan bab berikutnya -- pakai model yang sudah ke-load, tidak reload lagi.
-    """
+    """Jalankan MinerU sekali pada rentang halaman."""
     pdf = Path(pdf).resolve()
     out = Path(out).resolve()
     if not pdf.exists():

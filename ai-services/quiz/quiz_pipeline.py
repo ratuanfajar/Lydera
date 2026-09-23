@@ -13,19 +13,7 @@ from parallel import parallel_map
 
 
 def compute_for_chapter(chapter_id, blocks, hots_count, lots_count, on_progress=None) -> list[tuple[dict, dict]]:
-    """Jalankan Chain 0-4 untuk satu bab, tanpa menyentuh DB. Mengembalikan list (data, hasil_validasi)
-    per soal -- pemanggil (`backend/app/tasks/quiz_tasks.py`) yang menyimpan hasilnya.
-
-    `blocks` iterable of dict/row dengan field reading_order, block_type, readable_text (urut
-    reading_order), dibaca pemanggil dari DB.
-
-    Map (ringkas tiap segmen) dan Generation+Validation (tiap soal) dijalankan paralel -- keduanya
-    independen satu sama lain dalam satu bab (segmen tidak saling butuh; soal cuma butuh segmen +
-    chapter_summary yang sudah pasti selesai lebih dulu). Reduce tetap satu panggilan tunggal
-    (butuh semua ringkasan Map bab ini).
-
-    `on_progress`: Callback opsional yang dipanggil setiap kali 1 soal selesai.
-    """
+    """Jalankan Chain 0-4 untuk satu bab. Mengembalikan list (data, hasil_validasi) per soal."""
     segments = segment.build_segments(chapter_id, blocks)
     if not segments:
         raise RuntimeError(f"chapter {chapter_id}: tidak ada sub-bab berpola 'A. ...' untuk dijadikan soal")
@@ -78,8 +66,21 @@ def _generate_and_validate(item: tuple, chapter_summary: str) -> tuple[dict, dic
     return data, result
 
 
+LOTS_LEVELS = (1, 2, 3)
+HOTS_LEVELS = (4, 5)
+
+
 def _allocate(segments, hots_count, lots_count) -> list[tuple]:
-    """Sebar target soal ke segmen secara round-robin. LOTS -> Bloom C2, HOTS -> Bloom C5 (default)."""
-    plan = [(segments[i % len(segments)], 2) for i in range(lots_count)]
-    plan += [(segments[i % len(segments)], 5) for i in range(hots_count)]
+    """Tiap segmen menghasilkan soal di SEMUA level dalam band-nya dulu (LOTS C1-C3, HOTS C4-C5)
+    sebelum pindah ke segmen berikutnya -- satu segmen mencakup beberapa level kognitif, bukan
+    satu segmen terkunci satu level. C6 (mencipta) di-drop -- MCQ 4 opsi tetap secara struktural
+    tidak bisa menguji "create" murni, opsinya sudah ditulis lebih dulu oleh generator, bukan
+    disusun siswa (lihat evaluasi Bloom-alignment)."""
+    plan = _cross_product(segments, LOTS_LEVELS, lots_count)
+    plan += _cross_product(segments, HOTS_LEVELS, hots_count)
     return plan
+
+
+def _cross_product(segments, levels, count) -> list[tuple]:
+    pairs = [(seg, level) for seg in segments for level in levels]
+    return [pairs[i % len(pairs)] for i in range(count)]

@@ -39,9 +39,7 @@ def build_prompt(segment, question_text: str, options: dict, correct_option: str
 def evaluate_scratchwork(segment, question_text: str, options: dict, correct_option: str,
                           correct_langkah: list[str], kesimpulan: str,
                           student_option: str, student_langkah: list[str]) -> dict:
-    """Chain 5: bandingkan langkah pengerjaan siswa terhadap langkah penyelesaian yang benar,
-    untuk soal yang dijawab salah. Tidak dicache -- hasilnya personal per siswa per attempt.
-    Pemanggil (nanti: backend) yang memastikan ini cuma dipanggil saat student_option != correct_option."""
+    """Chain 5: bandingkan langkah pengerjaan siswa terhadap langkah penyelesaian yang benar untuk soal yang dijawab salah"""
     prompt = build_prompt(segment, question_text, options, correct_option, correct_langkah,
                            kesimpulan, student_option, student_langkah)
     return llm.complete_json(

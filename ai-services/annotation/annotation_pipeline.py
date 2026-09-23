@@ -49,7 +49,6 @@ def main() -> int:
         print(f"[ERROR] folder output tidak ada: {outputs}", file=sys.stderr)
         return 2
 
-    # Hanya jalankan AI, tidak ada lagi logika create_module atau create_chapter di sini!
     print(f"[INFO] Mulai memproses anotasi untuk {outputs}...")
     hasil_json = run(outputs)
     

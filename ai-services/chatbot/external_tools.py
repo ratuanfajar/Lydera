@@ -1,7 +1,3 @@
-"""Implementasi tool eksternal: Wolfram Alpha (Full Results API, tier gratis), OER search, dan
-web search akademik (domain-filtered). Semua panggil HTTP murni, tidak menyentuh DB -- konsisten
-dengan aturan ai-services/CONTRACT.md."""
-
 from __future__ import annotations
 
 import httpx
@@ -12,8 +8,6 @@ from chatbot import trusted_domains
 
 TIMEOUT = 15.0
 
-# Katalog OER yang di-support langsung (dicari lewat masing-masing scoping-nya, bukan search engine
-# generik) -- lihat trusted_domains.TIER2_DOMAINS untuk daftar domain yang diizinkan tampil ke siswa.
 _OER_SITES = " OR ".join(f"site:{d}" for d in sorted(trusted_domains.TIER2_DOMAINS))
 
 

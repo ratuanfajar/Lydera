@@ -1,11 +1,3 @@
-"""Skema tool (format OpenAI function calling, didukung OpenRouter) untuk agent chatbot.
-
-`search_module` TIDAK diimplementasikan di sini -- itu butuh akses ke pgvector di PostgreSQL,
-yang jadi tanggung jawab backend (lihat CONTRACT.md: ai-services tidak menyentuh DB). Backend
-menyuntikkan hasil pencarian modul lewat callable `search_module_executor` ke `agent.run()`.
-Tool eksternal (Wolfram/OER/web) murni HTTP, jadi diimplementasikan langsung di `external_tools.py`.
-"""
-
 TOOLS_SCHEMA = [
     {
         "type": "function",
@@ -134,6 +126,4 @@ TOOLS_SCHEMA = [
     },
 ]
 
-# Tool yang boleh dipanggil LLM murni lewat HTTP, tanpa DB (search_module dikecualikan --
-# dipasok lewat search_module_executor yang diinjeksi backend).
 EXTERNAL_TOOL_NAMES = {"query_wolfram_alpha", "search_oer", "search_academic_web"}

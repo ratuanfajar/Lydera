@@ -1,0 +1,314 @@
+[
+  {
+    "bab": "bab1",
+    "bloom_level": 1,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "C",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "C"
+    },
+    "voted": "C",
+    "matches_majority": false,
+    "question": "Dalam materi fungsi, himpunan yang menyatakan semua kemungki"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 2,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Perhatikan pernyataan berikut tentang suatu fungsi.\\n\\n\"Doma"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 3,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Manakah relasi berikut yang merupakan fungsi?"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 1,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Manakah pernyataan yang tepat tentang syarat dua fungsi f da"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 2,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Manakah pernyataan yang paling tepat tentang syarat dua fung"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 3,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "B"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Jika f(x) = 3x - 2 dan g(x) = x + 4, tentukan nilai (f ∘ g)("
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 4,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Perhatikan data suhu mesin pada tiap menit berikut: (1, 40),"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 5,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Berdasarkan data pada stimulus, manakah strategi pemeriksaan"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 4,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Dalam konteks pembelian meja belajar, fungsi t(x) menyatakan"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 5,
+    "generator_answer": "B",
+    "derived": {
+      "grok-4.3": "B",
+      "DeepSeek-V3.2": "B",
+      "Llama-3.3-70B-Instruct": "B"
+    },
+    "voted": "B",
+    "matches_majority": true,
+    "question": "Di sebuah toko pakaian, harga awal sebuah jaket adalah x rup"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 4,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Perhatikan stimulus berikut.\\n\\nBerdasarkan tabel hubungan j"
+  },
+  {
+    "bab": "bab1",
+    "bloom_level": 5,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Sebuah toko menerapkan diskon 40% lalu potongan harga Rp15.0"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 1,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Manakah pernyataan yang sesuai dengan Teorema Thales pada li"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 2,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Perhatikan dua sudut pada lingkaran yang menghadap busur yan"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 3,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Pada sebuah lingkaran, sudut keliling yang menghadap busur y"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 1,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Manakah pernyataan yang paling tepat tentang garis singgung "
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 2,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Pernyataan yang paling tepat tentang garis singgung lingkara"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 3,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Sebuah lingkaran berpusat di O memiliki jari-jari 9 cm. Titi"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 4,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Pada kolam berbentuk lingkaran, titik B dan C adalah ujung b"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 5,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Pada gambar, AB adalah diameter lingkaran dan titik C berada"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 4,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Pada model cakrawala di stimulus, O adalah pusat bumi, B tit"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 5,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Bram ingin menentukan jarak cakrawala yang terlihat dari rua"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 4,
+    "generator_answer": "B",
+    "derived": {
+      "grok-4.3": "B",
+      "DeepSeek-V3.2": "B",
+      "Llama-3.3-70B-Instruct": "B"
+    },
+    "voted": "B",
+    "matches_majority": true,
+    "question": "Berdasarkan stimulus, pernyataan mana yang paling tepat tent"
+  },
+  {
+    "bab": "bab2",
+    "bloom_level": 5,
+    "generator_answer": "A",
+    "derived": {
+      "grok-4.3": "A",
+      "DeepSeek-V3.2": "A",
+      "Llama-3.3-70B-Instruct": "A"
+    },
+    "voted": "A",
+    "matches_majority": true,
+    "question": "Pada papan nama kafe berbentuk lingkaran, ada dua tali busur"
+  }
+]

@@ -1,8 +1,3 @@
-"""Grounding check: pastikan `evidence` yang diklaim LLM benar-benar ada di konten yang
-dikembalikan tool call, bukan kutipan karangan. Reuse semangat `quiz/validate.py` -- di sana
-jawaban soal di-derive ulang independen lalu dibandingkan; di sini kutipan dicocokkan balik ke
-sumber mentah, bukan dipercaya begitu saja dari output LLM."""
-
 from __future__ import annotations
 
 import re
@@ -67,14 +62,11 @@ def verify_citations(sources: list[dict], tool_outputs: dict[str, str]) -> list[
         raw_content = _lookup_raw_content(source.get("reference", ""), tool_outputs)
         source = {**source, "verified": fuzzy_contains(source.get("evidence", ""), raw_content)}
 
-        # trust_tier DIHITUNG ULANG dari reference (URL), bukan dipercaya dari isian model --
-        # model sering lupa/salah nyalin nilai yang sebenarnya sudah kita hitung sendiri di
-        # trusted_domains.py saat tool dipanggil.
+        # trust_tier DIHITUNG ULANG dari reference (URL)
         if source.get("source_type") in ("web", "oer"):
             source["trust_tier"] = trusted_domains.trust_tier(source.get("reference", ""))
         elif source.get("source_type") == "modul":
             source["trust_tier"] = None
-        # wolfram_alpha: biarkan apa adanya (bukan link, tidak relevan trust_tier domain)
-
+            
         verified.append(source)
     return verified

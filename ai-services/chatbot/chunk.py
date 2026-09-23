@@ -1,13 +1,5 @@
-"""Konversi tiap block jadi satu vector langsung -- SATU block = SATU embedding, bukan digabung
-beberapa block jadi satu chunk artifisial. `blocks` sudah datang tersegmentasi rapi dari pipeline
-anotasi (satu block_type = satu unit makna: satu heading, satu paragraf, satu rumus, satu tabel,
-satu gambar -- lihat `annotation/preprocess.py`), jadi tidak perlu chunking tambahan di atas itu,
-dan tidak dibedakan perlakuan per block_type (heading/text/formula/table/image semua diperlakukan
-sama, cuma teksnya beda).
-
-Satu-satunya "pemrosesan" di sini: block NON-heading diberi prefix heading terdekat sebagai
-konteks, supaya embedding-nya tidak kosong makna kalau block-nya pendek/berdiri sendiri (mis. satu
-kalimat definisi tanpa konteks sub-bab apa dia berasal, bakal susah ditemukan lewat similarity)."""
+"""Konversi block jadi chunk untuk embedding: semua block di bawah satu heading digabung jadi
+satu Chunk, bukan satu block satu Chunk (lihat evaluasi retrieval chatbot)."""
 
 from __future__ import annotations
 
@@ -26,27 +18,35 @@ class Chunk:
 
 def build_chunks(chapter_id: int, blocks: list[dict]) -> list[Chunk]:
     """`blocks`: dict dengan field id, block_type, readable_text, reading_order, urut reading_order.
-    Satu block DB -> satu Chunk (satu vector nanti). `heading` dilacak berjalan sebagai konteks,
-    bukan sebagai batas penggabungan."""
-    current_heading = "Pembuka"
-    chunks: list[Chunk] = []
+    Batas chunk = tiap heading; block sebelum heading pertama masuk chunk "Pembuka"."""
+    sections: list[dict] = []
+    current: dict | None = None
 
     for block in blocks:
         if block["block_type"] == "heading":
-            current_heading = block["readable_text"]
-            text = block["readable_text"]
-        else:
-            text = f"{current_heading}: {block['readable_text']}"
+            if current and current["block_ids"]:
+                sections.append(current)
+            current = {"heading": block["readable_text"], "block_ids": [block["id"]], "texts": [],
+                      "reading_order_start": block["reading_order"], "reading_order_end": block["reading_order"]}
+            continue
+        if current is None:
+            current = {"heading": "Pembuka", "block_ids": [], "texts": [],
+                      "reading_order_start": block["reading_order"], "reading_order_end": block["reading_order"]}
+        current["block_ids"].append(block["id"])
+        current["texts"].append(block["readable_text"])
+        current["reading_order_end"] = block["reading_order"]
 
-        chunks.append(
-            Chunk(
-                chapter_id=chapter_id,
-                heading=current_heading,
-                block_ids=[block["id"]],
-                reading_order_start=block["reading_order"],
-                reading_order_end=block["reading_order"],
-                text=text,
-            )
+    if current and current["block_ids"]:
+        sections.append(current)
+
+    return [
+        Chunk(
+            chapter_id=chapter_id,
+            heading=s["heading"],
+            block_ids=s["block_ids"],
+            reading_order_start=s["reading_order_start"],
+            reading_order_end=s["reading_order_end"],
+            text=f"{s['heading']}: " + " ".join(s["texts"]) if s["texts"] else s["heading"],
         )
-
-    return chunks
+        for s in sections
+    ]

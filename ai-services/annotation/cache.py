@@ -15,7 +15,10 @@ def put(namespace: str, value: str, *parts: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(f".{os.getpid()}.{id(value)}.tmp")
     tmp.write_text(value, encoding="utf-8")
-    os.replace(tmp, path)
+    try:
+        os.replace(tmp, path)
+    except PermissionError:
+        tmp.unlink(missing_ok=True)
 
 
 def _key(parts: tuple[str, ...]) -> str:

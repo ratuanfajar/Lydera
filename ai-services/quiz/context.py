@@ -1,6 +1,6 @@
-import cache
+from annotation import cache
 from annotation import config
-import llm
+from annotation import llm
 
 SEGMENT_SYSTEM = (
     "Anda meringkas satu bagian dari buku matematika SMA. Tulis 1-2 kalimat ringkas dalam Bahasa "

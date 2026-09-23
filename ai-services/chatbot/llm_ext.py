@@ -1,8 +1,3 @@
-"""Ekstensi client LLM untuk chatbot: embeddings + chat completion dengan tool calling.
-
-Reuse `annotation/llm.py` (client OpenRouter + retry) untuk completion biasa, tapi embeddings
-dipisah ke client sendiri karena base_url/model beda (lihat config.EMBEDDING_*)."""
-
 import time
 from functools import lru_cache
 
@@ -34,15 +29,18 @@ def _retry(fn, **kwargs):
 
 
 def embed_texts(texts: list[str], model: str | None = None) -> list[list[float]]:
-    """Embed sekumpulan teks sekaligus (batch), balikkan satu vector per teks, urutan terjaga."""
+    """Embed sekumpulan teks (dipecah per EMBEDDING_BATCH_SIZE), balikkan satu vector per teks, urutan terjaga."""
     if not texts:
         return []
-    response = _retry(
-        _embedding_client().embeddings.create,
-        model=model or config.EMBEDDING_MODEL,
-        input=texts,
-    )
-    return [item.embedding for item in response.data]
+    vectors: list[list[float]] = []
+    for start in range(0, len(texts), config.EMBEDDING_BATCH_SIZE):
+        response = _retry(
+            _embedding_client().embeddings.create,
+            model=model or config.EMBEDDING_MODEL,
+            input=texts[start:start + config.EMBEDDING_BATCH_SIZE],
+        )
+        vectors.extend(item.embedding for item in response.data)
+    return vectors
 
 
 def embed_text(text: str, model: str | None = None) -> list[float]:
@@ -61,8 +59,8 @@ def chat_with_tools(
     response = _retry(
         annotation_llm.client().chat.completions.create,
         model=model or config.CHAT_MODEL,
-        max_tokens=max_tokens or config.CHAT_MAX_TOKENS,
-        extra_body={"reasoning": {"enabled": False}},
+        max_completion_tokens=max_tokens or config.CHAT_MAX_TOKENS,
+        reasoning_effort=config.REASONING_EFFORT,
         messages=messages,
         tools=tools,
         tool_choice=tool_choice,

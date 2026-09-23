@@ -1,4 +1,4 @@
-from annotation import config, cache, llm
+from annotation import config, cache, llm, vision_prompt
 
 SYSTEM = (
     "Anda membaca tabel dari buku matematika untuk siswa tunanetra. Berdasarkan gambar "
@@ -9,7 +9,7 @@ SYSTEM = (
     "jangan mulai dengan 'Berikut' atau 'Berdasarkan', dan jangan menyebut 'tabel tersebut', "
     "'HTML', atau 'gambar yang diberikan'. Jangan gunakan markdown, tanda bintang, atau "
     "tanda pagar. Keluarkan hanya teks bacaannya."
-)
+) + vision_prompt.STRUCTURED_SUFFIX
 
 
 def linearize_table(block) -> str:

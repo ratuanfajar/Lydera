@@ -1,4 +1,4 @@
-from annotation import config, llm, cache
+from annotation import config, llm, cache, vision_prompt
 
 SYSTEM = (
     "Anda mendeskripsikan gambar dari buku matematika SMA untuk siswa tunanetra. "
@@ -9,7 +9,7 @@ SYSTEM = (
     "menunjukkan', 'Berikut', atau 'Berdasarkan gambar', dan jangan menyebut proses OCR "
     "atau HTML. Jangan gunakan markdown, tanda bintang, atau tanda pagar. Keluarkan hanya "
     "deskripsinya."
-)
+) + vision_prompt.FOLLOW_IMAGE_RULES + vision_prompt.STRUCTURED_SUFFIX
 
 
 def caption_image(block, context: str = "") -> str:

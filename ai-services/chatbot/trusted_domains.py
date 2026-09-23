@@ -1,9 +1,3 @@
-"""Ranking domain untuk `search_academic_web`/`search_oer` -- SEMUA hasil boleh tampil (tidak ada
-yang dibuang), tapi diberi label kepercayaan (`trust_tier`) dan diurutkan: `.edu`/`.gov`/arxiv (tier
-1) paling diutamakan, katalog OER kurasi manual (tier 2) berikutnya, sisanya -- termasuk Wikipedia,
-blog, situs edukasi umum -- masuk tier 3 (paling rendah, tapi tetap ditampilkan dengan label jelas
-supaya siswa/guru tahu itu belum sepenuh nya diverifikasi)."""
-
 from __future__ import annotations
 
 import re
@@ -13,10 +7,10 @@ from urllib.parse import urlparse
 # mencakup banyak subdomain universitas/pemerintah yang tidak mungkin didaftar satu-satu).
 TIER1_PATTERNS = [
     re.compile(r"(^|\.)[\w-]+\.edu$"),
-    re.compile(r"(^|\.)[\w-]+\.edu\.\w{2,3}$"),   # mis. .edu.au
-    re.compile(r"(^|\.)[\w-]+\.ac\.id$"),          # universitas Indonesia
+    re.compile(r"(^|\.)[\w-]+\.edu\.\w{2,3}$"),   
+    re.compile(r"(^|\.)[\w-]+\.ac\.id$"),        
     re.compile(r"(^|\.)[\w-]+\.gov$"),
-    re.compile(r"(^|\.)[\w-]+\.go\.id$"),          # pemerintah Indonesia (kemdikbud.go.id, dst)
+    re.compile(r"(^|\.)[\w-]+\.go\.id$"),        
     re.compile(r"^arxiv\.org$"),
     re.compile(r"(^|\.)ncbi\.nlm\.nih\.gov$"),
 ]
@@ -32,9 +26,7 @@ TIER2_DOMAINS = {
 }
 
 # Tier 3 = catch-all -- domain apapun yang tidak cocok tier 1/2 (Wikipedia, blog, situs edukasi
-# umum seperti Zenius/RuangGuru/dst). Tidak ada whitelist di sini karena memang menampung semuanya.
-
-
+# umum seperti Zenius/RuangGuru/dst).
 def domain_of(url: str) -> str:
     return (urlparse(url).netloc or url).lower().removeprefix("www.")
 
