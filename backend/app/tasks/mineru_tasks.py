@@ -24,17 +24,21 @@ MAX_RETRIES = 3
 
 async def publish_progress(redis: Redis, job_id: int, status: str, progress:int, message: str, annotation_paths: list[str] = []):
     """Helper to publish real-time progress events to Redis Pub/Sub with monotonic progress safeguard."""
-    redis_key = f"job_last_progress:{job_id}"
+    if annotation_paths is None:
+        annotation_paths = []
+
+    redis_progress_key = f"job_last_progress:{job_id}"
+    redis_state_key = f"job_last_state:{job_id}"
 
     if status in ("retrying", "queued"):
-        await redis.set(redis_key, 0, ex=3600)
         p_to_send = 0
+        await redis.delete(redis_progress_key)
     else:
-        last_p_raw = await redis.get(redis_key)
-        last_p = int(last_p_raw) if last_p_raw else 0
+        last_p_raw = await redis.get(redis_progress_key)
+        last_p = int(last_p_raw) if last_p_raw is not None else 0
         
         p_to_send = max(progress, last_p)
-        await redis.set(redis_key, p_to_send, ex=3600)
+        await redis.set(redis_progress_key, p_to_send, ex=3600)
 
     payload = json.dumps({
         "job_id": job_id,
@@ -44,6 +48,7 @@ async def publish_progress(redis: Redis, job_id: int, status: str, progress:int,
         "annotation_paths":annotation_paths
     })
 
+    await redis.set(redis_state_key, payload, ex=3600)
     await redis.publish(f"job_progress:{job_id}", payload)
 
 @broker.task

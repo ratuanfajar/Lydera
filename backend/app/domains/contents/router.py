@@ -296,21 +296,32 @@ response_class=StreamingResponse,
 )
 async def stream_job_progress(job_id: int):
     """Real-time SSE stream for monitoring MinerU job progress."""
-    async def event_generator(
-            
-    ):
+    async def event_generator():
         redis: Redis = get_redis_client()
         pubsub = redis.pubsub()
         channel_name = f"job_progress:{job_id}"
+        state_key = f"job_last_state:{job_id}"
         
         await pubsub.subscribe(channel_name)
 
         try:
+            last_state = await redis.get(state_key)
+            if last_state:
+                state_str = last_state.decode('utf-8') if isinstance(last_state, bytes) else last_state
+                yield f"data: {state_str}\n\n"
+
+                # If the job completed or failed before the stream opened, terminate stream early
+                parsed_initial = json.loads(state_str)
+                if parsed_initial.get("status") in ("done", "failed"):
+                    return
+                
             while True:
                 # Listen for messages with a timeout to allow heartbeat checks
                 message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
                 if message and message["type"] == "message":
                     data = message["data"]
+                    if isinstance(data, bytes):
+                        data = data.decode("utf-8")
                     yield f"data: {data}\n\n"
 
                     # Parse message to stop streaming when complete or failed
