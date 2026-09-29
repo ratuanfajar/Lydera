@@ -323,7 +323,7 @@ async def stream_job_progress(job_id: int):
         finally:
             await pubsub.unsubscribe(channel_name)
             await pubsub.close()
-            await redis.aclose()
+
 
     return StreamingResponse(
         event_generator(), 

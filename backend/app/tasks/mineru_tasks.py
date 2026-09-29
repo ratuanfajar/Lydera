@@ -22,25 +22,24 @@ from app.tasks.chatbot_tasks import reindex_chapter_task
 
 MAX_RETRIES = 3
 
-_last_progress_map: dict[int, int] = {}
-
 async def publish_progress(redis: Redis, job_id: int, status: str, progress:int, message: str, annotation_paths: list[str] = []):
     """Helper to publish real-time progress events to Redis Pub/Sub with monotonic progress safeguard."""
-    global _last_progress_map
+    redis_key = f"job_last_progress:{job_id}"
 
-    if status == "retrying":
-        _last_progress_map[job_id] = 0
+    if status in ("retrying", "queued"):
+        await redis.set(redis_key, 0, ex=3600)
+        p_to_send = 0
     else:
-        last_p = _last_progress_map.get(job_id, 0)
-        if progress < last_p:
-            progress = last_p
-        else:
-            _last_progress_map[job_id] = progress
+        last_p_raw = await redis.get(redis_key)
+        last_p = int(last_p_raw) if last_p_raw else 0
+        
+        p_to_send = max(progress, last_p)
+        await redis.set(redis_key, p_to_send, ex=3600)
 
     payload = json.dumps({
         "job_id": job_id,
         "status": status,
-        "progress": progress,
+        "progress": p_to_send,
         "message": message,
         "annotation_paths":annotation_paths
     })
@@ -55,7 +54,6 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
         repo = JobRepository(db)
         job = await db.get(Job, job_id)
         if not job:
-            await redis.aclose()
             return
 
         await repo.update_job_status(job, "running")
@@ -154,5 +152,4 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
                 await repo.update_job_status(job, "failed", error=str(exc))
                 await db.commit()
                 await publish_progress(redis, job_id, "failed", 0, f"Final Failure: {str(exc)}")
-        finally:
-            await redis.aclose()
+
