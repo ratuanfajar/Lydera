@@ -26,6 +26,7 @@ from app.domains.quizz.models.quiz_progress import QuizReviewStatus
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.utils import paths
 from app.domains.quizz.schemas.step_request import AddStepRequest
+from app.domains.quizz.schemas.soal_response import SoalOpsiResponse
 
 paths.setup()
 
@@ -676,6 +677,7 @@ class QuizService:
                 )
             results.append(QuizResultItem(
                 soal_id=soal.id,
+                options=[SoalOpsiResponse(label=o.label, opsi_text=o.opsi_text) for o in sorted(soal.opsi, key=lambda o: o.label)],
                 question_text=soal.question_text,
                 selected_option=jawaban.selected_option if jawaban else None,
                 correct_option=soal.correct_option,

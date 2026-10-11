@@ -236,7 +236,7 @@ class StudentService:
             try:
                 raw_module = await self.content_repo.get_detail_module_student(module_id,dto.classroom_id, student_id)
                 if not raw_module:
-                    raise NotFoundException("Module tidak ditemukan")
+                    raise NotFoundException("Module tidak ditemukan")            
                 module = StudentModuleResponse.model_validate(raw_module)
                 return module
             except Exception as e:

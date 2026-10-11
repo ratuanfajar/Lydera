@@ -25,13 +25,13 @@ class QuizRequestCreate(BaseModel):
 
         if total_questions <= 0:
             raise ValueError(
-                "Total question count (HOTS + LOTS) across all chapters must be at least 1."
+                "Total pertanyaan (HOTS + LOTS) minimal 1."
             )
 
         MAX_QUESTIONS_PER_QUIZ = 20
         if total_questions > MAX_QUESTIONS_PER_QUIZ:
             raise ValueError(
-                f"Total question count cannot exceed {MAX_QUESTIONS_PER_QUIZ} (got {total_questions})."
+                f"Total pertanyaan tidak bisa melebihi {MAX_QUESTIONS_PER_QUIZ} (mendapati {total_questions})."
             )
 
         return self

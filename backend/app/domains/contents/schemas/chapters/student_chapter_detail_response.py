@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.domains.contents.schemas.blocks.block_response import BlockResponse
 
@@ -41,7 +41,14 @@ class StudentChapterDetailWithoutBlockResponse(BaseModel):
     title: str
     number: int | None = None
     chapter_progress: StudentChapterProgressResponse | None = Field(
-        default=None, 
-        validation_alias="chapter_progress"
+        default=None,
+        validation_alias="chapter_progress",
     )
 
+    @field_validator("chapter_progress", mode="before")
+    @classmethod
+    def extract_chapter_progress(cls, value):
+        if isinstance(value, list):
+            return value[0] if value else None
+
+        return value

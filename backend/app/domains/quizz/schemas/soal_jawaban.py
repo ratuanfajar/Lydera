@@ -1,5 +1,7 @@
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.domains.quizz.schemas.soal_response import SoalOpsiResponse
+
 
 class SoalSubmitRequest(BaseModel):
     selected_option: str = Field(pattern="^[A-D]$")
@@ -28,5 +30,6 @@ class QuizResultItem(BaseModel):
     selected_option: str | None
     correct_option: str
     is_correct: bool | None
+    options: list[SoalOpsiResponse]
     justification: SoalJustification | None
     langkah: list[SoalJawabanLangkahResponse]
