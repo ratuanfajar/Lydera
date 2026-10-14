@@ -250,7 +250,7 @@ class StudentService:
         chapter = await self.content_repo.student_get_blocks_by_chapter_id(chapter_id=chapter_id, student_id=student_id)
         if not chapter:
             raise NotFoundException(detail="Chapter tidak ditemukan.")
-        await self.content_repo.student_upsert_chapter_progress(student_id, chapter_id)
+        await self.content_repo.student_create_chapter_progress(student_id, chapter_id)
         await self.db.commit()
         return StudentChapterDetailWithoutProgressResponse.model_validate(chapter)
 

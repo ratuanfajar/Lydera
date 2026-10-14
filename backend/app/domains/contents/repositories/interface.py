@@ -56,7 +56,7 @@ class ContentRepositoryInterface(ABC):
     async def create_chapter(self, module_id: int, source_file: str, number: int | None = None, title: str | None = None, cp_id: int | None = None) -> int: raise NotImplementedError
 
     @abstractmethod
-    async def student_upsert_chapter_progress(self, student_id: int, chapter_id: int) -> bool:
+    async def student_create_chapter_progress(self, student_id: int, chapter_id: int) -> bool:
         """Creates chapter progress if it doesn't exist (ON CONFLICT DO NOTHING)."""
         raise NotImplementedError
 

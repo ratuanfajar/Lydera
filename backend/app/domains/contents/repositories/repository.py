@@ -284,17 +284,20 @@ class ContentRepository(ContentRepositoryInterface):
         return await self.db.get(Cp, cp_id)
 
     # Chapter
-    async def student_upsert_chapter_progress(self, student_id: int, chapter_id: int) -> bool:
-        completed_at = datetime.now(timezone.utc)
+    async def student_create_chapter_progress(self, student_id: int, chapter_id: int) -> bool:
         stmt = (
             insert(ChapterProgress)
             .values(
                 student_id=student_id,
                 chapter_id=chapter_id,
-                is_done=True,
-                completed_at=datetime.now(timezone.utc),
+                is_done=False,
+                completed_at=None,
+            ).on_conflict_do_nothing(
+                index_elements=[
+                    ChapterProgress.student_id,
+                    ChapterProgress.chapter_id,
+                ]
             )
-            .on_conflict_do_update( index_elements=["student_id", "chapter_id"], set_={ "is_done": True, "completed_at": completed_at, }, )
             .returning(ChapterProgress.id) 
         )
     
