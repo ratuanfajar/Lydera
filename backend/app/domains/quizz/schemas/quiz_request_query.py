@@ -1,5 +1,5 @@
 from enum import Enum
-from fastapi import Query
+from fastapi import Path, Query
 from pydantic import BaseModel
 from typing import Annotated
 from app.domains.quizz.models.quiz_request import QuizRequestStatus
@@ -15,3 +15,7 @@ class QuizRequestQuery(BaseModel):
 
 class QuizRequestDetailQuery(BaseModel):
     classroom_id: Annotated[int, Query(...)]
+
+class QuizRequestStudentDetailQuery(BaseModel):
+    classroom_id: Annotated[int, Query(...)]
+    student_id: Annotated[int, Query(...)]

@@ -13,7 +13,7 @@ from app.domains.quizz.repositories.interface import QuizRepositoryInterface
 from app.domains.quizz.schemas import QuizResultItem, SoalJustification, SoalSubmitRequest
 
 from app.domains.quizz.models.quiz_request import QuizRequest, QuizRequestStatus
-from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
+from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery, QuizRequestStudentDetailQuery
 from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
 from app.domains.quizz.schemas.quiz_request_create import QuizRequestCreate
 from app.utils.idempotency import generate_idempotency_key
@@ -21,12 +21,15 @@ from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
 from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
 from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
-from app.domains.quizz.schemas.quiz_request_student_response import QuestionAnswerStudentResponse, QuestionOptionResponse, QuestionStimulusStudentResponse, QuestionStudentSteps, QuizRequestQuestionStudentResponse, QuizRequestStudentResponse
+from app.domains.quizz.schemas.quiz_request_student_response import QuestionAnswerStudentResponse, QuestionOptionResponse, QuestionStimulusStudentResponse, QuestionStudentSteps, QuizRequestQuestionStudentResponse, QuizRequestStudentProgressResponse, QuizRequestStudentResponse
 from app.domains.quizz.models.quiz_progress import QuizReviewStatus
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.utils import paths
 from app.domains.quizz.schemas.step_request import AddStepRequest
 from app.domains.quizz.schemas.soal_response import SoalOpsiResponse
+from app.domains.quizz.schemas.student_quiz_response import StudentQuizResponse
+from app.domains.users.schemas.profile_response import ProfileResponse
+from app.domains.users.schemas.student_response import StudentResponse
 
 paths.setup()
 
@@ -427,6 +430,23 @@ class QuizService:
         quizzes = await self.repo.get_quizzes_student(query.classroom_id, student_id, query.status)
         return [QuizRequestStudentResponse.model_validate(q) for q in quizzes]
 
+    async def get_students(self, query: QuizRequestDetailQuery, quiz_request_id:int, teacher_id:int) -> list[StudentQuizResponse]:
+        data = await self.repo.get_students(query.classroom_id, teacher_id, quiz_request_id)
+        return [
+            StudentQuizResponse(
+                student_profile=ProfileResponse(
+                    id=student.user.id,
+                    email=student.user.email,
+                    student=StudentResponse.model_validate(student)
+                ),
+                quiz=(QuizRequestStudentProgressResponse.model_validate(progress)
+                if progress is not None
+                else None
+                ),
+            )
+            for student, progress in data
+        ]
+
     async def get_quiz_teacher(self, query: QuizRequestDetailQuery, teacher_id:int, id:int) -> QuizRequestTeacherDetailResponse: 
         quiz = await self.repo.get_quiz_teacher(query.classroom_id, teacher_id, id)
         if not quiz:
@@ -593,6 +613,13 @@ class QuizService:
 
         await self.repo.mark_quiz_completed(student_id, quiz_id)
         await process_exam_review_task.kiq(quiz_id, student_id)
+
+    async def get_student_quiz_result_from_teacher(self, quiz_request_id:int, query: QuizRequestStudentDetailQuery, teacher_id:int):
+        is_valid = await self.repo.validate_quiz_request(quiz_request_id, teacher_id, query.classroom_id)
+        if not is_valid:
+            raise ForbiddenException("Quiz Request tidak ditemukan atau Anda tidak memiliki akses.")
+        
+        return await self.get_quiz_results(quiz_request_id, query.student_id)
 
     async def get_quiz_results(self, quiz_request_id: int, student_id: int) -> list[QuizResultItem]:
         """Hasil kuis siswa untuk satu quiz_request: tiap soal yang dijawab SALAH dan belum pernah

@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import Label, and_, delete, func, insert, or_, select, text
 from sqlalchemy.orm import contains_eager, joinedload, selectinload
-
+from app.domains.users.models.student import student_classrooms
 from app.core.db import AsyncSession
 from app.domains.contents.models import Block, Chapter, Module
 from app.domains.quizz.models import (
@@ -18,6 +18,7 @@ from app.domains.quizz.models.quiz_progress import QuizProgress
 from app.domains.quizz.models.quiz_request import QuizRequestStatus
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
 from app.core.exceptions import NotFoundException
+from app.domains.users.models.student import Student
 
 
 class QuizRepository(QuizRepositoryInterface):
@@ -27,11 +28,10 @@ class QuizRepository(QuizRepositoryInterface):
     async def validate_quiz_request(self, quiz_request_id:int, teacher_id: int, classroom_id: int) -> bool:
         stmt = (
             select(QuizRequest.id)
-            .join(QuizRequest.module)
-            .join(Module.classroom)
+            .join(QuizRequest.classroom)
             .where(
                 QuizRequest.id == quiz_request_id,
-                Module.classroom_id == classroom_id,
+                QuizRequest.classroom_id == classroom_id,
                 Classroom.teacher_id == teacher_id,
             )
         )
@@ -613,3 +613,32 @@ class QuizRepository(QuizRepositoryInterface):
         jawaban.diagnosis = diagnosis
         jawaban.personalized_justification = personalized_justification
         jawaban.evaluated_at = datetime.now(timezone.utc)
+
+    async def get_students(self,classroom_id: int,teacher_id: int, quiz_request_id:int) -> Sequence[QuizProgress]:
+        stmt = (
+            select(Student, QuizProgress)
+            .join(
+                student_classrooms,
+                student_classrooms.c.student_id == Student.id,
+            )
+            .join(
+                Classroom,
+                Classroom.id == student_classrooms.c.classroom_id,
+            )
+            .outerjoin(
+                QuizProgress,
+                and_(
+                    QuizProgress.student_id == Student.id,
+                    QuizProgress.quiz_request_id == quiz_request_id,
+                ),
+            )
+            .options(selectinload(Student.user))
+            .where(
+                student_classrooms.c.classroom_id == classroom_id,
+                Classroom.teacher_id == teacher_id,
+            )
+        )
+
+        result = await self.db.execute(stmt)
+        return result.all()
+

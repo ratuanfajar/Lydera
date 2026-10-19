@@ -54,3 +54,4 @@ class QuizRequest(Base):
     )
     soals: Mapped[List["Soal"]] = relationship(back_populates="quiz_request", order_by="Soal.id", cascade="all, delete-orphan")
     stimulus: Mapped[List["SoalStimulus"]] = relationship(back_populates="quiz_request",order_by="QuizRequestChapter.chapter_id", cascade="all, delete-orphan")
+    

@@ -30,7 +30,7 @@ from app.domains.quizz.schemas import (
 )
 from app.domains.quizz.services import QuizService
 from app.tasks.quiz_tasks import TTL_3_MINUTES, process_quiz_request_task
-from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
+from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery, QuizRequestStudentDetailQuery
 from app.domains.quizz.models.quiz_request import QuizRequest
 from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
 from app.core.redis import get_redis_client
@@ -41,6 +41,7 @@ from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
 from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
 from app.domains.quizz.schemas.quiz_request_student_response import QuestionStudentSteps, QuizRequestStudentResponse
 from app.domains.quizz.schemas.step_request import AddStepRequest
+from app.domains.quizz.schemas.student_quiz_response import StudentQuizResponse
 
 
 def _to_soal_response(soal: Soal) -> SoalResponse:
@@ -262,6 +263,46 @@ async def delete_quiz(
     result = await service.delete_quiz(teacher.profile_id, quiz_id, payload.classroom_id)
     return Response(message="Berhasil hapus quizz", data=result)
 
+@router_teacher_quizz.get(
+    "/quizzes/{quiz_id}/students",
+    description="Requires the TEACHER role.",
+    response_model=Response[list[StudentQuizResponse]],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES
+)
+async def get_list_student_progress(
+    quiz_id: Annotated[int, Path()],
+    teacher: Roles(Role.TEACHER),
+    query: Annotated[QuizRequestQuery, Query()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    result = await service.get_students(query, quiz_id, teacher.profile_id)
+    return Response(
+        message="Berhasil dapatkan list progres quiz murid",
+        data=result
+    )
+
+@router_teacher_quizz.get(
+    "/quizzes/{quiz_id}/student-results",
+    description=(
+        "Requires the TEACHER role. Hasil kuis siswa yang login: untuk soal yang dijawab salah, "
+        "justifikasi personal (perbandingan langkah pengerjaan siswa vs yang benar) dievaluasi di "
+        "sini kalau belum pernah, lalu disimpan -- panggilan berikutnya pakai hasil tersimpan."
+    ),
+    response_model=Response[list[QuizResultItem]],
+    status_code=status.HTTP_200_OK,
+)
+async def get_student_quiz_results(
+    teacher: Roles(Role.TEACHER),
+    query: Annotated[QuizRequestStudentDetailQuery, Query()],
+    quiz_id: Annotated[int, Path()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    results = await service.get_student_quiz_result_from_teacher(quiz_id, query, teacher.profile_id)
+    return Response(message=get_response_message(), data=results)
+
+
+
 # ==========================================
 # Student ROUTER
 # ==========================================
@@ -307,7 +348,7 @@ async def get_list_quizzes(
 )
 async def start_quiz(
     student: Roles(Role.STUDENT),
-    quiz_id: Annotated[int, FastAPIPath()],
+    quiz_id: Annotated[int, Path()],
     service: QuizService = Depends(get_quiz_service),
 ):
     stream_gen = await service.initialize_and_stream_quiz(

@@ -42,6 +42,9 @@ class QuizRepositoryInterface(ABC):
     async def delete_quizz(self, quiz_request_id: int) -> bool : raise NotImplementedError
     @abstractmethod
     async def check_is_quiz_done(self, student_id: int, quiz_id: int) -> bool: raise NotImplementedError
+    
+    
+    
     # New Method Soal
     @abstractmethod
     async def get_quizzes_teacher(self, classroom_id: int, teacher_id:int, status: QuizRequestQueryStatus) -> Sequence[QuizRequest]: raise NotImplementedError
@@ -80,6 +83,9 @@ class QuizRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_quiz_teacher(self, classroom_id: int, teacher_id:int, id:int) -> QuizRequest | None: raise NotImplementedError
+
+    @abstractmethod
+    async def get_students(self, classroom_id:int, teacher_id:int, quiz_request_id:int ) -> Sequence[QuizProgress] : raise NotImplementedError
 
     # Soal
     @abstractmethod

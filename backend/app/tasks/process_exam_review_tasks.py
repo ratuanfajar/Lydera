@@ -57,7 +57,7 @@ async def process_exam_review_task(quiz_id: int, student_id: int) -> None:
             for soal in quiz.soals:
                 jawaban = jawaban_by_soal.get(soal.id)
                 if jawaban:
-                    is_correct = jawaban.selected_option.upper() == soal.correct_option.upper()
+                    is_correct = jawaban.selected_option == soal.correct_option
                     jawaban.is_correct = is_correct
                     if is_correct:
                         correct_count += 1
