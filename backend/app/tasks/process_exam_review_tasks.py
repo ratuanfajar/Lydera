@@ -1,18 +1,27 @@
+import logging
 from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from app.domains.quizz.models import QuizProgress, QuizReviewStatus
+from app.domains.quizzer.models import QuizProgress, QuizReviewStatus
 from app.core.taskiq import broker
 from app.core.db import AsyncSessionLocal
-from app.domains.quizz.models.quiz_progress import QuizReviewStatus
-from app.domains.quizz.models.quiz_request import QuizRequest
-from app.domains.quizz.models.soal_jawaban import SoalJawaban
+from app.domains.quizzer.models.quiz_request import QuizRequest
+from app.domains.quizzer.models.soal_jawaban import SoalJawaban
+from app.tasks.evaluaizer_tasks import evaluate_quiz_answers_task
 
-@broker.task
-async def process_exam_review_task(quiz_id: int, student_id: int) -> None:
-    """Calculates student score by comparing selected_option with correct_option."""
+logger = logging.getLogger(__name__)
+
+
+async def _enqueue_evaluation(quiz_id: int, student_id: int) -> None:
+    try:
+        await evaluate_quiz_answers_task.kiq(quiz_id, student_id)
+    except Exception:
+        logger.warning("antre evaluasi kuis %s siswa %s gagal", quiz_id, student_id, exc_info=True)
+
+
+async def _grade_exam(quiz_id: int, student_id: int) -> bool:
     async with AsyncSessionLocal() as db:
         # 1. Fetch progress record
         stmt = select(QuizProgress).where(
@@ -21,11 +30,12 @@ async def process_exam_review_task(quiz_id: int, student_id: int) -> None:
         )
         progress = (await db.scalars(stmt)).one_or_none()
         if not progress:
-            return
+            return False
 
         try:
             # Mark processing
             progress.review_status = QuizReviewStatus.PROCESSING
+            progress.review_started_at = datetime.now(timezone.utc)
             await db.commit()
 
             stmt_quiz = (
@@ -41,7 +51,7 @@ async def process_exam_review_task(quiz_id: int, student_id: int) -> None:
                 progress.review_status = QuizReviewStatus.COMPLETED
                 progress.completed_at = datetime.now(timezone.utc)
                 await db.commit()
-                return
+                return False
 
             soal_ids = [soal.id for soal in quiz.soals]
             stmt_jawaban = select(SoalJawaban).where(
@@ -70,6 +80,7 @@ async def process_exam_review_task(quiz_id: int, student_id: int) -> None:
             progress.completed_at = datetime.now(timezone.utc)
             progress.review_error = None
             await db.commit()
+            return True
 
         except Exception as exc:
             await db.rollback()
@@ -77,4 +88,10 @@ async def process_exam_review_task(quiz_id: int, student_id: int) -> None:
             progress.review_error = str(exc)
             await db.commit()
             raise exc
-        
+
+
+@broker.task
+async def process_exam_review_task(quiz_id: int, student_id: int) -> None:
+    """Calculates student score by comparing selected_option with correct_option."""
+    if await _grade_exam(quiz_id, student_id):
+        await _enqueue_evaluation(quiz_id, student_id)

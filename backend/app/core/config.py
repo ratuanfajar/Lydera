@@ -10,7 +10,7 @@ env_file = ".env.test" if os.getenv("APP_ENV") == "test" else ".env"
 load_dotenv(env_file)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_AI_OUTPUT_DIR = PROJECT_ROOT / "ai-services" / "annotation" / "output"
+DEFAULT_AI_OUTPUT_DIR = PROJECT_ROOT / "ai-services" / "annoter" / "output"
 
 class Settings(BaseSettings):
     BASE_URL: str = os.getenv("BASE_URL", "http://localhost:8003")
@@ -71,10 +71,10 @@ class EmailSettings(BaseSettings):
     EMAIL_FROM : EmailStr = os.getenv('EMAIL_FROM', "no-reply-lydera@gmail.com")
     EMAIL_FROM_NAME : str = os.getenv('EMAIL_FROM_NAME', "Lydera App")
     SMTP_HOST : Optional[str] = os.getenv('SMTP_HOST')
-    SMTP_PORT : int = os.getenv('SMTP_PORT')
+    SMTP_PORT : int = int(os.getenv('SMTP_PORT', 587))
     SMTP_USER : Optional[str] = os.getenv('SMTP_USER')
     SMTP_PASS : Optional[str] = os.getenv('SMTP_PASS')
-    SMTP_TLS : bool = os.getenv('SMTP_TLS', True)
-    PROVIDER: str = os.getenv('PROVIDER')
+    SMTP_TLS : bool = os.getenv('SMTP_TLS', 'true').strip().lower() in ('1', 'true', 'yes')
+    PROVIDER: Optional[str] = os.getenv('PROVIDER')
 
 email_settings = EmailSettings()

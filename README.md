@@ -19,7 +19,10 @@ Guru upload modul matematika per bab. Sistem mengekstrak isinya (termasuk rumus,
 ### Quizzer — Quiz Generator
 Guru pilih modul dan bab (bisa lebih dari satu sekaligus), lalu tentukan jumlah soal LOTS dan HOTS untuk tiap bab. Sistem menghasilkan soal pilihan ganda beserta langkah penyelesaian dan kesimpulan jawaban, digroundkan ke isi modul yang sudah dianotasi, tanpa menyalin ulang soal latihan yang sudah ada di modul. Soal mengikuti Capaian Pembelajaran (CP) Kurikulum Merdeka sesuai fase modul, dengan level taksonomi Bloom sesuai LOTS (C1-C3)/HOTS (C4-C6). Tiap soal dicek ulang otomatis sebelum sampai ke guru: AI menjawab ulang soal itu secara independen dari materi yang sama dan menandai kalau hasilnya tidak konsisten dengan jawaban aslinya. Guru memvalidasi tiap soal; koreksi soal LOTS (berdiri sendiri) dilakukan guru langsung, sedangkan soal HOTS (punya stimulus/konteks bersama) dikoreksi lewat feedback ke AI yang meregenerasi ulang, dan guru approve hasilnya sebelum final.
 
-Hasil kedua fitur di atas tersimpan ke database yang sama, dan sama-sama diakses siswa lewat aplikasi yang aksesibel untuk pembaca layar.
+### Chatbot — Tanya Jawab Materi
+Siswa bertanya soal materi modul di kelasnya. Sistem mencari bagian modul yang relevan (RAG, embedding per blok) dan menjawab dengan sitasi. Pertanyaan di luar topik diarahkan kembali dengan halus; untuk perluasan materi, sistem boleh memakai sumber eksternal terbatas (enam host OER kurasi dengan ambang relevansi), dan setiap kutipan diperiksa ulang terhadap isi sumber aslinya. Pencarian modul memakai vektor, kata kunci, dan kecocokan rumus persis.
+
+Hasil ketiga fitur di atas tersimpan ke database yang sama, dan sama-sama diakses siswa lewat aplikasi yang aksesibel untuk pembaca layar.
 
 ## Alur Singkat
 
@@ -33,6 +36,9 @@ Guru pilih bab + jumlah soal LOTS/HOTS
     -> sistem generate soal pilihan ganda (digroundkan ke modul yang sudah dianotasi)
     -> guru validasi, edit langsung kalau ada yang salah
     -> siswa kerjakan quiz lewat pembaca layar
+
+Siswa bertanya soal materi
+    -> sistem cari bagian modul relevan, jawab dengan sitasi
 ```
 
 ## Arsitektur
@@ -41,6 +47,8 @@ Tiga bagian, dikembangkan dan dijalankan terpisah:
 
 | Bagian | Tanggung jawab | Dokumentasi |
 |---|---|---|
-| Layanan AI | Ekstraksi PDF (MinerU), anotasi rumus/tabel/gambar dan generate soal (LLM/MLLM) | [`ai-services/README.md`](ai%20services/README.md) |
-| Backend | Penyimpanan (PostgreSQL), API (FastAPI), orkestrasi pemrosesan bab | [`backend/README.md`](backend/README.md) |
-| Frontend | Aplikasi guru (upload, validasi) dan siswa (akses modul/quiz lewat pembaca layar) | [`frontend/README.md`](frontend/README.md) |.
+| Layanan AI | Ekstraksi PDF (MinerU), anotasi rumus/tabel/gambar, generate soal, dan chatbot RAG (LLM/MLLM) | [`ai-services/README.md`](ai-services/README.md) |
+| Backend | Penyimpanan (PostgreSQL + pgvector), API (FastAPI), antrean pekerjaan (Redis + taskiq), orkestrasi pemrosesan bab | [`backend/README.md`](backend/README.md) |
+| Frontend | Aplikasi guru (upload, validasi) dan siswa (akses modul/quiz lewat pembaca layar). Belum dimulai | [`frontend/README.md`](frontend/README.md) |
+
+Dokumentasi arsitektur, keputusan (ADR), spec, dan runbook ada di [`docs/`](docs/README.md). Panduan untuk agent AI ada di [`CLAUDE.md`](CLAUDE.md)..

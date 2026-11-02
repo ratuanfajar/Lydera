@@ -8,8 +8,8 @@ from app.utils import paths
 paths.setup()
 
 from app.core.redis import get_redis_client
-from annotation import annotation_pipeline
-from annotation import run_mineru
+from annoter import annoter_pipeline
+from annoter import run_mineru
 
 from app.core.taskiq import broker
 from app.core.config import settings
@@ -46,6 +46,14 @@ async def publish_progress(redis: Redis, job_id: int, status: str, progress:int,
     })
 
     await redis.publish(f"job_progress:{job_id}", payload)
+
+
+def completion_message(total_blocks: int, report) -> str:
+    message = f"Successfully processed {total_blocks} blocks."
+    if report.needs_review:
+        message += f" {report.needs_review} blok atau window gagal diproses dan perlu ditinjau atau dibuat ulang oleh guru."
+    return message
+
 
 @broker.task
 async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter_id:int, teacher_id:int, attempt: int = 1) -> None:
@@ -105,7 +113,8 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
     
             # 2. Run Pipeline aggregation
             await publish_progress(redis, job_id, "running", 75, "Aggregating extracted output...")
-            list_json_paths = await asyncio.to_thread(annotation_pipeline.run, out_dir)
+            report = await asyncio.to_thread(annoter_pipeline.run_with_report, out_dir)
+            list_json_paths = report.paths
 
             # 3. Database Ingestion
             await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
@@ -125,13 +134,12 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
 
             # 4. Success
             annotation_paths = [str(path) for path in list_json_paths]
-            print(annotation_paths)
             await repo.update_job_status(job, "done", blocks_total=total_blocks)
             await db.commit()
-            await publish_progress(redis, job_id, "done", 100, f"Successfully processed {total_blocks} blocks.", relative_json_paths)
+            await publish_progress(redis, job_id, "done", 100, completion_message(total_blocks, report), relative_json_paths)
 
             # 5. Trigger reindex chatbot (vector DB) otomatis -- guru tidak perlu panggil
-            # POST /chatbot/chapters/{id}/reindex manual lagi. Aman dipanggil sebelum module
+            # POST /clarifier/chapters/{id}/reindex manual lagi. Aman dipanggil sebelum module
             # published -- search_module tetap memfilter WHERE module.status = 'publish', jadi
             # embedding yang sudah terbentuk duluan tidak otomatis kelihatan ke siswa.
             await reindex_chapter_task.kiq(chapter_id=chapter_id)

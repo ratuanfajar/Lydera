@@ -19,6 +19,7 @@ class ChatMessage(Base):
     session_id: Mapped[int] = mapped_column(ForeignKey("chat_sessions.id", ondelete="CASCADE"), nullable=False)
     role: Mapped[str] = mapped_column(Text, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    content_markup: Mapped[Optional[str]] = mapped_column(Text)
     tool_calls: Mapped[Optional[list]] = mapped_column(JSONB)
     citations: Mapped[Optional[list]] = mapped_column(JSONB)
     scope_klass: Mapped[Optional[str]] = mapped_column(Text)

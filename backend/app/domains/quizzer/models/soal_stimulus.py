@@ -1,5 +1,6 @@
 from typing import List, Optional
 from sqlalchemy import CheckConstraint, ForeignKey, Index, Integer, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.db import Base
 
@@ -12,6 +13,8 @@ class SoalStimulus(Base):
     chapter_id: Mapped[int] = mapped_column(ForeignKey("chapters.id", ondelete="CASCADE"), nullable=False, index=True)
     source_markup: Mapped[str] = mapped_column(Text, nullable=False, server_default='')
     readable_text: Mapped[str] = mapped_column(Text, nullable=False)
+    ringkasan: Mapped[Optional[str]] = mapped_column(Text)
+    tabel: Mapped[Optional[dict]] = mapped_column(JSONB(none_as_null=True))
     review_status: Mapped[str] = mapped_column(Text, nullable=False, server_default='pending')
     source_reading_order_start: Mapped[int] = mapped_column(Integer, nullable=False)
     source_reading_order_end: Mapped[int] = mapped_column(Integer, nullable=False)

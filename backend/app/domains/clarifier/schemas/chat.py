@@ -27,10 +27,9 @@ class ChatAskRequest(BaseModel):
 
 
 class SourceCitation(BaseModel):
-    source_type: str  # modul | oer | wolfram_alpha | web
+    source_type: str  # modul | oer
     label: str
     reference: str
-    trust_tier: int | None = None
     evidence: str
     justification: str
     verified: bool
@@ -39,6 +38,7 @@ class SourceCitation(BaseModel):
 class ChatAnswerResponse(BaseModel):
     status: str  # out_of_scope | answered
     message: str
+    message_markup: str | None = None
     sources: list[SourceCitation] | None = None
     suggested_questions: list[str] | None = None
     scope_klass: str
@@ -48,6 +48,7 @@ class ChatMessageResponse(BaseModel):
     id: int
     role: str
     content: str
+    content_markup: str | None = None
     citations: list[SourceCitation] | None = None
     created_at: datetime
 

@@ -11,6 +11,8 @@ class QuizSaveStatus(str, Enum):
 class StimulusCreateRequest(BaseModel):
     readable_text: str
     source_markup: str = ""
+    ringkasan: Optional[str] = None
+    tabel: Optional[Dict] = None
     source_reading_order_start: Optional[int] = None
     source_reading_order_end: Optional[int] = None
 
@@ -25,6 +27,7 @@ class SoalDataCreateRequest(BaseModel):
     bloom_level: int = Field(..., ge=1, le=6)
     reading_order_start: int
     reading_order_end: int
+    markup: Optional[Dict] = None
 
 
 class SoalCreateRequest(BaseModel):
@@ -32,6 +35,7 @@ class SoalCreateRequest(BaseModel):
     data: SoalDataCreateRequest
     review_priority: str = Field(default="normal", pattern="^(low|normal|high)$")
     validation_notes: Optional[str] = None
+    source_point: Optional[str] = None
 
 
 class SaveQuizRequestPayload(BaseModel):

@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy import CHAR, CheckConstraint, DateTime, ForeignKey, Index, Integer, Text, UniqueConstraint, text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.db import Base
 
@@ -17,10 +18,13 @@ class SoalJawaban(Base):
     # created_at (dari Base/TimestampMixin) merangkap sebagai waktu submit -- tidak perlu kolom sendiri.
 
     # Diisi belakangan oleh Chain 5 (evaluate_scratchwork), hanya untuk jawaban salah --
-    # evaluated_at null berarti belum dievaluasi, terisi berarti hasil final (tidak dipanggil ulang).
+    # evaluated_at null berarti belum dievaluasi; justification_points null pada baris lama memicu evaluasi ulang satu kali.
     divergence_step: Mapped[Optional[int]] = mapped_column(Integer)
     diagnosis: Mapped[Optional[str]] = mapped_column(Text)
     personalized_justification: Mapped[Optional[str]] = mapped_column(Text)
+    error_type: Mapped[Optional[str]] = mapped_column(Text)
+    justification_points: Mapped[Optional[list]] = mapped_column(JSONB(none_as_null=True))
+    needs_review: Mapped[bool] = mapped_column(nullable=False, server_default=text("false"))
     evaluated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
     __table_args__ = (

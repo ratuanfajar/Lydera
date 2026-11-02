@@ -1,5 +1,6 @@
 from typing import List, Optional
 from sqlalchemy import CHAR, CheckConstraint, ForeignKey, Index, Integer, Text
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.db import Base
 
@@ -20,6 +21,8 @@ class Soal(Base):
     review_status: Mapped[str] = mapped_column(Text, nullable=False, server_default='pending')
     review_priority: Mapped[str] = mapped_column(Text, nullable=False, server_default='normal')
     validation_notes: Mapped[Optional[str]] = mapped_column(Text)
+    source_point: Mapped[Optional[str]] = mapped_column(Text)
+    markup: Mapped[Optional[dict]] = mapped_column(JSONB)
 
     __table_args__ = (
         CheckConstraint("bloom_level BETWEEN 1 AND 6", name="check_soal_bloom"),

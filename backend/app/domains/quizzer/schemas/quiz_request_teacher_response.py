@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.domains.quizz.models.quiz_request import QuizRequestStatus
-from app.domains.quizz.models.quiz_request_chapter import QuizRequestChapter
-from app.domains.quizz.schemas.module_quiz_response import ModuleQuizResponse
+from app.domains.quizzer.models.quiz_request import QuizRequestStatus
+from app.domains.quizzer.models.quiz_request_chapter import QuizRequestChapter
+from app.domains.quizzer.schemas.module_quiz_response import ModuleQuizResponse
 
 class QuizRequestTeacherResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -54,6 +54,8 @@ class QuestionStimulusResponse(BaseModel):
     id: int
     source_markup: str
     readable_text: str
+    ringkasan: Optional[str] = None
+    tabel: Optional[dict] = None
     review_status: str
     source_reading_order_start: int
     source_reading_order_end: int
@@ -73,6 +75,8 @@ class QuizRequestQuestionResponse(BaseModel):
     review_status: str = 'pending'
     review_priority: str ='normal'
     validation_notes: Optional[str]
+    source_point: Optional[str] = None
+    markup: Optional[dict] = None
     options: List[QuestionOptionResponse] = Field(validation_alias="opsi")
     explanation_steps: List[QuestionExplanationSteps] = Field(validation_alias="langkah")
 
@@ -88,6 +92,7 @@ class QuizRequestTeacherDetailResponse(BaseModel):
     start_time: datetime
     end_time: datetime
     error: Optional[str] = None
+    coverage_report: Optional[dict] = None
     questions: List[QuizRequestQuestionResponse] = Field(validation_alias="soals")
     quiz_request_chapters: List[QuizRequestChapterDetailResponse] = Field(validation_alias="chapter_links")
     module: ModuleQuizResponse

@@ -26,11 +26,12 @@ from app.domains.cities.router import router as router_city
 from app.domains.schools.router import router as router_school
 from app.domains.users.router import router_user, router_student, router_teacher
 from app.domains.classrooms.router import router_classrooms, router_classrooms_types
-from app.domains.contents.router import router_blocks, router_chapters, router_fases, router_modules, router_cps
-from app.domains.quizz.router import router_teacher_quizz, router_student_quizz
+from app.domains.contents.router import router_blocks, router_chapters, router_annoter_jobs, router_fases, router_modules, router_cps
+from app.domains.quizzer.router import router_teacher_quizz, router_student_quizz
 from app.domains.otp.router import router_reset_password
 from app.core.redis import close_redis_client, get_redis_client
-from app.domains.chatbot.router import router_chatbot
+from app.domains.clarifier.router import router_clarifier
+from app.domains.evaluaizer.router import router_evaluaizer
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(router_city)
@@ -45,9 +46,11 @@ api_router.include_router(router_classrooms)
 api_router.include_router(router_blocks)
 api_router.include_router(router_modules)
 api_router.include_router(router_chapters)
+api_router.include_router(router_annoter_jobs)
 api_router.include_router(router_fases)
 api_router.include_router(router_cps)
-api_router.include_router(router_chatbot)
+api_router.include_router(router_clarifier)
+api_router.include_router(router_evaluaizer)
 api_router.include_router(router_reset_password)
 
 

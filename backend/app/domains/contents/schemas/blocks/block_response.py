@@ -15,6 +15,9 @@ class BlockResponse(BaseModel):
     source_markup: str | None
     caption: str | None
     image_file: str | None
+    image_kind: str | None = None
+    ringkasan: str | None = None
+    tabel: dict | None = None
 
     @computed_field
     @property

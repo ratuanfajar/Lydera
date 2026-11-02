@@ -1,0 +1,34 @@
+name: lydera-dev
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: lydera-dev-db
+    environment:
+      POSTGRES_USER: lydera
+      POSTGRES_PASSWORD: lydera
+      POSTGRES_DB: lydera_dev
+    ports:
+      - "55433:5432"
+    volumes:
+      - lydera-dev-db:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lydera -d lydera_dev"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7
+    container_name: lydera-dev-redis
+    ports:
+      - "56379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  lydera-dev-db:

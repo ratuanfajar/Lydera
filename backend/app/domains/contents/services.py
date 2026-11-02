@@ -7,20 +7,23 @@ from app.domains.jobs.repositories.interface import JobRepositoryInterface
 from app.tasks.file_tasks import cleanup_module_files_task
 from app.domains.contents.schemas.cp_response import CpResponse
 paths.setup()
-from annotation import annotation_regenerate
+from annoter import annoter_regenerate
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, Dict, List, Sequence
 from app.domains.contents.models import Block, Fase, Module, Chapter, Cp, ModuleStatus
 from app.domains.contents.repositories.interface import ContentRepositoryInterface
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
-from app.core.config import DEFAULT_AI_OUTPUT_DIR
+from app.core.config import settings
 from app.tasks.progress_tasks import enqueue_chapter_progress_reset_job, enqueue_module_progress_job
 from app.domains.contents.schemas.blocks.regenerate_request import RegenerateRequest
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateDetailResponse, RegenerateResponse
 
 UNMERGEABLE_TYPES = {"image", "table", "formula"}
 MAX_BLOCK_CHARS = 350
+DECORATIVE_KIND = "dekoratif"
+ILLUSTRATION_KIND = "ilustrasi_konteks"
+CONTEXT_TYPES = {"text", "heading"}
 
 PRIORITY_MAP = {"high": 3, "normal": 2, "low": 1}
 PRIORITY_REVERSE = {3: "high", 2: "normal", 1: "low"}
@@ -34,6 +37,15 @@ class ContentService:
 
     async def get_block_by_id(self, block_id: int) -> Block | None:
         return await self.repo.get_block_by_id(block_id)
+
+    async def _image_context(self, block: Block) -> str:
+        limit = annoter_regenerate.IMAGE_CONTEXT_CHARS
+        neighbors = await self.repo.get_neighbor_blocks(block.chapter_id, block.reading_order)
+        texts = [
+            n.readable_text[-limit:] if n.reading_order < block.reading_order else n.readable_text[:limit]
+            for n in neighbors if n.block_type in CONTEXT_TYPES and n.readable_text
+        ]
+        return " ".join(texts)
 
     def _find_image(self, out_dir: Path, image_file: str) -> Path | None:
         if not out_dir.exists():
@@ -69,15 +81,23 @@ class ContentService:
         jobs = await asyncio.gather(*[job_service.get_latest_job_for_chapter(c_id) for c_id in chapter_ids])
         job_map = {c_id: job for c_id, job in zip(chapter_ids, jobs)}
 
+        contexts = {block.id: await self._image_context(block) for block in blocks if block.block_type == "image"}
+
         def run_ai(block, job):
             image_path = self._find_image(Path(job.out_dir), block.image_file) if block.image_file and job else None
-            new_text = annotation_regenerate.regenerate(
+            regenerated = annoter_regenerate.regenerate(
                 block.block_type, dto.feedback,
                 source_markup=block.source_markup or "",
                 image_path=image_path,
-                caption=block.caption or ""
+                caption=block.caption or "",
+                context=contexts.get(block.id, ""),
             )
-            return {"id": block.id, "readable_text": new_text}
+            image_kind = ILLUSTRATION_KIND if block.image_kind == DECORATIVE_KIND else block.image_kind
+            return {
+                "id": block.id, "readable_text": regenerated.text, "image_kind": image_kind,
+                "ringkasan": regenerated.ringkasan, "tabel": regenerated.tabel,
+                "review_priority": "high" if regenerated.issues else block.review_priority,
+            }
 
         update_data = await asyncio.gather(*[
             asyncio.to_thread(run_ai, block, job_map.get(block.chapter_id)) for block in blocks
@@ -85,7 +105,10 @@ class ContentService:
         await self.repo.bulk_update_readable_text(update_data)
         
         return [
-            RegenerateDetailResponse(block_id=item["id"], readable_text=item["readable_text"]) 
+            RegenerateDetailResponse(
+                block_id=item["id"], readable_text=item["readable_text"], ringkasan=item["ringkasan"], tabel=item["tabel"],
+                review_priority=item["review_priority"],
+            )
             for item in update_data
         ]
     
@@ -176,7 +199,7 @@ class ContentService:
             )
         
         try:
-            path = DEFAULT_AI_OUTPUT_DIR / annotated_path
+            path = Path(settings.OUTPUT_DIR) / annotated_path
             raw_blocks_data = self._load_annotated(path)
             blocks_data = self._combine_annotated_blocks(raw_blocks_data, MAX_BLOCK_CHARS)
 
@@ -193,7 +216,10 @@ class ContentService:
                     heading_level=block_dict.get("heading_level"),
                     source_markup=block_dict.get("source_markup", ""),
                     caption=block_dict.get("caption", ""),
-                    image_file=block_dict.get("image_file", "")
+                    image_file=block_dict.get("image_file", ""),
+                    image_kind=block_dict.get("image_kind") or None,
+                    ringkasan=block_dict.get("ringkasan") or None,
+                    tabel=block_dict.get("tabel") or None,
                 )
                 blocks_to_insert.append(new_block)
             
@@ -233,7 +259,7 @@ class ContentService:
         return True
     
     def load_preview(self, annotated_path:str):
-        path = DEFAULT_AI_OUTPUT_DIR / annotated_path
+        path = Path(settings.OUTPUT_DIR) / annotated_path
         raw_blocks_data = self._load_annotated(path)
         blocks_data = self._combine_annotated_blocks(raw_blocks_data, MAX_BLOCK_CHARS)
         return blocks_data

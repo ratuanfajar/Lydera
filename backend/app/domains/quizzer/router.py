@@ -14,13 +14,12 @@ from app.core.response import Response, get_response_message, COMMON_VALIDATION_
 from app.core.route import WrappedRoute
 from app.core.security import Roles
 from app.utils.role import Role
-from app.domains.quizz.depedencies import get_quiz_service
-from app.domains.quizz.models import Soal
-from app.domains.quizz.schemas import (
+from app.domains.quizzer.depedencies import get_quiz_service
+from app.domains.quizzer.models import Soal
+from app.domains.quizzer.schemas import (
     QuizRequestCreate,
     QuizRequestCreateResponse,
     QuizRequestStatus,
-    QuizResultItem,
     SoalEditRequest,
     SoalOpsiResponse,
     SoalRegenerateRequest,
@@ -29,18 +28,17 @@ from app.domains.quizz.schemas import (
     SoalSubmitRequest,
     SoalSubmitResponse,
 )
-from app.domains.quizz.services import QuizService
+from app.domains.quizzer.services import QuizService
 from app.tasks.quiz_tasks import TTL_3_MINUTES, process_quiz_request_task
-from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
-from app.domains.quizz.models.quiz_request import QuizRequest
-from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
+from app.domains.quizzer.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
+from app.domains.quizzer.models.quiz_request import QuizRequest
+from app.domains.quizzer.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
 from app.core.redis import get_redis_client
-from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
-from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
-from app.domains.quizz.schemas.quiz_delete_request import QuizDeleteRequest
-from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
-from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
-from app.domains.quizz.schemas.quiz_request_student_response import QuizRequestStudentResponse
+from app.domains.quizzer.schemas.soal_create_request import SaveQuizRequestPayload
+from app.domains.quizzer.schemas.quiz_delete_request import QuizDeleteRequest
+from app.domains.quizzer.schemas.quiz_request_update import QuizRequestUpdate
+from app.domains.quizzer.schemas.quiz_request_student_query import QuizRequestStudentQuery
+from app.domains.quizzer.schemas.quiz_request_student_response import QuizRequestStudentResponse
 
 
 def _to_soal_response(soal: Soal) -> SoalResponse:
@@ -58,12 +56,14 @@ def _to_soal_response(soal: Soal) -> SoalResponse:
         review_status=soal.review_status,
         review_priority=soal.review_priority,
         validation_notes=soal.validation_notes,
+        source_point=soal.source_point,
+        markup=soal.markup,
     )
 
 # ==========================================
 # Teacher ROUTER
 # ==========================================
-router_teacher_quizz = APIRouter(prefix="/teachers", tags=["teachers"], route_class=WrappedRoute)
+router_teacher_quizz = APIRouter(prefix="/quizzer/teacher", tags=["quizzer"], route_class=WrappedRoute)
 
 @router_teacher_quizz.get(
     "/quizzes",
@@ -146,6 +146,7 @@ async def create_quiz_request(
         cached_result = await redis.get(result_key)
         if cached_result:
             await redis.expire(result_key, TTL_3_MINUTES)
+            coverage_report = await redis.get(f"quiz_coverage:{quiz_request_id}")
             parsed_data = json.loads(cached_result)
             payload_data = json.dumps(
                 {
@@ -155,6 +156,7 @@ async def create_quiz_request(
                     "total": len(parsed_data),
                     "message": "Semua soal selesai dibuat (Cache Hit)",
                     "data": parsed_data,
+                    "coverage_report": json.loads(coverage_report) if coverage_report else None,
                 }
             )
             yield f"data: {payload_data}\n\n"
@@ -222,13 +224,13 @@ async def save_quiz_requets(
     responses=COMMON_VALIDATION_RESPONSES,
 )
 async def regenerate_stimulus_soal(
-    _: Roles(Role.TEACHER),
+    teacher: Roles(Role.TEACHER),
     soal_id: Annotated[int, FastAPIPath()],
     payload: Annotated[SoalRegenerateRequest, Body()],
     service: QuizService = Depends(get_quiz_service),
 ):
     try:
-        updated = await service.regenerate_cluster(soal_id, payload.feedback)
+        updated = await service.regenerate_cluster(soal_id, teacher.profile_id, payload.feedback)
         return Response(message=get_response_message(), data=[_to_soal_response(s) for s in updated])
     except ValueError as e:
         raise BadRequestException(str(e))
@@ -241,12 +243,12 @@ async def regenerate_stimulus_soal(
     responses=COMMON_VALIDATION_RESPONSES,
 )
 async def edit_soal(
-    _: Roles(Role.TEACHER),
+    teacher: Roles(Role.TEACHER),
     soal_id: Annotated[int, FastAPIPath()],
     payload: Annotated[SoalEditRequest, Body()],
     service: QuizService = Depends(get_quiz_service),
 ):
-    soal = await service.edit_soal(soal_id, payload)
+    soal = await service.edit_soal(soal_id, teacher.profile_id, payload)
     return Response(message=get_response_message(), data=_to_soal_response(soal))
 
 @router_teacher_quizz.delete(
@@ -269,7 +271,7 @@ async def delete_quiz(
 # Student ROUTER
 # ==========================================
 
-router_student_quizz = APIRouter(prefix="/students", tags=["students"], route_class=WrappedRoute)
+router_student_quizz = APIRouter(prefix="/quizzer/student", tags=["quizzer"], route_class=WrappedRoute)
 @router_student_quizz.get(
     "/quizzes",
     description="Requires the STUDENT role.",
@@ -343,33 +345,12 @@ async def finish_quiz(
         data={"quiz_id": quiz_id, "status": "PROCESSING"},
     )
 
-@router_student_quizz.get(
-    "/quizzes/{quiz_request_id}/my-results",
-    description=(
-        "Requires the STUDENT role. Hasil kuis siswa yang login: untuk soal yang dijawab salah, "
-        "justifikasi personal (perbandingan langkah pengerjaan siswa vs yang benar) dievaluasi di "
-        "sini kalau belum pernah, lalu disimpan -- panggilan berikutnya pakai hasil tersimpan."
-    ),
-    response_model=Response[list[QuizResultItem]],
-    status_code=status.HTTP_200_OK,
-)
-async def get_my_quiz_results(
-    student: Roles(Role.STUDENT),
-    quiz_request_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
-):
-    try:
-        results = await service.get_quiz_results(quiz_request_id, student.profile_id)
-        return Response(message=get_response_message(), data=results)
-    except ValueError as e:
-        raise BadRequestException(str(e))
-
 @router_student_quizz.post(
     "/soal/{soal_id}/submit",
     description=(
         "Requires the STUDENT role. Simpan jawaban + langkah pengerjaan siswa untuk satu soal. "
         "Tidak ada evaluasi LLM di sini -- justifikasi untuk jawaban salah baru dihitung saat "
-        "siswa minta hasil lewat GET /quiz-requests/{id}/my-results. Satu siswa cuma bisa submit "
+        "siswa minta hasil lewat GET /evaluaizer/student/quizzes/{id}/results. Satu siswa cuma bisa submit "
         "sekali per soal."
     ),
     response_model=Response[SoalSubmitResponse],

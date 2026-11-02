@@ -1,0 +1,250 @@
+[
+ {
+  "kategori": "fungsi",
+  "latex": "f(x) = 2x + 3"
+ },
+ {
+  "kategori": "fungsi",
+  "latex": "f(g(4))"
+ },
+ {
+  "kategori": "fungsi",
+  "latex": "(g \\circ f)(x) = g(f(x))"
+ },
+ {
+  "kategori": "fungsi",
+  "latex": "f(x + 1) = x^{2} - 1"
+ },
+ {
+  "kategori": "fungsi",
+  "latex": "f^{-1}(x) = \\frac{x - 3}{2}"
+ },
+ {
+  "kategori": "fungsi",
+  "latex": "h(f(g(x + 2)))"
+ },
+ {
+  "kategori": "pecahan",
+  "latex": "\\frac{3}{4} + \\frac{1}{2}"
+ },
+ {
+  "kategori": "pecahan",
+  "latex": "\\frac{a + b}{c}"
+ },
+ {
+  "kategori": "pecahan",
+  "latex": "\\frac{x^{2} - 1}{x + 1}"
+ },
+ {
+  "kategori": "pecahan",
+  "latex": "\\frac{1}{\\frac{1}{a} + \\frac{1}{b}}"
+ },
+ {
+  "kategori": "pecahan",
+  "latex": "x = \\frac{-b \\pm \\sqrt{b^{2} - 4ac}}{2a}"
+ },
+ {
+  "kategori": "akar",
+  "latex": "\\sqrt{16} = 4"
+ },
+ {
+  "kategori": "akar",
+  "latex": "\\sqrt{a^{2} + b^{2}}"
+ },
+ {
+  "kategori": "akar",
+  "latex": "\\sqrt[3]{27} = 3"
+ },
+ {
+  "kategori": "akar",
+  "latex": "5\\sqrt{21} + 2\\sqrt{3}"
+ },
+ {
+  "kategori": "akar",
+  "latex": "\\sqrt{25^{2} - (11 - 4)^{2}}"
+ },
+ {
+  "kategori": "akar",
+  "latex": "\\sqrt{\\sqrt{x + 1} + 2}"
+ },
+ {
+  "kategori": "pangkat",
+  "latex": "x^{2} + 5x + 6"
+ },
+ {
+  "kategori": "pangkat",
+  "latex": "2^{3x + 1} = 32"
+ },
+ {
+  "kategori": "pangkat",
+  "latex": "(x + 1)^{2} = x^{2} + 2x + 1"
+ },
+ {
+  "kategori": "pangkat",
+  "latex": "x^{-3} = \\frac{1}{x^{3}}"
+ },
+ {
+  "kategori": "pangkat",
+  "latex": "a_{n} = a_{1} + (n - 1)b"
+ },
+ {
+  "kategori": "pangkat",
+  "latex": "a_{n + 1} = 2a_{n}"
+ },
+ {
+  "kategori": "kurung",
+  "latex": "2(3x - (4 - x)) = 10"
+ },
+ {
+  "kategori": "kurung",
+  "latex": "[(a + b)(a - b)]^{2}"
+ },
+ {
+  "kategori": "himpunan",
+  "latex": "A = \\{1, 2, 3\\}"
+ },
+ {
+  "kategori": "himpunan",
+  "latex": "C \\cup D = \\{ y \\mid y > 0, y \\in \\mathbb{Z} \\}"
+ },
+ {
+  "kategori": "himpunan",
+  "latex": "A \\cup B"
+ },
+ {
+  "kategori": "himpunan",
+  "latex": "x \\in [2, 7)"
+ },
+ {
+  "kategori": "himpunan",
+  "latex": "n(A \\cup B) = n(A) + n(B) - n(A \\cap B)"
+ },
+ {
+  "kategori": "mutlak",
+  "latex": "| x - 4 | \\leq 2"
+ },
+ {
+  "kategori": "mutlak",
+  "latex": "|x| = 5"
+ },
+ {
+  "kategori": "trigonometri",
+  "latex": "\\sin 30^{\\circ} = \\frac{1}{2}"
+ },
+ {
+  "kategori": "trigonometri",
+  "latex": "\\sin^{2} x + \\cos^{2} x = 1"
+ },
+ {
+  "kategori": "trigonometri",
+  "latex": "\\tan \\theta = \\frac{a}{b}"
+ },
+ {
+  "kategori": "trigonometri",
+  "latex": "\\sin (2x + 30^{\\circ})"
+ },
+ {
+  "kategori": "logaritma",
+  "latex": "\\log_{2} 8 = 3"
+ },
+ {
+  "kategori": "logaritma",
+  "latex": "\\ln (x + 1)"
+ },
+ {
+  "kategori": "logaritma",
+  "latex": "{}^{a}\\log (bc) = {}^{a}\\log b + {}^{a}\\log c"
+ },
+ {
+  "kategori": "kalkulus",
+  "latex": "\\lim_{x \\to 2} (x^{2} - 1)"
+ },
+ {
+  "kategori": "kalkulus",
+  "latex": "f'(x) = 2x"
+ },
+ {
+  "kategori": "kalkulus",
+  "latex": "\\frac{dy}{dx} = 3x^{2}"
+ },
+ {
+  "kategori": "kalkulus",
+  "latex": "\\int_{0}^{1} x^{2} \\, dx = \\frac{1}{3}"
+ },
+ {
+  "kategori": "kalkulus",
+  "latex": "\\sum_{i=1}^{n} i = \\frac{n(n + 1)}{2}"
+ },
+ {
+  "kategori": "matriks",
+  "latex": "\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}"
+ },
+ {
+  "kategori": "vektor",
+  "latex": "\\vec{a} \\cdot \\vec{b} = |\\vec{a}| |\\vec{b}| \\cos \\theta"
+ },
+ {
+  "kategori": "geometri",
+  "latex": "\\overline{AB} \\perp \\overline{CD}"
+ },
+ {
+  "kategori": "geometri",
+  "latex": "\\angle ABC = 60^{\\circ}"
+ },
+ {
+  "kategori": "geometri",
+  "latex": "\\triangle ABC \\cong \\triangle DEF"
+ },
+ {
+  "kategori": "geometri",
+  "latex": "\\overline{AC}^{2} = \\overline{AB}^{2} + \\overline{BC}^{2}"
+ },
+ {
+  "kategori": "geometri",
+  "latex": "L = \\pi r^{2}"
+ },
+ {
+  "kategori": "geometri",
+  "latex": "\\widehat{AB} = \\frac{60}{360} \\times 2\\pi r"
+ },
+ {
+  "kategori": "statistik",
+  "latex": "\\bar{x} = \\frac{\\sum x_{i}}{n}"
+ },
+ {
+  "kategori": "statistik",
+  "latex": "P(A) = \\frac{n(A)}{n(S)}"
+ },
+ {
+  "kategori": "statistik",
+  "latex": "{}_{n}C_{r} = \\frac{n!}{r!(n - r)!}"
+ },
+ {
+  "kategori": "persamaan",
+  "latex": "x^{2} - 5x + 6 = 0"
+ },
+ {
+  "kategori": "persamaan",
+  "latex": "x \\geq 3"
+ },
+ {
+  "kategori": "persamaan",
+  "latex": "2 \\leq x < 5"
+ },
+ {
+  "kategori": "persamaan",
+  "latex": "\\begin{cases} x + y = 5 \\\\ x - y = 1 \\end{cases}"
+ },
+ {
+  "kategori": "bilangan",
+  "latex": "20.000 \\times 0,75 = 15.000"
+ },
+ {
+  "kategori": "bilangan",
+  "latex": "25\\% \\text{ dari } 80"
+ },
+ {
+  "kategori": "bilangan",
+  "latex": "3 \\times 4 = 12"
+ }
+]

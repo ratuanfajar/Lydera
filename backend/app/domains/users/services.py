@@ -24,8 +24,8 @@ from app.domains.contents.schemas.module.teacher_module_request import TeacherMo
 from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse, TeacherModuleWithoutChapterResponse
 from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
-from app.domains.quizz.repositories.interface import QuizRepositoryInterface
-from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
+from app.domains.quizzer.repositories.interface import QuizRepositoryInterface
+from app.domains.quizzer.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
 
 class UserService:
     def __init__(

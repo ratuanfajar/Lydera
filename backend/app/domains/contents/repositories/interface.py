@@ -15,6 +15,8 @@ class ContentRepositoryInterface(ABC):
     @abstractmethod
     async def get_teacher_blocks(self, block_ids: list[int], teacher_id: int) -> list[Block]: raise NotImplementedError
     @abstractmethod
+    async def get_neighbor_blocks(self, chapter_id: int, reading_order: int) -> list[Block]: raise NotImplementedError
+    @abstractmethod
     async def get_block_by_id(self, block_id: int) -> Block | None: raise NotImplementedError
     @abstractmethod
     async def bulk_insert_blocks(self, blocks: list[Block]) -> None: raise NotImplementedError

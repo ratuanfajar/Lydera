@@ -11,9 +11,8 @@ __pycache__/
 .claude/
 .codex/
 
-ai-services/annotation/output/
-ai-services/annotation/.cache/
-ai-services/quiz/.cache/
+ai-services/annoter/output/
+ai-services/.cache/
 
 *.db
 *.db-journal

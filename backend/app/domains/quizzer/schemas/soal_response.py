@@ -20,3 +20,5 @@ class SoalResponse(BaseModel):
     review_status: str
     review_priority: str
     validation_notes: str | None
+    source_point: str | None = None
+    markup: dict | None = None

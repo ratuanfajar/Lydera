@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-AI_SERVICES = Path(r"E:\Lydera\ai-services")
+AI_SERVICES = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(AI_SERVICES))
 
 from common import llm

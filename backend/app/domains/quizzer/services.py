@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import AsyncGenerator
 from redis.asyncio import Redis
@@ -6,34 +7,81 @@ import json
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
-from app.domains.quizz.models import Soal
+from app.domains.quizzer.models import Soal
 
-from app.domains.quizz.models import Soal, SoalJawaban
-from app.domains.quizz.repositories.interface import QuizRepositoryInterface
-from app.domains.quizz.schemas import QuizResultItem, SoalJustification, SoalSubmitRequest
+from app.domains.quizzer.models import Soal, SoalJawaban
+from app.domains.quizzer.repositories.interface import QuizRepositoryInterface
+from app.domains.quizzer.schemas import QuizResultItem, SoalJustification, SoalSubmitRequest
 
-from app.domains.quizz.models.quiz_request import QuizRequest, QuizRequestStatus
-from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
-from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
-from app.domains.quizz.schemas.quiz_request_create import QuizRequestCreate
+from app.domains.quizzer.models.quiz_request import QuizRequest, QuizRequestStatus
+from app.domains.quizzer.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
+from app.domains.quizzer.schemas.quiz_request_teacher_response import QuizRequestTeacherDetailResponse, QuizRequestTeacherResponse
+from app.domains.quizzer.schemas.quiz_request_create import QuizRequestCreate
 from app.utils.idempotency import generate_idempotency_key
-from app.domains.quizz.schemas.soal_create_request import SaveQuizRequestPayload
-from app.domains.quizz.schemas.soal_regenerate import RegenerateClusterRequest
-from app.domains.quizz.schemas.quiz_request_update import QuizRequestUpdate
-from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQuery
-from app.domains.quizz.schemas.quiz_request_student_response import QuestionAnswerStudentResponse, QuestionOptionResponse, QuestionStimulusStudentResponse, QuizRequestQuestionStudentResponse, QuizRequestStudentResponse
-from app.domains.quizz.models.quiz_progress import QuizReviewStatus
+from app.domains.quizzer.schemas.soal_create_request import SaveQuizRequestPayload
+from app.domains.quizzer.schemas.quiz_request_update import QuizRequestUpdate
+from app.domains.quizzer.schemas.quiz_request_student_query import QuizRequestStudentQuery
+from app.domains.quizzer.schemas.quiz_request_student_response import QuestionAnswerStudentResponse, QuestionOptionResponse, QuestionStimulusStudentResponse, QuizRequestQuestionStudentResponse, QuizRequestStudentResponse
+from app.domains.quizzer.models.quiz_progress import QuizReviewStatus
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.utils import paths
 
 paths.setup()
 
-from app.domains.quizz.schemas.soal_jawaban import SoalJawabanLangkahResponse
-from quiz import evaluate as quiz_evaluate
-from quiz import quiz_regenerate
-from quiz.segment import Segment
+from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
+from quizzer import quizzer_regenerate
+from quizzer import readable as quizzer_readable
+from quizzer import segment as quizzer_segment
 
 TTL_3_MINUTES = 180
+logger = logging.getLogger(__name__)
+
+
+def _soal_to_dict(soal: Soal) -> dict:
+    """Bentuk teks yang diedit LLM: markup bila soal punya rumus, selain itu teks biasa."""
+    markup = soal.markup or {}
+    return {
+        "id": soal.id,
+        "question_text": markup.get("question", soal.question_text),
+        "options": markup.get("options") or {o.label: o.opsi_text for o in soal.opsi},
+        "correct_option": soal.correct_option,
+        "langkah": markup.get("langkah") or [l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
+        "kesimpulan": markup.get("kesimpulan", soal.kesimpulan),
+    }
+
+
+def _review_dict(soal: Soal) -> dict:
+    """Bentuk yang diverifikasi: teks siap-baca (yang didengar siswa) plus markup untuk audit kesetiaan."""
+    return {
+        "id": soal.id,
+        "question_text": soal.question_text,
+        "options": {o.label: o.opsi_text for o in soal.opsi},
+        "correct_option": soal.correct_option,
+        "langkah": [l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
+        "kesimpulan": soal.kesimpulan,
+        "markup": soal.markup,
+        "stimulus": {"readable_text": soal.stimulus.readable_text, "source_markup": soal.stimulus.source_markup or ""} if soal.stimulus else None,
+    }
+
+
+def _readable_dict(soal: Soal) -> dict:
+    return {
+        "question": soal.question_text,
+        "options": {o.label: o.opsi_text for o in soal.opsi},
+        "langkah": [l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
+        "kesimpulan": soal.kesimpulan,
+    }
+
+
+def _student_markup(soal: Soal) -> dict | None:
+    markup = soal.markup
+    return {k: markup[k] for k in ("question", "options") if k in markup} if markup else None
+
+
+def _review_flags(issues: list[str]) -> tuple[str, str | None]:
+    return ("high" if issues else "normal"), ("\n".join(issues) or None)
+
+
 class QuizService:
     def __init__(self, repo: QuizRepositoryInterface, db: AsyncSession, redis:Redis):
         self.repo = repo
@@ -41,15 +89,13 @@ class QuizService:
         self.redis = redis
 
     async def delete_quiz(self, teacher_id:int, quiz_request_id:int, classroom_id:int):
-        if classroom_id:
-            is_valid = await self.repo.validate_quiz_request(
-                quiz_request_id=quiz_request_id,
-                teacher_id=teacher_id,
-                classroom_id=classroom_id,
-            )
-
-            if not is_valid:
-                raise ForbiddenException("Quiz Request tidak ditemukan atau Anda tidak memiliki akses.")
+        is_valid = await self.repo.validate_quiz_request(
+            quiz_request_id=quiz_request_id,
+            teacher_id=teacher_id,
+            classroom_id=classroom_id,
+        )
+        if not is_valid:
+            raise ForbiddenException("Quiz Request tidak ditemukan atau Anda tidak memiliki akses.")
 
         deleted = await self.repo.delete_quizz(quiz_request_id)
 
@@ -231,47 +277,82 @@ class QuizService:
         # await self.redis.delete(*keys_to_delete)
         return True
 
-    async def edit_soal(self, soal_id: int, payload) -> Soal:
-        """Edit langsung tanpa LLM. Hanya berlaku untuk soal berdiri sendiri (stimulus_id kosong, biasanya LOTS)."""
+    async def _ensure_soal_owner(self, soal_id: int, teacher_id: int) -> None:
+        if not await self.repo.validate_soal_owner(soal_id, teacher_id):
+            raise ForbiddenException("Soal tidak ditemukan atau Anda tidak memiliki akses.")
+
+    async def edit_soal(self, soal_id: int, teacher_id: int, payload) -> Soal:
+        """Edit langsung (isi soal tidak ditulis LLM; sesudah simpan, validator memverifikasi ulang). Hanya berlaku untuk soal berdiri sendiri (stimulus_id kosong, biasanya LOTS)."""
+        await self._ensure_soal_owner(soal_id, teacher_id)
         soal = await self.repo.get_soal_by_id(soal_id)
         if soal is None:
             raise NotFoundException("soal tidak ditemukan")
         if soal.stimulus_id is not None:
-            raise BadRequestException("soal ini punya stimulus, koreksi lewat POST /soal/{id}/regenerate")
+            raise BadRequestException("soal ini punya stimulus, koreksi lewat POST /quizzer/teacher/soal/stimulus/regenerate/{soal_id}")
 
+        touched = False
         try:
-            touched = False
-            if payload.question_text is not None:
-                soal.question_text = payload.question_text
+            text_fields = {
+                "question": payload.question_text, "options": payload.options,
+                "langkah": payload.langkah, "kesimpulan": payload.kesimpulan,
+            }
+            if payload.markup or any(value is not None for value in text_fields.values()):
+                merged = {**_readable_dict(soal), **(soal.markup or {})}
+                merged.update({key: value for key, value in text_fields.items() if value is not None})
+                merged.update(payload.markup or {})
+                problems = quizzer_readable.fields_issues(merged)
+                if problems:
+                    raise BadRequestException("Markup tidak valid: " + "; ".join(problems))
+                try:
+                    readable, markup = await asyncio.to_thread(quizzer_readable.derive_fields, merged)
+                except Exception:
+                    logger.exception("verbalisasi markup soal %s gagal", soal_id)
+                    raise BadRequestException("Teks siap-baca tidak dapat dibuat dari markup ini, coba lagi.")
+                soal.question_text = readable["question"]
+                soal.kesimpulan = readable["kesimpulan"]
+                soal.markup = markup
+                await self.repo.replace_soal_opsi(soal_id, readable["options"])
+                await self.repo.replace_soal_langkah(soal_id, readable["langkah"])
                 touched = True
             if payload.correct_option is not None:
                 soal.correct_option = payload.correct_option
-                touched = True
-            if payload.kesimpulan is not None:
-                soal.kesimpulan = payload.kesimpulan
-                touched = True
-            if payload.options is not None:
-                await self.repo.replace_soal_opsi(soal_id, payload.options)
-                touched = True
-            if payload.langkah is not None:
-                await self.repo.replace_soal_langkah(soal_id, payload.langkah)
                 touched = True
             if touched:
                 soal.review_status = "edited"
 
             await self.db.commit()
-            return await self.repo.get_soal_by_id(soal_id)
         except Exception as e:
             await self.db.rollback()
             raise e
 
-    async def regenerate_cluster(self, soal_id: int, feedback: str) -> list[Soal]:
+        updated = await self.repo.get_soal_by_id(soal_id)
+        if touched:
+            await self._refresh_review_flags(updated)
+            updated = await self.repo.get_soal_by_id(soal_id)
+        return updated
+
+    async def _refresh_review_flags(self, soal: Soal) -> None:
+        """Verifikasi ulang soal yang diedit guru (jawab buta + audit) lalu perbarui tanda review; tidak pernah menggagalkan simpan."""
+        try:
+            blocks = await self.repo.get_blocks_for_chapter(soal.chapter_id)
+            rows = [{"reading_order": b.reading_order, "block_type": b.block_type, "readable_text": b.readable_text} for b in blocks]
+            source_text = quizzer_segment.span_text(rows, soal.source_reading_order_start, soal.source_reading_order_end)
+            stimulus_text = soal.stimulus.readable_text if soal.stimulus else ""
+            issues = await asyncio.to_thread(quizzer_regenerate.review_soal, source_text, _review_dict(soal), stimulus_text)
+        except Exception:
+            logger.exception("verifikasi ulang soal %s gagal", soal.id)
+            issues = ["Verifikasi otomatis gagal dijalankan; periksa soal ini secara manual."]
+        soal.review_priority, soal.validation_notes = _review_flags(issues)
+        await self.db.commit()
+
+    async def regenerate_cluster(self, soal_id: int, teacher_id: int, feedback: str) -> list[Soal]:
         """Feedback guru untuk SATU soal memicu edit soal itu (bukan generate ulang dari nol --
-        lihat `ai-services/quiz/revise.py`). Kalau perbaikannya ternyata perlu sampai ke stimulus
+        lihat `ai-services/quizzer/revise.py`). Kalau perbaikannya ternyata perlu sampai ke stimulus
         (shared ke soal lain di cluster), stimulus ikut direvisi dan SEMUA soal di cluster
         di-recheck konsistensinya -- kalau tidak, cuma soal yang dikritik yang tersentuh, stimulus
         dan soal lain di cluster tetap utuh. Guru approve draft hasilnya sebelum final --
         review_status dikembalikan ke 'pending', bukan otomatis final."""
+        await self._ensure_soal_owner(soal_id, teacher_id)
         target_soal = await self.repo.get_soal_by_id(soal_id)
         if target_soal is None:
             raise NotFoundException("soal tidak ditemukan")
@@ -288,43 +369,33 @@ class QuizService:
             for b in all_blocks
         ]
 
-        def to_dict(s: Soal) -> dict:
-            return {
-                "id": s.id,
-                "question_text": s.question_text,
-                "options": {o.label: o.opsi_text for o in s.opsi},
-                "correct_option": s.correct_option,
-                "langkah": [l.teks for l in sorted(s.langkah, key=lambda l: l.urutan)],
-                "kesimpulan": s.kesimpulan,
-            }
-
         try:
             result = await asyncio.to_thread(
-                quiz_regenerate.compute_regeneration,
-                stimulus.chapter_id, blocks_as_rows,
-                stimulus.source_reading_order_start, stimulus.source_reading_order_end,
-                stimulus.readable_text, to_dict(target_soal), [to_dict(s) for s in sibling_soal], feedback,
+                quizzer_regenerate.compute_regeneration,
+                blocks_as_rows,
+                target_soal.source_reading_order_start, target_soal.source_reading_order_end,
+                stimulus.source_markup or "", stimulus.readable_text, _soal_to_dict(target_soal),
+                [_soal_to_dict(s) for s in sibling_soal], feedback,
             )
-        except Exception as exc:
-            raise BadRequestException(f"regenerasi gagal, coba lagi: {exc}")
+        except Exception:
+            logger.exception("regenerasi soal %s gagal", soal_id)
+            raise BadRequestException("Regenerasi gagal, coba lagi.")
         
         try:
-            if result["new_stimulus_text"]:
-                await self.repo.update_stimulus_text(stimulus, result["new_stimulus_text"])
+            if result["new_stimulus"]:
+                await self.repo.update_stimulus_text(
+                    stimulus, result["new_stimulus"]["readable_text"], result["new_stimulus"]["source_markup"],
+                    result["new_stimulus"]["ringkasan"], result["new_stimulus"]["tabel"],
+                )
 
-            for sid, data, val in result["soal_updates"]:
+            for sid, data, issues in result["soal_updates"]:
                 soal = await self.repo.get_soal_by_id(sid)
                 soal.question_text = data["question_text"]
+                soal.markup = data.get("markup")
                 soal.correct_option = data["correct_option"]
                 soal.kesimpulan = data["kesimpulan"]
                 soal.review_status = "pending"
-                soal.review_priority = "normal" if val["matches"] else "high"
-                soal.validation_notes = None
-                if not val["matches"]:
-                    soal.validation_notes = (
-                        f"Validasi independen sampai ke jawaban {val['derived_option']}, berbeda dari "
-                        f"jawaban Generation ({data['correct_option']})."
-                    )
+                soal.review_priority, soal.validation_notes = _review_flags(issues)
                 await self.repo.replace_soal_opsi(sid, data["options"])
                 await self.repo.replace_soal_langkah(sid, data["langkah"])
 
@@ -346,7 +417,12 @@ class QuizService:
         quizzes = await self.repo.get_quizzes_teacher(query.classroom_id, teacher_id, query.status)
         return [QuizRequestTeacherResponse.model_validate(q) for q in quizzes]
 
+    async def _ensure_student_in_classroom(self, student_id: int, classroom_id: int) -> None:
+        if not await self.repo.is_student_in_classroom(student_id, classroom_id):
+            raise ForbiddenException("Anda tidak terdaftar di kelas ini.")
+
     async def get_quizzes_student(self, query: QuizRequestStudentQuery, student_id:int) -> list[QuizRequestStudentResponse]:
+        await self._ensure_student_in_classroom(student_id, query.classroom_id)
         quizzes = await self.repo.get_quizzes_student(query.classroom_id, student_id, query.status)
         return [QuizRequestStudentResponse.model_validate(q) for q in quizzes]
 
@@ -361,6 +437,10 @@ class QuizService:
     # -- Jawaban siswa --
     async def initialize_and_stream_quiz(self, student_id:int, quiz_id:int) -> AsyncGenerator[str, None]:
         now = datetime.now(timezone.utc)
+        quiz = await self.repo.get_quiz_request(quiz_id)
+        if quiz is None or quiz.status_published != QuizRequestStatus.PUBLISH:
+            raise NotFoundException("Kuis tidak ditemukan.")
+        await self._ensure_student_in_classroom(student_id, quiz.classroom_id)
         quiz, progress = await self.repo.get_or_create_quiz_progress(student_id, quiz_id)
 
         if now < quiz.start_time or now > quiz.end_time:
@@ -407,7 +487,7 @@ class QuizService:
                 id=soal.id,
                 stimulus=QuestionStimulusStudentResponse.model_validate(soal.stimulus) if soal.stimulus else None,
                 question_text=soal.question_text,
-                kesimpulan=soal.kesimpulan,
+                markup=_student_markup(soal),
                 options=[QuestionOptionResponse.model_validate(o) for o in soal.opsi],
                 answer=ans_dto,
             )
@@ -464,9 +544,7 @@ class QuizService:
         return True
     
     async def submit_answer(self, soal_id: int, student_id: int, payload: SoalSubmitRequest) -> None:
-        """Simpan jawaban + langkah pengerjaan siswa untuk satu soal. Tidak ada panggilan LLM di
-        sini -- evaluasi (untuk yang salah) baru dijalankan saat siswa minta hasil akhir kuis lewat
-        `get_quiz_results`."""
+        """Simpan jawaban dan langkah pengerjaan siswa; evaluasi jawaban salah dijalankan saat hasil kuis diminta (EvaluaizerService)."""
         soal = await self.repo.get_soal_by_id(soal_id)
         if soal is None:
             raise NotFoundException("soal tidak ditemukan")
@@ -477,7 +555,6 @@ class QuizService:
 
         existing = await self.repo.get_soal_jawaban(soal_id, student_id)
         is_correct = payload.selected_option.upper() == soal.correct_option.upper()
-        print(f"existing : {existing is not None}")
         if existing is not None:
             try:
                 await self.repo.update_soal_jawaban(
@@ -509,119 +586,3 @@ class QuizService:
 
         await self.repo.mark_quiz_completed(student_id, quiz_id)
         await process_exam_review_task.kiq(quiz_id, student_id)
-
-    async def get_quiz_results(self, quiz_request_id: int, student_id: int) -> list[QuizResultItem]:
-        """Hasil kuis siswa untuk satu quiz_request: tiap soal yang dijawab SALAH dan belum pernah
-        dievaluasi dipicu evaluasinya sekarang (paralel), lalu hasilnya disimpan supaya panggilan
-        berikutnya tidak memanggil LLM ulang (`evaluated_at` jadi penanda sudah final)."""
-        quiz_request = await self.repo.get_quiz_request(quiz_request_id)
-        if quiz_request is None:
-            raise NotFoundException("Quiz request tidak ditemukan.")
-
-        progress = await self.repo.get_quiz_progress(quiz_request_id, student_id)
-        now = datetime.now(timezone.utc)
-
-        # -------------------------------------------------------------
-        # EDGE CASE 1: Lazy Finalization if student closed SSE timer
-        # -------------------------------------------------------------
-        if progress and progress.started_at and not progress.is_done:
-            deadline = min(
-                progress.started_at + timedelta(minutes=quiz_request.max_duration_minutes),
-                quiz_request.end_time,
-            )
-            if now >= deadline:
-                # Trigger grading immediately
-                await process_exam_review_task(quiz_request_id, student_id)
-                progress = await self.repo.get_quiz_progress(quiz_request_id, student_id)
-
-        # -------------------------------------------------------------
-        # EDGE CASE 2: Server Restart / Taskiq Job Crash Recovery
-        # If task gets stuck in 'PROCESSING' > 3 mins or 'FAILED', run evaluation inline
-        # -------------------------------------------------------------
-        is_stuck = (
-            progress 
-            and progress.review_status == QuizReviewStatus.PROCESSING
-            and progress.completed_at is None 
-            and (now - (progress.started_at or now)) > timedelta(minutes=3)
-        )
-        if progress and (progress.review_status == QuizReviewStatus.FAILED or is_stuck):
-            await process_exam_review_task(quiz_request_id, student_id)
-            progress = await self.repo.get_quiz_progress(quiz_request_id, student_id)
-
-        if not progress or not progress.is_done or progress.review_status != QuizReviewStatus.COMPLETED:
-            raise BadRequestException("Kuis belum selesai dikerjakan atau hasil belum siap.")
-
-        # -------------------------------------------------------------
-        # FETCH SOAL & JAWABAN
-        # -------------------------------------------------------------
-        soal_list = await self.repo.get_soal_for_request(quiz_request_id)
-        jawaban_list = await self.repo.get_jawaban_for_request(quiz_request_id, student_id)
-        jawaban_by_soal = {j.soal_id: j for j in jawaban_list}
-
-        to_evaluate: list[tuple[Soal, SoalJawaban]] = []
-        for soal in soal_list:
-            jawaban = jawaban_by_soal.get(soal.id)
-            if jawaban is not None and not jawaban.is_correct and jawaban.evaluated_at is None:
-                to_evaluate.append((soal, jawaban))
-
-        if to_evaluate:
-            evaluations = await asyncio.gather(*[
-                self._evaluate_one(soal, jawaban) for soal, jawaban in to_evaluate
-            ])
-            try:
-                for (_, jawaban), result in zip(to_evaluate, evaluations):
-                    await self.repo.save_evaluation(
-                        jawaban, result.get("divergence_step"),
-                        result.get("diagnosis", ""), result.get("personalized_justification", ""),
-                    )
-                await self.db.commit()
-            except Exception as e:
-                await self.db.rollback()
-                raise e
-
-        results = []
-        for soal in soal_list:
-            jawaban = jawaban_by_soal.get(soal.id)
-            justification = None
-            if jawaban is not None:
-                jawaban.langkah
-            if jawaban is not None and not jawaban.is_correct:
-                justification = SoalJustification(
-                    divergence_step=jawaban.divergence_step,
-                    diagnosis=jawaban.diagnosis or "",
-                    personalized_justification=jawaban.personalized_justification or "",
-                )
-            results.append(QuizResultItem(
-                soal_id=soal.id,
-                question_text=soal.question_text,
-                selected_option=jawaban.selected_option if jawaban else None,
-                correct_option=soal.correct_option,
-                is_correct=jawaban.is_correct if jawaban else None,
-                justification=justification,
-                langkah = [
-                    SoalJawabanLangkahResponse.model_validate(step)
-                        for step in (jawaban.langkah if jawaban and jawaban.langkah else [])
-                ]
-            ))
-        return results
-
-    async def _evaluate_one(self, soal: Soal, jawaban: SoalJawaban) -> dict:
-        """Bangun Segment sumber dari rentang block soal ini, lalu jalankan Chain 5 di thread
-        terpisah (sama seperti `regenerate_cluster` memanggil `compute_regeneration`)."""
-        blocks = await self.repo.get_blocks_for_chapter(soal.chapter_id)
-        seg_blocks = [b for b in blocks if soal.source_reading_order_start <= b.reading_order <= soal.source_reading_order_end]
-        seg = Segment(
-            chapter_id=soal.chapter_id,
-            title="",
-            reading_order_start=soal.source_reading_order_start,
-            reading_order_end=soal.source_reading_order_end,
-            text="\n".join(b.readable_text for b in seg_blocks),
-        )
-        options = {o.label: o.opsi_text for o in soal.opsi}
-        correct_langkah = [l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)]
-        student_langkah = [l.teks for l in sorted(jawaban.langkah, key=lambda l: l.urutan)]
-        return await asyncio.to_thread(
-            quiz_evaluate.evaluate_scratchwork,
-            seg, soal.question_text, options, soal.correct_option, correct_langkah, soal.kesimpulan,
-            jawaban.selected_option, student_langkah,
-        )

@@ -1,23 +1,24 @@
 from __future__ import annotations
 
+import difflib
 import re
 
-from clarifier import trusted_domains
-
 _DIGITS = re.compile(r"\d+")
+URL_MATCH_CUTOFF = 0.97
 
 
-def _lookup_raw_content(reference: str, tool_outputs: dict[str, str]) -> str:
-    """Cari `reference` di `tool_outputs`. Model kadang nulis reference block modul dengan teks
-    tambahan (mis. "block_id 85" alih-alih "85" polos) -- exact match dulu, kalau gagal coba
-    angka yang terkandung di reference-nya (tool_outputs untuk modul selalu key-nya angka polos
-    per chunk.py/sync_search.py). Bukan pelonggaran verifikasi, cuma toleransi format penulisan."""
-    if reference in tool_outputs:
-        return tool_outputs[reference]
+def _resolve_reference(reference: str, source_type: str, tool_outputs: dict[str, str]) -> str | None:
+    """Cari key `reference` di `tool_outputs`: modul toleran pada "block_id 85", oer toleran pada URL yang tertukar satu-dua karakter."""
+    urls = [key for key in tool_outputs if key.startswith("http")]
+    if source_type == "oer":
+        if reference in urls:
+            return reference
+        close = difflib.get_close_matches(reference, urls, n=1, cutoff=URL_MATCH_CUTOFF) if reference.startswith("http") else []
+        return close[0] if close else None
+    if reference in tool_outputs and reference not in urls:
+        return reference
     digits = _DIGITS.search(reference)
-    if digits and digits.group() in tool_outputs:
-        return tool_outputs[digits.group()]
-    return ""
+    return digits.group() if digits and digits.group() in tool_outputs and digits.group() not in urls else None
 
 
 _WHITESPACE = re.compile(r"\s+")
@@ -44,9 +45,11 @@ def fuzzy_contains(needle: str, haystack: str, threshold: float = 0.75) -> bool:
     karakter cukup jauh walau isinya identik. Overlap kata tetap ketat soal ISI (kata yang tidak
     pernah ada di sumber = jelas dikarang, langsung menjatuhkan skor), tapi tidak peduli urutan/
     penggabungan kalimat."""
-    needle_words = [w for w in _WORD.findall(_normalize(needle).lower()) if len(w) > 2]
-    haystack_words = set(w for w in _WORD.findall(_normalize(haystack).lower()) if len(w) > 2)
+    needle_words = [w for w in _WORD.findall(_normalize(needle).lower()) if len(w) > 2 or w.isdigit()]
+    haystack_words = set(w for w in _WORD.findall(_normalize(haystack).lower()) if len(w) > 2 or w.isdigit())
     if not needle_words:
+        return False
+    if any(w.isdigit() and w not in haystack_words for w in needle_words):
         return False
     matched = sum(1 for w in needle_words if w in haystack_words)
     return (matched / len(needle_words)) >= threshold
@@ -54,19 +57,14 @@ def fuzzy_contains(needle: str, haystack: str, threshold: float = 0.75) -> bool:
 
 def verify_citations(sources: list[dict], tool_outputs: dict[str, str]) -> list[dict]:
     """`tool_outputs`: map reference -> konten mentah yang benar-benar dikembalikan tool (block
-    text, snippet OER/web, atau hasil Wolfram). Setiap source ditandai `verified` -- kalau False,
+    text atau snippet OER). Setiap source ditandai `verified` -- kalau False,
     TETAP ditampilkan ke siswa (bukan disembunyikan) tapi dengan label eksplisit, supaya siswa/guru
     tahu ada ketidakpastian, bukan ilusi keakuratan."""
     verified = []
     for source in sources:
-        raw_content = _lookup_raw_content(source.get("reference", ""), tool_outputs)
-        source = {**source, "verified": fuzzy_contains(source.get("evidence", ""), raw_content)}
-
-        # trust_tier DIHITUNG ULANG dari reference (URL)
-        if source.get("source_type") in ("web", "oer"):
-            source["trust_tier"] = trusted_domains.trust_tier(source.get("reference", ""))
-        elif source.get("source_type") == "modul":
-            source["trust_tier"] = None
-            
-        verified.append(source)
+        key = _resolve_reference(source.get("reference", ""), source.get("source_type", ""), tool_outputs)
+        checked = {**source, "verified": fuzzy_contains(source.get("evidence", ""), tool_outputs.get(key, ""))}
+        if checked["verified"] and source.get("source_type") == "oer":
+            checked["reference"] = key
+        verified.append(checked)
     return verified

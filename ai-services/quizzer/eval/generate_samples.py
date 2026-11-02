@@ -4,10 +4,10 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-AI_SERVICES = Path(r"E:\Lydera\ai-services")
+AI_SERVICES = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(AI_SERVICES))
 
-from quizzer.quizzer_pipeline import compute_for_chapter
+from quizzer.quizzer_pipeline import compute_for_quiz
 
 EVAL_DIR = AI_SERVICES / "clarifier" / "eval"
 OUT_DIR = Path(__file__).parent
@@ -15,8 +15,9 @@ OUT_DIR = Path(__file__).parent
 
 def run_chapter(chapter_id, blocks_path):
     blocks = json.loads(blocks_path.read_text(encoding="utf-8"))
-    results = compute_for_chapter(chapter_id, blocks, hots_count=6, lots_count=6)
-    return [{"soal": data, "validasi": validasi} for data, validasi in results]
+    chapter = {"chapter_id": chapter_id, "blocks": blocks, "cp_text": "", "hots_count": 6, "lots_count": 6}
+    items = compute_for_quiz([chapter])["items"]
+    return [{"soal": item["data"], "validasi": {"matches": not item["issues"], "issues": item["issues"]}} for item in items]
 
 
 bab1_soal = run_chapter(1, EVAL_DIR / "blocks" / "bab1.json")

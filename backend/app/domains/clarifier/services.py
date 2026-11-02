@@ -2,22 +2,26 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 
 from app.core.config import settings
 from app.core.db import AsyncSession
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.core.redis import get_redis_client
-from app.domains.chatbot.models import ChatSession
-from app.domains.chatbot.repositories.repository import ChatbotRepository
-from app.domains.chatbot.sync_search import make_search_module_executor
+from app.domains.clarifier.models import ChatSession
+from app.domains.clarifier.repositories.repository import ChatbotRepository
+from app.domains.clarifier.sync_search import make_search_module_executor
 from app.utils import paths
-from app.domains.chatbot.schemas.chat import ChatSessionResponseWithMessage
+from app.domains.clarifier.schemas.chat import ChatSessionResponseWithMessage
 
 paths.setup()
-from chatbot import agent as chatbot_agent  # noqa: E402  (ai-services/chatbot/agent.py)
-from chatbot import chunk as chatbot_chunk  # noqa: E402  (ai-services/chatbot/chunk.py)
-from chatbot import llm_ext  # noqa: E402  (ai-services/chatbot/llm_ext.py)
-from annotation import config as ai_config  # noqa: E402
+from clarifier import agent as clarifier_agent
+from clarifier import chunk as clarifier_chunk
+from clarifier import llm_ext
+from clarifier import config as ai_config
+
+
+logger = logging.getLogger(__name__)
 
 
 def _history_key(session_id: int) -> str:
@@ -37,10 +41,13 @@ class ChatbotService:
             raise BadRequestException("Bab ini belum punya block untuk diindeks (atau bab tidak ditemukan)")
 
         blocks_as_rows = [
-            {"id": b.id, "block_type": b.block_type, "readable_text": b.readable_text, "reading_order": b.reading_order}
+            {
+                "id": b.id, "block_type": b.block_type, "readable_text": b.readable_text,
+                "reading_order": b.reading_order, "source_markup": b.source_markup,
+            }
             for b in blocks
         ]
-        chunks = await asyncio.to_thread(chatbot_chunk.build_chunks, chapter_id, blocks_as_rows)
+        chunks = await asyncio.to_thread(clarifier_chunk.build_chunks, chapter_id, blocks_as_rows)
         if not chunks:
             raise BadRequestException("Tidak ada chunk yang bisa dibentuk dari bab ini")
 
@@ -51,7 +58,7 @@ class ChatbotService:
             chapter_id,
             kb.kb_version,
             [
-                {"block_ids": c.block_ids, "heading": c.heading, "text": c.text, "embedding": emb}
+                {"block_ids": c.block_ids, "heading": c.heading, "text": c.text, "formula_norm": c.formula_norm, "embedding": emb}
                 for c, emb in zip(chunks, embeddings)
             ],
         )
@@ -60,6 +67,9 @@ class ChatbotService:
 
     async def verify_classroom_teacher(self, classroom_id: int, teacher_id: int) -> bool:
         return await self.repo.verify_classroom_teacher(classroom_id, teacher_id)
+
+    async def verify_chapter_teacher(self, chapter_id: int, teacher_id: int) -> bool:
+        return await self.repo.verify_chapter_teacher(chapter_id, teacher_id)
 
     # --- Sesi ---
 
@@ -72,8 +82,9 @@ class ChatbotService:
         return session
 
     async def list_session(self, student_id:int, classroom_id:int) -> list[ChatSessionResponseWithMessage]:
-        result = await self.repo.get_list_sessions(student_id, classroom_id)
-        return result
+        if not await self.repo.validate_student_classroom_access(classroom_id, student_id):
+            raise ForbiddenException("Anda tidak memiliki akses ke kelas ini.")
+        return await self.repo.get_list_sessions(student_id, classroom_id)
     # --- Tanya jawab ---
 
     async def ask(self, session_id: int, student_id: int, question: str) -> dict:
@@ -84,19 +95,25 @@ class ChatbotService:
         history = await self._get_history(session_id)
         search_module_executor = make_search_module_executor(session.classroom_id, ai_config.TOP_K_CHUNKS)
 
-        result = await asyncio.to_thread(chatbot_agent.run, question, history, search_module_executor)
+        result = await asyncio.to_thread(clarifier_agent.run, question, history, search_module_executor)
 
         await self.repo.add_message(session_id, "user", question)
         await self.repo.add_message(
             session_id,
             "assistant",
             result["message"],
+            content_markup=result.get("message_markup"),
             tool_calls=result.get("tool_calls"),
             citations=result.get("sources"),
             scope_klass=result["scope"]["klass"],
         )
         await self.db.commit()
-        await self._push_history(session_id, question, result["message"])
+        if result.get("format_issues"):
+            logger.warning("rumus jawaban sesi %s bermasalah: %s", session_id, result["format_issues"])
+        try:
+            await self._push_history(session_id, question, result.get("message_markup") or result["message"])
+        except Exception:
+            logger.warning("riwayat Redis sesi %s tidak tersimpan", session_id, exc_info=True)
 
         return result
 
@@ -115,7 +132,7 @@ class ChatbotService:
             return [json.loads(item) for item in cached]
 
         messages = await self.repo.get_recent_messages(session_id, settings.CHAT_HISTORY_TURNS * 2)
-        return [{"role": m.role, "content": m.content} for m in messages]
+        return [{"role": m.role, "content": m.content_markup or m.content} for m in messages]
 
     async def _push_history(self, session_id: int, question: str, answer: str) -> None:
         redis_client = get_redis_client()

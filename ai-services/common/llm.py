@@ -11,6 +11,7 @@ from common import jsonutil
 RETRYABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError)
 MAX_RETRIES = 5
 BACKOFF_BASE = 2
+MAX_JSON_TOKENS = 32768
 
 JSON_FORMAT_REMINDER = (
     "\n\nPENTING: keluarkan HANYA satu objek JSON valid sesuai format yang diminta di atas -- "
@@ -19,6 +20,10 @@ JSON_FORMAT_REMINDER = (
 
 
 class ContentFilterError(ValueError):
+    pass
+
+
+class TruncatedOutputError(ValueError):
     pass
 
 
@@ -47,8 +52,7 @@ def _create(*, model: str, max_tokens: int, effort: str, **kwargs):
             raise
 
 
-def complete_text(system: str, user: str, model: str | None = None, max_tokens: int | None = None,
-                   effort: str | None = None) -> str:
+def _complete(system: str, user: str, model: str | None, max_tokens: int | None, effort: str | None):
     response = _create(
         model=model or config.TEXT_MODEL,
         max_tokens=max_tokens or config.TEXT_MAX_TOKENS,
@@ -58,10 +62,17 @@ def complete_text(system: str, user: str, model: str | None = None, max_tokens: 
             {"role": "user", "content": user},
         ],
     )
-    return (response.choices[0].message.content or "").strip()
+    choice = response.choices[0]
+    return (choice.message.content or "").strip(), choice.finish_reason == "length"
 
 
-def complete_vision(system: str, user: str, image_path: Path, model: str | None = None) -> str:
+def complete_text(system: str, user: str, model: str | None = None, max_tokens: int | None = None,
+                   effort: str | None = None) -> str:
+    return _complete(system, user, model, max_tokens, effort)[0]
+
+
+def complete_vision_json(system: str, user: str, image_path: Path, *, model: str | None = None,
+                         max_tokens: int | None = None, required_keys: tuple[str, ...] = ("deskripsi",)) -> dict:
     content = [
         {"type": "text", "text": user},
         {"type": "image_url", "image_url": {"url": _data_uri(image_path)}},
@@ -69,33 +80,43 @@ def complete_vision(system: str, user: str, image_path: Path, model: str | None 
     for attempt in range(2):
         response = _create(
             model=model or config.VISION_MODEL,
-            max_tokens=config.VISION_MAX_TOKENS,
+            max_tokens=max_tokens or config.VISION_MAX_TOKENS,
             effort=config.VISION_EFFORT,
             response_format={"type": "json_object"},
             messages=[{"role": "system", "content": system}, {"role": "user", "content": content}],
         )
         try:
-            description = str(jsonutil.parse_json(response.choices[0].message.content or "")["deskripsi"]).strip()
-            if description:
-                return description
+            data = jsonutil.parse_json(response.choices[0].message.content or "")
+            if all(data.get(key) not in (None, "") for key in required_keys):
+                return data
         except Exception:
             pass
         if attempt == 0:
             content[0]["text"] += JSON_FORMAT_REMINDER
-    raise ValueError("model tidak mengeluarkan deskripsi gambar dengan format JSON yang diharapkan setelah retry")
+    raise ValueError("model tidak mengeluarkan JSON gambar dengan format yang diharapkan setelah retry")
+
+
+def complete_vision(system: str, user: str, image_path: Path, model: str | None = None) -> str:
+    return str(complete_vision_json(system, user, image_path, model=model)["deskripsi"]).strip()
 
 
 def complete_json(system: str, user: str, *, model: str | None = None, max_tokens: int | None = None,
-                   required_keys: list[str] | None = None, effort: str | None = None) -> dict:
+                   required_keys: list[str] | None = None, effort: str | None = None, latex: bool = False) -> dict:
     """Sama seperti `complete_text` tapi hasilnya diparse+divalidasi sebagai JSON. Kalau parse
     gagal atau ada `required_keys` yang hilang (model keluar kosong/salah format -- bisa karena
     feedback adversarial atau sekadar model meleset), retry SEKALI dengan reminder format yang
     lebih tegas ditempel ke prompt. Kalau masih gagal, raise ValueError dengan pesan bersih --
     bukan JSONDecodeError/KeyError mentah yang bisa bocor ke response API."""
+    budget = max_tokens or config.TEXT_MAX_TOKENS
     for attempt in range(2):
-        raw = complete_text(system, user, model=model, max_tokens=max_tokens, effort=effort)
+        raw, truncated = _complete(system, user, model, budget, effort)
+        if truncated and budget < MAX_JSON_TOKENS:
+            budget = min(budget * 2, MAX_JSON_TOKENS)
+            raw, truncated = _complete(system, user, model, budget, effort)
+        if truncated:
+            raise TruncatedOutputError(f"keluaran model terpotong pada batas {budget} token")
         try:
-            data = jsonutil.parse_json(raw)
+            data = jsonutil.parse_json(raw, latex=latex)
             missing = [k for k in (required_keys or []) if k not in data]
             if not missing:
                 return data

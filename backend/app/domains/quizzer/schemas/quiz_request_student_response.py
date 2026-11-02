@@ -3,10 +3,10 @@ from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from app.domains.quizz.models.quiz_request import QuizRequestStatus
-from app.domains.quizz.schemas.module_quiz_response import ModuleQuizResponse
-from app.domains.quizz.models.quiz_progress import QuizReviewStatus
-from app.domains.quizz.schemas.quiz_request_teacher_response import QuestionOptionResponse, QuizRequestQuestionResponse
+from app.domains.quizzer.models.quiz_request import QuizRequestStatus
+from app.domains.quizzer.schemas.module_quiz_response import ModuleQuizResponse
+from app.domains.quizzer.models.quiz_progress import QuizReviewStatus
+from app.domains.quizzer.schemas.quiz_request_teacher_response import QuestionOptionResponse, QuizRequestQuestionResponse
 
 
 class QuizRequestStudentProgressResponse(BaseModel):
@@ -56,6 +56,9 @@ class QuestionStimulusStudentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     readable_text: str
+    source_markup: str = ""
+    ringkasan: Optional[str] = None
+    tabel: Optional[dict] = None
 
 class QuestionAnswerStudentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -70,7 +73,7 @@ class QuizRequestQuestionStudentResponse(BaseModel):
     id: int
     stimulus: Optional[QuestionStimulusStudentResponse]
     question_text: str
-    kesimpulan: str
+    markup: Optional[dict] = None
     options: List[QuestionOptionResponse] = Field(validation_alias="opsi")
     answer: QuestionAnswerStudentResponse | None = None
 

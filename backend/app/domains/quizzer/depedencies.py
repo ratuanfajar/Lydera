@@ -3,8 +3,8 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_db
-from app.domains.quizz.repositories.repository import QuizRepository
-from app.domains.quizz.services import QuizService
+from app.domains.quizzer.repositories.repository import QuizRepository
+from app.domains.quizzer.services import QuizService
 from app.core.redis import get_redis_client
 
 

@@ -4,11 +4,11 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-AI_SERVICES = Path(r"E:\Lydera\ai-services")
+AI_SERVICES = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(AI_SERVICES))
 
 from common import llm
-from quizzer import validate
+from quizzer import prompts, validate
 from quizzer.segment import build_segments
 
 EVAL_DIR = AI_SERVICES / "clarifier" / "eval"
@@ -29,9 +29,9 @@ def find_segment(soal: dict, segments: list):
 
 def derive_option(segment, soal: dict, model: str) -> str | None:
     stim_text = (soal.get("stimulus") or {}).get("readable_text", "")
-    prompt = validate.build_prompt(segment, soal["question_text"], soal["options"], stim_text)
+    prompt = prompts.validate_input(segment.text, soal["question_text"], soal["options"], stim_text)
     try:
-        result = llm.complete_json(validate.SYSTEM, prompt, model=model, max_tokens=validate.MAX_TOKENS,
+        result = llm.complete_json(prompts.VALIDATE_SYSTEM, prompt, model=model, max_tokens=validate.MAX_TOKENS,
                                     required_keys=["correct_option"])
         return result.get("correct_option")
     except Exception:

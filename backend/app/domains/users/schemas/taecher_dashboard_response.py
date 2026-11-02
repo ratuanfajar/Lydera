@@ -3,7 +3,7 @@ from typing import Any
 from pydantic import BaseModel
 from app.domains.classrooms.schemas import ClassroomInfoResponse
 from app.domains.contents.schemas.module.module_response import ModuleResponse
-from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestTeacherResponse
+from app.domains.quizzer.schemas.quiz_request_teacher_response import QuizRequestTeacherResponse
 
 class TeacherDashboardResponse(BaseModel):
     teacher_email: str

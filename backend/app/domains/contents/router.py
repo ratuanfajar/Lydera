@@ -21,7 +21,7 @@ from app.domains.contents.schemas.chapters.ingest_annonated_request import Inges
 from app.tasks.progress_tasks import enqueue_module_progress_job
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateDetailResponse
 from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
-from annotation import annotation_regenerate
+from annoter import annoter_regenerate
 
 from app.domains.contents.schemas import (
     BlockResponse, RegenerateRequest, RegenerateResponse, 
@@ -42,7 +42,7 @@ UPLOAD_DIR = Path(__file__).resolve().parents[3] / "uploads"
 # ==========================================
 # BLOCKS ROUTER
 # ==========================================
-router_blocks = APIRouter(prefix="/blocks", tags=["blocks"], route_class=WrappedRoute)
+router_blocks = APIRouter(prefix="/annoter/blocks", tags=["annoter"], route_class=WrappedRoute)
 
 @router_blocks.post("/bulk-regenerate/text", response_model=Response[RegenerateResponse])
 async def bulk_regenerate_text(
@@ -162,7 +162,8 @@ async def get_cps_by_fase_id(
 # ==========================================
 # CHAPTER ROUTER
 # ==========================================
-router_chapters = APIRouter(prefix="/chapters", tags=["chapters"], route_class=WrappedRoute)
+router_chapters = APIRouter(prefix="/annoter/chapters", tags=["annoter"], route_class=WrappedRoute)
+router_annoter_jobs = APIRouter(prefix="/annoter/jobs", tags=["annoter"], route_class=WrappedRoute)
 
 @router_chapters.post(
     "",
@@ -255,7 +256,7 @@ async def preview_chapter(
         )
 
 @router_chapters.post(
-    "/confirm/{chapter_id}",
+    "/{chapter_id}/confirm",
     description="Requires the TEACHER role.",
     response_model=Response[int],
     status_code=status.HTTP_201_CREATED,
@@ -279,8 +280,8 @@ async def confirm_chapter(
         data=result
 )
 
-@router_chapters.get(""
-"/jobs/{job_id}/stream",
+@router_annoter_jobs.get(
+"/{job_id}/stream",
 response_class=StreamingResponse,
     summary="Stream job progress updates via SSE",
     responses={

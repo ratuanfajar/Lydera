@@ -35,10 +35,11 @@ def _looks_compound(question: str) -> bool:
 
 
 def check_scope(question: str, top_chunks: list[dict]) -> dict:
-    """`top_chunks`: hasil `search_module_executor(question)` (sudah terurut similarity desc).
+    """`top_chunks`: hasil `search_module_executor(question)` (urutan fusi, bukan similarity).
     Balikkan {"klass": "inti"|"perluasan"|"campuran"|"di_luar_topik", "alasan": str,
     "bagian_di_luar_topik": str | None, "similarity": float}."""
-    similarity = top_chunks[0]["similarity"] if top_chunks else 0.0
+    best = max(top_chunks, key=lambda chunk: chunk["similarity"]) if top_chunks else None
+    similarity = best["similarity"] if best else 0.0
     compound = _looks_compound(question)
 
     if similarity >= config.SCOPE_SIM_HIGH and not compound:
@@ -57,8 +58,7 @@ def check_scope(question: str, top_chunks: list[dict]) -> dict:
         }
 
     # Zona abu-abu ATAU pertanyaan majemuk -- serahkan ke LLM classifier, pakai chunk paling mirip
-    best = top_chunks[0]
-    context = f"{best['heading']}: {best['text'][:500]}"
+    context =f"{best['heading']}: {best['text'][:500]}"
     prompt = f"Materi paling relevan yang tersedia: {context}\n\nPertanyaan siswa: {question}"
     try:
         raw = llm.complete_text(CLASSIFIER_SYSTEM, prompt, model=config.CHAT_MODEL, max_tokens=250)

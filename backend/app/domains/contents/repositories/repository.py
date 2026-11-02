@@ -69,6 +69,17 @@ class ContentRepository(ContentRepositoryInterface):
             raise ForbiddenException("Tidak punya akses, beberapa block bukan punya mu.")
         return blocks
     
+    async def get_neighbor_blocks(self, chapter_id: int, reading_order: int) -> list[Block]:
+        before = (
+            select(Block).where(Block.chapter_id == chapter_id, Block.reading_order < reading_order)
+            .order_by(Block.reading_order.desc()).limit(1)
+        )
+        after = (
+            select(Block).where(Block.chapter_id == chapter_id, Block.reading_order > reading_order)
+            .order_by(Block.reading_order.asc()).limit(1)
+        )
+        return [*(await self.db.scalars(before)).all(), *(await self.db.scalars(after)).all()]
+
     async def bulk_update_readable_text(self, update_data: list[dict]) -> bool:
         await self.db.execute(update(Block), update_data)
         await self.db.commit()

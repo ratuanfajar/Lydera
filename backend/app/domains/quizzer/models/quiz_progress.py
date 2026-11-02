@@ -28,6 +28,7 @@ class QuizProgress(Base):
         default=QuizReviewStatus.PENDING,
     )
     review_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    review_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         UniqueConstraint("quiz_request_id", "student_id", name="uq_quiz_progress_quiz_student"),

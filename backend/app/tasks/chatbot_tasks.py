@@ -2,8 +2,8 @@ import traceback
 
 from app.core.taskiq import broker
 from app.core.db import AsyncSessionLocal
-from app.domains.chatbot.repositories.repository import ChatbotRepository
-from app.domains.chatbot.services import ChatbotService
+from app.domains.clarifier.repositories.repository import ChatbotRepository
+from app.domains.clarifier.services import ChatbotService
 
 
 @broker.task

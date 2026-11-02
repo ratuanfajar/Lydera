@@ -12,8 +12,8 @@ from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.domains.contents.models import Module, ModuleProgress, ModuleStatus
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.users.models.student import student_classrooms
-from app.domains.quizz.models.quiz_request import QuizRequest, QuizRequestStatus
-from app.domains.quizz.models.quiz_progress import QuizProgress
+from app.domains.quizzer.models.quiz_request import QuizRequest, QuizRequestStatus
+from app.domains.quizzer.models.quiz_progress import QuizProgress
 from app.core.exceptions import NotFoundException
 
 

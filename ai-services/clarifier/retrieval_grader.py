@@ -22,12 +22,11 @@ GRADER_SYSTEM = (
 )
 
 NOTE_INCORRECT = (
-    "Tidak ada hasil modul yang dinilai relevan untuk pertanyaan ini. Coba search_oer atau "
-    "search_academic_web."
+    "Tidak ada hasil modul yang dinilai relevan untuk pertanyaan ini. Coba search_oer."
 )
 NOTE_AMBIGUOUS = (
     "Hasil modul relevan tapi belum lengkap/meyakinkan. Pertimbangkan melengkapi dengan search_oer "
-    "atau search_academic_web sebelum compose_answer."
+    "sebelum compose_answer."
 )
 
 

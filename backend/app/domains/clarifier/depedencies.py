@@ -2,8 +2,8 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import get_db
-from app.domains.chatbot.repositories.repository import ChatbotRepository
-from app.domains.chatbot.services import ChatbotService
+from app.domains.clarifier.repositories.repository import ChatbotRepository
+from app.domains.clarifier.services import ChatbotService
 
 
 def get_chatbot_repository(db: AsyncSession = Depends(get_db)) -> ChatbotRepository:

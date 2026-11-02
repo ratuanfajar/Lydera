@@ -1,6 +1,6 @@
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import ForeignKey, Index, Integer, Text
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy import Computed, ForeignKey, Index, Integer, Text
+from sqlalchemy.dialects.postgresql import ARRAY, TSVECTOR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.config import settings
@@ -8,7 +8,7 @@ from app.core.db import Base
 
 
 class BlockEmbedding(Base):
-    """Satu baris per chunk (bukan per block mentah -- lihat `ai-services/chatbot/chunk.py`).
+    """Satu baris per chunk (bukan per block mentah -- lihat `ai-services/clarifier/chunk.py`).
     `block_ids` menyimpan block mana saja yang tergabung dalam chunk ini, dipakai untuk melacak
     balik ke `blocks` asal saat menyusun evidence/citation."""
 
@@ -21,7 +21,10 @@ class BlockEmbedding(Base):
     chunk_text: Mapped[str] = mapped_column(Text, nullable=False)
     embedding: Mapped[list[float]] = mapped_column(Vector(settings.EMBEDDING_DIM), nullable=False)
     kb_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    lexical_tsv: Mapped[str | None] = mapped_column(TSVECTOR, Computed("to_tsvector('simple', chunk_text)", persisted=True))
+    formula_norm: Mapped[str] = mapped_column(Text, nullable=False, default="", server_default="")
 
     __table_args__ = (
         Index("ix_block_embeddings_chapter", "chapter_id", "kb_version"),
+        Index("ix_block_embeddings_lexical", "lexical_tsv", postgresql_using="gin"),
     )

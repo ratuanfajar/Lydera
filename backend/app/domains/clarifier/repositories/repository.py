@@ -5,9 +5,9 @@ from sqlalchemy import delete, exists, select
 from app.core.db import AsyncSession
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.contents.models import Block, Chapter, Module, ModuleStatus
-from app.domains.chatbot.models import BlockEmbedding, ChapterKb, ChatMessage, ChatSession
+from app.domains.clarifier.models import BlockEmbedding, ChapterKb, ChatMessage, ChatSession
 from app.domains.users.models.student import student_classrooms
-from app.domains.chatbot.schemas.chat import ChatSessionResponseWithMessage
+from app.domains.clarifier.schemas.chat import ChatSessionResponseWithMessage
 
 
 class ChatbotRepository:
@@ -23,7 +23,7 @@ class ChatbotRepository:
 
     async def get_chapter_ids_for_classroom(self, classroom_id: int) -> Sequence[int]:
         """Semua chapter di module yang published dalam satu classroom -- dipakai reindex massal
-        (`POST /chatbot/classrooms/{id}/reindex`), supaya guru tidak perlu reindex satu-satu."""
+        (`POST /clarifier/classrooms/{id}/reindex`), supaya guru tidak perlu reindex satu-satu."""
         stmt = (
             select(Chapter.id)
             .join(Module, Module.id == Chapter.module_id)
@@ -37,6 +37,15 @@ class ChatbotRepository:
             exists().where(Classroom.id == classroom_id, Classroom.teacher_id == teacher_id)
         )
         return bool(await self.db.scalar(stmt))
+
+    async def verify_chapter_teacher(self, chapter_id: int, teacher_id: int) -> bool:
+        stmt = (
+            select(Chapter.id)
+            .join(Module, Chapter.module_id == Module.id)
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(Chapter.id == chapter_id, Classroom.teacher_id == teacher_id)
+        )
+        return (await self.db.execute(stmt)).first() is not None
 
     async def validate_student_classroom_access(self, classroom_id: int, student_id: int) -> bool:
         stmt = select(
@@ -73,6 +82,7 @@ class ChatbotRepository:
                     heading=chunk["heading"],
                     chunk_text=chunk["text"],
                     embedding=chunk["embedding"],
+                    formula_norm=chunk["formula_norm"],
                     kb_version=kb_version,
                 )
             )
@@ -134,11 +144,13 @@ class ChatbotRepository:
         tool_calls: list | None = None,
         citations: list | None = None,
         scope_klass: str | None = None,
+        content_markup: str | None = None,
     ) -> ChatMessage:
         message = ChatMessage(
             session_id=session_id,
             role=role,
             content=content,
+            content_markup=content_markup,
             tool_calls=tool_calls,
             citations=citations,
             scope_klass=scope_klass,

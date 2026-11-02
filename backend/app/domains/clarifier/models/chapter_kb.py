@@ -10,7 +10,7 @@ class ChapterKb(Base):
     `kb_version` di-increment tiap reindex (guru republish bab) -- dipakai sebagai penanda embedding
     mana yang aktif di `block_embeddings` (kolom `kb_version` di situ). Tidak ada lagi anchor topik
     di sini -- scope gate sekarang pakai skor similarity retrieval langsung, bukan bandingkan ke
-    anchor statis per-chapter (lihat `ai-services/chatbot/scope_gate.py`)."""
+    anchor statis per-chapter (lihat `ai-services/clarifier/scope_gate.py`)."""
 
     __tablename__ = "chapter_kb"
 

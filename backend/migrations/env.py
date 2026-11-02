@@ -31,17 +31,17 @@ from app.domains.contents.models.fase import Fase
 from app.domains.contents.models.module_progress import ModuleProgress
 from app.domains.contents.models.chapter_progress import ChapterProgress
 from app.domains.jobs.models.job import Job
-from app.domains.quizz.models.quiz_request import QuizRequest
-from app.domains.quizz.models.quiz_request_chapter import QuizRequestChapter
-from app.domains.quizz.models.quiz_progress import QuizProgress
-from app.domains.quizz.models.soal import Soal
-from app.domains.quizz.models.soal_langkah import SoalLangkah
-from app.domains.quizz.models.soal_opsi import SoalOpsi
-from app.domains.quizz.models.soal_stimulus import SoalStimulus
-from app.domains.chatbot.models.chapter_kb import ChapterKb
-from app.domains.chatbot.models.block_embedding import BlockEmbedding
-from app.domains.chatbot.models.chat_session import ChatSession
-from app.domains.chatbot.models.chat_message import ChatMessage
+from app.domains.quizzer.models.quiz_request import QuizRequest
+from app.domains.quizzer.models.quiz_request_chapter import QuizRequestChapter
+from app.domains.quizzer.models.quiz_progress import QuizProgress
+from app.domains.quizzer.models.soal import Soal
+from app.domains.quizzer.models.soal_langkah import SoalLangkah
+from app.domains.quizzer.models.soal_opsi import SoalOpsi
+from app.domains.quizzer.models.soal_stimulus import SoalStimulus
+from app.domains.clarifier.models.chapter_kb import ChapterKb
+from app.domains.clarifier.models.block_embedding import BlockEmbedding
+from app.domains.clarifier.models.chat_session import ChatSession
+from app.domains.clarifier.models.chat_message import ChatMessage
 from app.domains.otp.models.otp import OtpVerificationCode
 # add every new domain's models import here
 

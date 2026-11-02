@@ -1,0 +1,18 @@
+[
+  {"id": "f01", "chapter": 1, "question": "Bagaimana rumus (f + g)(x) = f(x) + g(x)?", "expected_reading_orders": [167]},
+  {"id": "f02", "chapter": 1, "question": "Jelaskan (f × g)(x) = f(x) × g(x)", "expected_reading_orders": [186]},
+  {"id": "f03", "chapter": 1, "question": "Cari invers dari f(x) = (x+4)/(2x-5)", "expected_reading_orders": [385]},
+  {"id": "f04", "chapter": 1, "question": "Hitung (f o g)(x) jika f(x) = 1/x dan g(x) = 2x+1", "expected_reading_orders": [277]},
+  {"id": "f05", "chapter": 1, "question": "Berapa domain dari f(x) = √(x-3) + 4?", "expected_reading_orders": [121]},
+  {"id": "f06", "chapter": 1, "question": "Bagaimana grafik f(x) = (x^2 - 1)/x?", "expected_reading_orders": [116]},
+  {"id": "f07", "chapter": 1, "question": "Apakah g o f = f o g jika f(x) = 2x + 1 dan g(x) = x^2 + 4?", "expected_reading_orders": [251, 256, 263]},
+  {"id": "f08", "chapter": 1, "question": "Tentukan r(x) = -20x^2 + 1000x", "expected_reading_orders": [201]},
+  {"id": "f09", "chapter": 1, "question": "Jelaskan k(x) = 250(x+1) dan b(k) = 400k + 20.000", "expected_reading_orders": [293]},
+  {"id": "f10", "chapter": 1, "question": "Apa itu u(x) = -75x^2 + 300x - 140?", "expected_reading_orders": [403]},
+  {"id": "f11", "chapter": 1, "question": "Jelaskan h(t) = 20.000.000 * e^(-0.25t)", "expected_reading_orders": [132]},
+  {"id": "f12", "chapter": 2, "question": "Buktikan AB + PC = AC + PB", "expected_reading_orders": [279]},
+  {"id": "f13", "chapter": 2, "question": "Mengapa LK + MN = LM + NK?", "expected_reading_orders": [285]},
+  {"id": "f14", "chapter": 2, "question": "Apa maksud AP = BP + CP?", "expected_reading_orders": [411]},
+  {"id": "n01", "chapter": 1, "question": "Selesaikan x^2 + 7x + 12 = 0", "expected_reading_orders": []},
+  {"id": "n02", "chapter": 1, "question": "Berapakah nilai 3a - 2b = 17?", "expected_reading_orders": []}
+]

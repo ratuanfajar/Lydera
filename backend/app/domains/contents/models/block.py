@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, List, Optional
 from app.core.db import Base
 from sqlalchemy import (
     String, Integer, Text, CHAR, ForeignKey, CheckConstraint, Index, UniqueConstraint
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 class Block(Base):
@@ -20,6 +21,9 @@ class Block(Base):
     source_markup: Mapped[Optional[str]] = mapped_column(Text)
     caption: Mapped[Optional[str]] = mapped_column(Text)
     image_file: Mapped[Optional[str]] = mapped_column(Text)
+    image_kind: Mapped[Optional[str]] = mapped_column(Text)
+    ringkasan: Mapped[Optional[str]] = mapped_column(Text)
+    tabel: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB(none_as_null=True))
 
     __table_args__ = (
         CheckConstraint("block_type IN ('heading', 'text', 'formula', 'table', 'image')", name="check_block_type"),

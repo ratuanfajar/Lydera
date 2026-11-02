@@ -19,48 +19,14 @@ TOOLS_SCHEMA = [
         "function": {
             "name": "search_oer",
             "description": (
-                "Cari materi tambahan di katalog Open Educational Resources yang sudah divetting "
-                "(OpenStax, Khan Academy, Rumah Belajar Kemdikbud, MIT OCW). Panggil kalau modul "
-                "tidak cukup menjawab, sebelum web search umum."
+                "Cari materi tambahan di sumber Open Educational Resources yang sudah dikurasi "
+                "(OpenStax, Khan Academy, Ruang Murid Kemendikdasmen, dan Repositori Kemendikdasmen berupa "
+                "modul PDF untuk guru). Hanya hasil berskor relevansi tinggi yang dikembalikan; bisa kosong. "
+                "Panggil kalau modul tidak cukup menjawab."
             ),
             "parameters": {
                 "type": "object",
-                "properties": {
-                    "query": {"type": "string"},
-                    "subject": {"type": "string", "description": "topik/domain, mis. 'kalkulus'"},
-                },
-                "required": ["query"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "query_wolfram_alpha",
-            "description": (
-                "Verifikasi HANYA jawaban numerik/komputasi matematika (hasil hitung, nilai limit, "
-                "hasil integral, dsb). Mengembalikan satu baris jawaban singkat, BUKAN langkah "
-                "penyelesaian -- dipakai untuk cross-check, bukan sumber penjelasan konsep."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {"query": {"type": "string"}},
-                "required": ["query"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "search_academic_web",
-            "description": (
-                "Cari di web SAAT informasi tidak ada di modul maupun OER. Hasil sudah difilter ke "
-                "sumber akademik/pemerintah terpercaya saja (.edu/.gov/arxiv/dsb). LAST RESORT -- "
-                "panggil paling akhir."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {"query": {"type": "string"}},
+                "properties": {"query": {"type": "string", "description": "frasa topik singkat tanpa kata tanya"}},
                 "required": ["query"],
             },
         },
@@ -84,20 +50,34 @@ TOOLS_SCHEMA = [
                             "properties": {
                                 "source_type": {
                                     "type": "string",
-                                    "enum": ["modul", "oer", "wolfram_alpha", "web"],
+                                    "enum": ["modul", "oer"],
                                 },
-                                "label": {"type": "string"},
+                                "label": {
+                                    "type": "string",
+                                    "description": (
+                                        "Nama sumber singkat dalam kalimat biasa berbahasa Indonesia, tanpa URL, tanpa tanda pisah "
+                                        "atau garis tegak, tanpa ekstensi berkas, garis bawah, atau kode seperti KD 3.5 dan KK B. "
+                                        "Contoh: Ruang Murid, materi lingkaran dan busur lingkaran; Repositori Kemendikdasmen, "
+                                        "modul matematika kelas sebelas, bab lingkaran. "
+                                        "Untuk modul: judul bagian atau bab dari heading, bukan nomor."
+                                    ),
+                                },
                                 "reference": {
                                     "type": "string",
                                     "description": (
                                         "HARUS persis disalin dari field \"reference\" di hasil tool "
-                                        "search_module/search_oer/search_academic_web -- untuk modul "
-                                        "cuma ANGKA polos (contoh: \"85\", BUKAN \"block_id 85\" atau "
-                                        "teks lain), untuk oer/web URL utuh, untuk wolfram query yang dikirim."
+                                        "search_module (cuma ANGKA polos, contoh: \"85\", BUKAN "
+                                        "\"block_id 85\" atau teks lain) atau dari field \"url\" di hasil search_oer (URL utuh)."
                                     ),
                                 },
-                                "evidence": {"type": "string", "description": "kutipan LANGSUNG dari isi sumber"},
-                                "justification": {"type": "string"},
+                                "evidence": {"type": "string", "description": "satu atau dua kalimat utuh dari isi sumber, tanpa kalimat yang terpotong dan tanpa fragmen rumus yang berantakan; bila rumusnya berantakan, kutip kalimat narasi di sekitarnya"},
+                                "justification": {
+                                    "type": "string",
+                                    "description": (
+                                        "Satu kalimat Indonesia tentang alasan sumber relevan, tanpa simbol matematika mentah. "
+                                        "Kalau evidence berbahasa Inggris, sebut intinya dalam bahasa Indonesia."
+                                    ),
+                                },
                             },
                             "required": ["source_type", "label", "reference", "evidence", "justification"],
                         },
@@ -105,8 +85,12 @@ TOOLS_SCHEMA = [
                     "summary": {
                         "type": "string",
                         "description": (
-                            "Ringkasan jawaban, MAKSIMAL 2-3 kalimat, langsung ke inti, kalimat "
-                            "mengalir biasa (tanpa bullet/markdown) -- dibacakan pembaca layar."
+                            "Ringkasan jawaban, MAKSIMAL 3 kalimat inti, langsung ke inti, kalimat mengalir biasa. "
+                            "Tanpa markdown dan tanpa pembuka seperti 'Berikut' atau 'Jadi'. Rumus matematika ditulis "
+                            "dalam LaTeX di antara tanda dolar, mis. $(x - h)^2 + (y - k)^2 = r^2$; sistem mengubahnya "
+                            "menjadi kata untuk pembaca layar, jadi jangan menulis simbol di luar tanda dolar. "
+                            "Satuan ditulis lengkap ('kilometer per jam'). "
+                            "Dibacakan pembaca layar."
                         ),
                     },
                     "suggested_questions": {
@@ -116,7 +100,8 @@ TOOLS_SCHEMA = [
                             "OPSIONAL, isi 1-2 pertanyaan rujukan seputar materi yang benar-benar "
                             "tersedia (dari hasil search_module) -- WAJIB diisi kalau pertanyaan "
                             "siswa majemuk dan sebagian di luar cakupan, supaya siswa tahu apa yang "
-                            "masih bisa ditanyakan. Kosongkan kalau tidak perlu."
+                            "masih bisa ditanyakan. Kosongkan kalau tidak perlu. Tulis seperti diucapkan: "
+                            "tanpa simbol matematika mentah dan tanpa markdown."
                         ),
                     },
                 },
@@ -125,5 +110,3 @@ TOOLS_SCHEMA = [
         },
     },
 ]
-
-EXTERNAL_TOOL_NAMES = {"query_wolfram_alpha", "search_oer", "search_academic_web"}

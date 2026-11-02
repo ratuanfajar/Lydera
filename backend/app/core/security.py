@@ -1,3 +1,4 @@
+import logging
 from fastapi import Depends
 from pydantic import ValidationError
 
@@ -40,12 +41,15 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
         algorithm=settings.JWT_ALGORITHM,
     )
 
+logger = logging.getLogger(__name__)
+
+
 def decode_access_token(token : str) -> Payload:
     try:
         payload_dict = jwt.decode(token, settings.APP_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM])
         return Payload.model_validate(payload_dict)
     except Exception as e:
-        print(f"ERROR JWT DECODE: {repr(e)}")
+        logger.warning("JWT decode gagal: %s", type(e).__name__)
         raise CredentialException
 
 def verify_token(

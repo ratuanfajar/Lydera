@@ -6,9 +6,9 @@ from app.domains.cities.models.city import City
 from app.domains.classrooms.models import Classroom
 from app.domains.contents.models.chapter_progress import ChapterProgress
 from app.domains.contents.models import Chapter, Block, Module, Cp, Fase, ModuleProgress, ModuleStatus
-from app.domains.quizz.models import QuizRequest, SoalStimulus, SoalOpsi, SoalLangkah, Soal, QuizRequestChapter
+from app.domains.quizzer.models import QuizRequest, SoalStimulus, SoalOpsi, SoalLangkah, Soal, QuizRequestChapter
 from app.domains.jobs.models import Job
-from app.domains.quizz.models.quiz_progress import QuizProgress
+from app.domains.quizzer.models.quiz_progress import QuizProgress
 from app.domains.users.models.user import User
 from app.domains.users.models.teacher import Teacher
 from app.domains.users.models.student import Student
@@ -17,6 +17,5 @@ from app.domains.cities.models.city import City
 from app.domains.classrooms.models import Classroom
 from app.domains.contents.models.chapter_progress import ChapterProgress
 from app.domains.contents.models import Chapter, Block, Module, Cp, Fase, ModuleProgress, ModuleStatus
-from app.domains.quizz.models import QuizRequest, SoalStimulus, SoalOpsi, SoalLangkah, Soal, QuizRequestChapter
-from app.domains.chatbot.models import BlockEmbedding, ChapterKb, ChatMessage, ChatSession
+from app.domains.clarifier.models import BlockEmbedding, ChapterKb, ChatMessage, ChatSession
 from app.domains.otp.models.otp import OtpVerificationCode

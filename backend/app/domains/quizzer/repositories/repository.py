@@ -5,18 +5,19 @@ from sqlalchemy import Label, and_, delete, func, insert, or_, select
 from sqlalchemy.orm import contains_eager, joinedload, selectinload
 
 from app.core.db import AsyncSession
-from app.domains.contents.models import Block, Chapter, Module
-from app.domains.quizz.models import (
+from app.domains.contents.models import Block, Chapter, Cp, Module
+from app.domains.quizzer.models import (
     QuizRequest, QuizRequestChapter, Soal, SoalJawaban, SoalJawabanLangkah,
     SoalLangkah, SoalOpsi, SoalStimulus,
 )
-from app.domains.quizz.repositories.interface import QuizRepositoryInterface
-from app.domains.quizz.schemas.quiz_request_query import QuizRequestQueryStatus
+from app.domains.quizzer.repositories.interface import QuizRepositoryInterface
+from app.domains.quizzer.schemas.quiz_request_query import QuizRequestQueryStatus
 from app.domains.classrooms.models.classroom import Classroom
-from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest
-from app.domains.quizz.models.quiz_progress import QuizProgress
-from app.domains.quizz.models.quiz_request import QuizRequestStatus
-from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
+from app.domains.users.models.student import student_classrooms
+from app.domains.quizzer.schemas.soal_create_request import SoalCreateRequest
+from app.domains.quizzer.models.quiz_progress import QuizProgress
+from app.domains.quizzer.models.quiz_request import QuizRequestStatus
+from app.domains.quizzer.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
 from app.core.exceptions import NotFoundException
 
 
@@ -38,11 +39,32 @@ class QuizRepository(QuizRepositoryInterface):
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none() is not None
 
+    async def validate_soal_owner(self, soal_id: int, teacher_id: int) -> bool:
+        stmt = (
+            select(Soal.id)
+            .join(QuizRequest, Soal.quiz_request_id == QuizRequest.id)
+            .join(Module, QuizRequest.module_id == Module.id)
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(Soal.id == soal_id, Classroom.teacher_id == teacher_id)
+        )
+        return (await self.db.execute(stmt)).scalar_one_or_none() is not None
+
+    async def is_student_in_classroom(self, student_id: int, classroom_id: int) -> bool:
+        stmt = select(student_classrooms.c.student_id).where(
+            student_classrooms.c.student_id == student_id,
+            student_classrooms.c.classroom_id == classroom_id,
+        )
+        return (await self.db.execute(stmt)).first() is not None
+
     # Module/Chapter
     async def get_blocks_for_chapter(self, chapter_id: int) -> Sequence[Block]:
         stmt = select(Block).where(Block.chapter_id == chapter_id).order_by(Block.reading_order)
         result = await self.db.scalars(stmt)
         return result.all()
+
+    async def get_chapter_cp_text(self, chapter_id: int) -> str:
+        stmt = select(Cp.cp_text).join(Chapter, Chapter.cp_id == Cp.id).where(Chapter.id == chapter_id)
+        return await self.db.scalar(stmt) or ""
 
     # QuizRequest
     async def validate_ownership_and_hierarchy(
@@ -284,7 +306,7 @@ class QuizRepository(QuizRepositoryInterface):
         return True
 
     # Soal
-    async def save_quiz_data(self, quiz_request_id: int, classroom_id:int, status_val: str, items: List[SoalCreateRequest]) -> bool:
+    async def save_quiz_data(self, quiz_request_id: int, classroom_id:int, status_val: str, items: List[SoalCreateRequest], coverage_report: Optional[dict] = None) -> bool:
         quiz_req = await self.db.get(QuizRequest, quiz_request_id)
 
         if not quiz_req:
@@ -292,6 +314,8 @@ class QuizRepository(QuizRepositoryInterface):
 
         quiz_req.status = status_val
         quiz_req.classroom_id = classroom_id
+        if coverage_report is not None:
+            quiz_req.coverage_report = coverage_report
 
         await self.db.execute(delete(Soal).where(Soal.quiz_request_id == quiz_request_id))
         await self.db.execute(delete(SoalStimulus).where(SoalStimulus.quiz_request_id == quiz_request_id))
@@ -306,6 +330,8 @@ class QuizRepository(QuizRepositoryInterface):
                     chapter_id=item.chapter_id,
                     source_markup=item.data.stimulus.source_markup or "",
                     readable_text=item.data.stimulus.readable_text,
+                    ringkasan=item.data.stimulus.ringkasan,
+                    tabel=item.data.stimulus.tabel,
                     source_reading_order_start=(
                         item.data.stimulus.source_reading_order_start
                         if item.data.stimulus.source_reading_order_start is not None
@@ -339,6 +365,8 @@ class QuizRepository(QuizRepositoryInterface):
                 source_reading_order_end=item.data.reading_order_end,
                 review_priority=item.review_priority,
                 validation_notes=item.validation_notes,
+                source_point=item.source_point,
+                markup=item.data.markup,
             )
             soal_objects.append(soal)
         self.db.add_all(soal_objects)
@@ -398,8 +426,14 @@ class QuizRepository(QuizRepositoryInterface):
         result = await self.db.scalars(stmt)
         return result.all()
 
-    async def update_stimulus_text(self, stimulus: SoalStimulus, readable_text: str) -> None:
+    async def update_stimulus_text(
+        self, stimulus: SoalStimulus, readable_text: str, source_markup: str = "",
+        ringkasan: str | None = None, tabel: dict | None = None,
+    ) -> None:
         stimulus.readable_text = readable_text
+        stimulus.source_markup = source_markup
+        stimulus.ringkasan = ringkasan
+        stimulus.tabel = tabel
         stimulus.review_status = "edited"
 
     async def replace_soal_opsi(self, soal_id: int, options: dict[str, str]) -> None:
@@ -535,9 +569,14 @@ class QuizRepository(QuizRepositoryInterface):
         result = await self.db.scalars(stmt)
         return result.one_or_none()
 
-    async def save_evaluation(self, jawaban: SoalJawaban, divergence_step: int | None,
-                               diagnosis: str, personalized_justification: str) -> None:
-        jawaban.divergence_step = divergence_step
-        jawaban.diagnosis = diagnosis
-        jawaban.personalized_justification = personalized_justification
+    async def refresh_quiz_progress(self, progress: QuizProgress) -> None:
+        await self.db.refresh(progress)
+
+    async def save_evaluation(self, jawaban: SoalJawaban, evaluation: dict) -> None:
+        jawaban.divergence_step = evaluation["divergence_step"]
+        jawaban.error_type = evaluation["error_type"]
+        jawaban.diagnosis = evaluation["diagnosis"]
+        jawaban.justification_points = evaluation["justification_points"]
+        jawaban.personalized_justification = evaluation["personalized_justification"]
+        jawaban.needs_review = evaluation["needs_review"]
         jawaban.evaluated_at = datetime.now(timezone.utc)

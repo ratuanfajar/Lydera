@@ -8,3 +8,6 @@ class RegenerateResponse(BaseModel):
 class RegenerateDetailResponse(BaseModel):
     readable_text: str
     block_id:int
+    ringkasan: str | None = None
+    tabel: dict | None = None
+    review_priority: str | None = None

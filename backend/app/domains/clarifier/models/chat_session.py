@@ -9,7 +9,7 @@ from app.core.db import Base
 class ChatSession(Base):
     """Satu sesi tanya-jawab siswa, di-scope ke CLASSROOM (bukan satu chapter) -- retrieval lewat
     pgvector otomatis nyari lintas semua chapter published di classroom ini, similarity-nya sendiri
-    yang jadi sinyal scope gate (lihat `ai-services/chatbot/scope_gate.py`), jadi tidak perlu siswa
+    yang jadi sinyal scope gate (lihat `ai-services/clarifier/scope_gate.py`), jadi tidak perlu siswa
     deklarasi chapter_id mana saja secara eksplisit."""
 
     __tablename__ = "chat_sessions"

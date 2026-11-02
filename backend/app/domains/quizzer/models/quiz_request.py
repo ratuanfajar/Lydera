@@ -5,6 +5,7 @@ from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, St
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.db import Base
 from sqlalchemy import Enum as SQLEnum
+from sqlalchemy.dialects.postgresql import JSONB
 
 class QuizRequestStatus(str, Enum):
     DRAFT = "draft"
@@ -24,6 +25,7 @@ class QuizRequest(Base):
     )
     status: Mapped[str] = mapped_column(Text, nullable=False, server_default='queued')
     error: Mapped[Optional[str]] = mapped_column(Text)
+    coverage_report: Mapped[Optional[dict]] = mapped_column(JSONB)
 
     max_retry: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     max_duration_minutes: Mapped[int] = mapped_column(Integer, nullable=False)

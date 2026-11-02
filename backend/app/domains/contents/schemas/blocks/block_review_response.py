@@ -11,3 +11,6 @@ class BlockPreviewResponse(BaseModel):
     caption: str | None
     image_file: str | None
     page: int | None
+    image_kind: str | None = None
+    ringkasan: str | None = None
+    tabel: dict | None = None

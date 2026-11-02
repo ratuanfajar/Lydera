@@ -3,24 +3,30 @@ from datetime import datetime
 from typing import List, Optional, Sequence
 
 from app.domains.contents.models import Block, Chapter, Module
-from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalStimulus
-from app.domains.quizz.schemas.quiz_request_query import QuizRequestQueryStatus
-from app.domains.quizz.schemas.quiz_request_create import QuizChapterRequest
-from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest
-from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
-from app.domains.quizz.models import QuizRequest, QuizRequestChapter, Soal, SoalJawaban, SoalStimulus
-from app.domains.quizz.models.quiz_progress import QuizProgress
+from app.domains.quizzer.models import QuizRequest, QuizRequestChapter, Soal, SoalStimulus
+from app.domains.quizzer.schemas.quiz_request_query import QuizRequestQueryStatus
+from app.domains.quizzer.schemas.quiz_request_create import QuizChapterRequest
+from app.domains.quizzer.schemas.soal_create_request import SoalCreateRequest
+from app.domains.quizzer.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
+from app.domains.quizzer.models import QuizRequest, QuizRequestChapter, Soal, SoalJawaban, SoalStimulus
+from app.domains.quizzer.models.quiz_progress import QuizProgress
 
 class QuizRepositoryInterface(ABC):
     # Module/Chapter (validasi request)
     @abstractmethod
     async def get_blocks_for_chapter(self, chapter_id: int) -> Sequence[Block]: raise NotImplementedError
+    @abstractmethod
+    async def get_chapter_cp_text(self, chapter_id: int) -> str: raise NotImplementedError
 
     # QuizRequest
     @abstractmethod
     async def validate_ownership_and_hierarchy(self, teacher_id: int, classroom_id: int, module_id: int, chapter_ids: list[int]) -> tuple[bool, str | None]: raise NotImplementedError
     @abstractmethod
     async def validate_quiz_request(self, quiz_request_id:int, teacher_id: int, classroom_id: int) -> bool: raise NotImplementedError
+    @abstractmethod
+    async def validate_soal_owner(self, soal_id: int, teacher_id: int) -> bool: raise NotImplementedError
+    @abstractmethod
+    async def is_student_in_classroom(self, student_id: int, classroom_id: int) -> bool: raise NotImplementedError
     @abstractmethod
     async def create_quiz_request(self, module_id: int, title:str, classroom_id:int,max_duration_minutes: int, max_retry:int, start_time: datetime, end_time: datetime) -> QuizRequest: raise NotImplementedError
     @abstractmethod
@@ -50,6 +56,9 @@ class QuizRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_quiz_progress(self, quiz_request_id: int, student_id: int) -> QuizProgress | None: raise NotImplementedError
+
+    @abstractmethod
+    async def refresh_quiz_progress(self, progress: QuizProgress) -> None: raise NotImplementedError
 
     @abstractmethod
     async def update_soal_jawaban(
@@ -85,13 +94,16 @@ class QuizRepositoryInterface(ABC):
     @abstractmethod
     async def get_soal_by_stimulus(self, stimulus_id: int) -> Sequence[Soal]: raise NotImplementedError
     @abstractmethod
-    async def update_stimulus_text(self, stimulus: SoalStimulus, readable_text: str) -> None: raise NotImplementedError
+    async def update_stimulus_text(
+        self, stimulus: SoalStimulus, readable_text: str, source_markup: str = "",
+        ringkasan: str | None = None, tabel: dict | None = None,
+    ) -> None: raise NotImplementedError
     @abstractmethod
     async def replace_soal_opsi(self, soal_id: int, options: dict[str, str]) -> None: raise NotImplementedError
     @abstractmethod
     async def replace_soal_langkah(self, soal_id: int, langkah: list[str]) -> None: raise NotImplementedError
     @abstractmethod
-    async def save_quiz_data(self, quiz_request_id: int, classroom_id:int, status_val: str, items: List[SoalCreateRequest]) -> bool : raise NotImplementedError
+    async def save_quiz_data(self, quiz_request_id: int, classroom_id:int, status_val: str, items: List[SoalCreateRequest], coverage_report: dict | None = None) -> bool : raise NotImplementedError
     
 
     # SoalJawaban (jawaban siswa)
@@ -105,8 +117,7 @@ class QuizRepositoryInterface(ABC):
     async def get_jawaban_for_request(self, quiz_request_id: int, student_id: int) -> Sequence[SoalJawaban]:
         raise NotImplementedError
     @abstractmethod
-    async def save_evaluation(self, jawaban: SoalJawaban, divergence_step: int | None,
-    diagnosis: str, personalized_justification: str) -> None:
+    async def save_evaluation(self, jawaban: SoalJawaban, evaluation: dict) -> None:
         raise NotImplementedError
 
     @abstractmethod

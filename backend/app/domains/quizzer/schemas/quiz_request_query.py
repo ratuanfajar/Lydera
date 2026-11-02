@@ -2,7 +2,7 @@ from enum import Enum
 from fastapi import Query
 from pydantic import BaseModel
 from typing import Annotated
-from app.domains.quizz.models.quiz_request import QuizRequestStatus
+from app.domains.quizzer.models.quiz_request import QuizRequestStatus
 
 class QuizRequestQueryStatus(str, Enum):
     ALL = "Semua"
