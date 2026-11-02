@@ -1,0 +1,155 @@
+[
+  {
+    "id": "bab1-q1",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "konsep",
+    "question": "Apa syarat suatu relasi disebut fungsi?",
+    "reference": "Tiap anggota domain dipetakan ke tepat satu anggota kodomain.",
+    "source_heading": ["1. Fungsi dan Bukan Fungsi"]
+  },
+  {
+    "id": "bab1-q2",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "konsep",
+    "question": "Apa itu relasi, dan bagaimana relasi direpresentasikan?",
+    "reference": "Relasi menjelaskan hubungan antar anggota dua himpunan; direpresentasikan sebagai himpunan pasangan berurutan, diagram panah, atau diagram Kartesius.",
+    "source_heading": ["Ayo Mengingat Kembali"]
+  },
+  {
+    "id": "bab1-q3",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "konsep",
+    "question": "Apa definisi formal komposisi fungsi f∘g?",
+    "reference": "Jika g:A→B dan f:B→C adalah dua fungsi, maka komposisi f∘g adalah fungsi dari domain A ke kodomain C.",
+    "source_heading": ["Definisi Komposisi Fungsi"]
+  },
+  {
+    "id": "bab1-q4",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "konsep",
+    "question": "Apa syarat agar dua fungsi f dan g dapat dikomposisikan?",
+    "reference": "Dua fungsi f dan g dapat dikomposisikan sebagai f∘g jika range dari g merupakan himpunan bagian dari domain f.",
+    "source_heading": ["Syarat Komposisi Fungsi"]
+  },
+  {
+    "id": "bab1-q5",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "konsep",
+    "question": "Apa perbedaan fungsi injektif, surjektif, dan bijektif?",
+    "reference": "Injektif: tiap anggota A dipetakan ke anggota B yang berbeda, masih ada anggota B yang tidak mendapat pasangan. Surjektif: semua anggota B mendapat pasangan, namun ada anggota B yang menerima lebih dari satu panah. Bijektif: setiap anggota A dipasangkan tepat satu kali dengan setiap anggota B (satu-satu, semua B terisi).",
+    "source_heading": ["1. Fungsi Injektif, Surjektif, dan Bijektif"]
+  },
+  {
+    "id": "bab1-q6",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "prosedur",
+    "question": "Bagaimana aturan domain hasil penjumlahan, pengurangan, perkalian, dan pembagian dua fungsi?",
+    "reference": "Domain hasil penjumlahan, pengurangan, dan perkalian dua fungsi f dan g adalah irisan domain f dan domain g (Df ∩ Dg). Khusus pembagian f/g, domainnya adalah (Df ∩ Dg) dikurangi himpunan x sedemikian sehingga g(x) = 0.",
+    "source_heading": ["1. Penjumlahan dan Pengurangan Fungsi", "2. Perkalian dan Pembagian Fungsi"]
+  },
+  {
+    "id": "bab1-q7",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "prosedur",
+    "question": "Apakah operasi komposisi fungsi bersifat asosiatif menurut eksplorasi di buku?",
+    "reference": "Ya. Berdasarkan Eksplorasi 1.5, komposisi fungsi memenuhi sifat asosiatif: (f∘g)∘h = f∘(g∘h).",
+    "source_heading": ["Sifat Asosiatif"]
+  },
+  {
+    "id": "bab1-q8",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "campuran",
+    "question": "Bagaimana hubungan antara definisi komposisi fungsi dan syarat agar komposisi itu terdefinisi?",
+    "reference": "Definisi menjelaskan f∘g sebagai pemetaan dari domain A (domain g) ke kodomain C (kodomain f), melalui B (kodomain g yang juga domain f). Syarat komposisi (range g harus merupakan himpunan bagian dari domain f) menentukan kapan pemetaan f∘g itu valid dilakukan untuk seluruh domain A.",
+    "source_heading": ["Definisi Komposisi Fungsi", "Syarat Komposisi Fungsi"]
+  },
+  {
+    "id": "bab1-q9",
+    "chapter": 1,
+    "chapter_title": "Komposisi Fungsi dan Fungsi Invers",
+    "category": "overview",
+    "question": "Apa saja tiga topik utama yang dibahas dalam bab Komposisi Fungsi dan Fungsi Invers ini?",
+    "reference": "A. Fungsi, B. Komposisi Fungsi, dan C. Fungsi Invers.",
+    "source_heading": ["A. Fungsi", "B. Komposisi Fungsi", "C. Fungsi Invers"]
+  },
+  {
+    "id": "bab2-q1",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "konsep",
+    "question": "Apa perbedaan sudut pusat dan sudut keliling pada lingkaran?",
+    "reference": "Sudut pusat adalah sudut yang titik sudutnya terletak pada pusat lingkaran dan kaki-kaki sudutnya adalah jari-jari lingkaran. Sudut keliling adalah sudut yang titik sudutnya terletak pada lingkaran dan kaki-kaki sudutnya berupa tali busur.",
+    "source_heading": ["A. Lingkaran dan Busur Lingkaran"]
+  },
+  {
+    "id": "bab2-q2",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "konsep",
+    "question": "Apa itu apotema?",
+    "reference": "Apotema adalah ruas garis dari pusat lingkaran yang tegak lurus terhadap tali busur.",
+    "source_heading": ["3. Apotema"]
+  },
+  {
+    "id": "bab2-q3",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "konsep",
+    "question": "Apa itu busur minor, busur mayor, dan tali busur?",
+    "reference": "Busur minor adalah busur yang lebih kecil (jika hanya disebut 'busur' saja, yang dimaksud adalah busur minor); busur mayor adalah bagian yang lebih besar. Tali busur adalah ruas garis yang menghubungkan dua titik pada lingkaran.",
+    "source_heading": ["A. Lingkaran dan Busur Lingkaran", "C. Lingkaran dan Tali Busur"]
+  },
+  {
+    "id": "bab2-q4",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "prosedur",
+    "question": "Bunyikan Teorema Thales tentang sudut yang menghadap diameter lingkaran.",
+    "reference": "Jika tiga titik A, B, C terletak pada lingkaran dan AB adalah diameter, maka sudut ACB siku-siku.",
+    "source_heading": ["Teorema Thales:"]
+  },
+  {
+    "id": "bab2-q5",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "prosedur",
+    "question": "Apa hubungan besar sudut pusat dan sudut keliling yang menghadap busur yang sama?",
+    "reference": "Sudut pusat besarnya dua kali sudut keliling yang menghadap pada busur yang sama.",
+    "source_heading": ["Rangkuman"]
+  },
+  {
+    "id": "bab2-q6",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "campuran",
+    "question": "Bagaimana alur pembuktian teorema 'sudut pusat = 2 × sudut keliling' pada kasus 1 (saat AC melalui pusat O)?",
+    "reference": "Karena OA = OB (jari-jari lingkaran), segitiga AOB sama kaki sehingga sudut OAB = sudut OBA = α. Jumlah sudut dalam segitiga AOB adalah 180°, sehingga sudut AOB = 180° - 2α. Sudut AOB berpelurus dengan sudut BOC (β), sehingga β = 180° - sudut AOB = 180° - (180° - 2α) = 2α.",
+    "source_heading": ["Pembuktian"]
+  },
+  {
+    "id": "bab2-q7",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "konsep",
+    "question": "Apa itu garis singgung persekutuan luar dan garis singgung persekutuan dalam pada dua lingkaran?",
+    "reference": "Garis singgung persekutuan adalah garis singgung yang merupakan garis singgung bagi dua lingkaran sekaligus. Ada dua jenis: garis singgung persekutuan luar dan garis singgung persekutuan dalam, dibedakan dari posisi garis tersebut relatif terhadap kedua lingkaran.",
+    "source_heading": ["5. Garis singgung persekutuan luar", "7. Garis singgung persekutuan dalam"]
+  },
+  {
+    "id": "bab2-q8",
+    "chapter": 2,
+    "chapter_title": "Lingkaran",
+    "category": "overview",
+    "question": "Apa saja tiga topik utama yang dibahas dalam bab Lingkaran ini?",
+    "reference": "A. Lingkaran dan Busur Lingkaran, B. Lingkaran dan Garis Singgung, dan C. Lingkaran dan Tali Busur.",
+    "source_heading": ["A. Lingkaran dan Busur Lingkaran", "B. Lingkaran dan Garis Singgung", "C. Lingkaran dan Tali Busur"]
+  }
+]
