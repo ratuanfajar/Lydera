@@ -13,7 +13,7 @@ from app.core.response import Response, get_response_message, COMMON_VALIDATION_
 from app.core.route import WrappedRoute
 from app.core.security import Roles
 from app.utils.role import Role
-from app.domains.quizz.depedencies import get_quiz_service
+from app.domains.quizz.depedencies import get_quiz_service, get_soal_service, get_quiz_taking_service, get_quiz_result_service
 from app.domains.quizz.models import Soal
 from app.domains.quizz.schemas import (
     QuizRequestCreate,
@@ -28,7 +28,10 @@ from app.domains.quizz.schemas import (
     SoalSubmitRequest,
     SoalSubmitResponse,
 )
-from app.domains.quizz.services import QuizService
+from app.domains.quizz.services.quiz_request_service import QuizRequestService
+from app.domains.quizz.services.soal_service import SoalService
+from app.domains.quizz.services.quiz_taking_service import QuizTakingService
+from app.domains.quizz.services.quiz_result_service import QuizResultService
 from app.tasks.quiz_tasks import TTL_3_MINUTES, process_quiz_request_task
 from app.domains.quizz.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery, QuizRequestStudentDetailQuery
 from app.domains.quizz.models.quiz_request import QuizRequest
@@ -76,7 +79,7 @@ router_teacher_quizz = APIRouter(prefix="/teachers", tags=["teachers"], route_cl
 async def get_list_quizzes(
     teacher: Roles(Role.TEACHER),
     query: Annotated[QuizRequestQuery, Query()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizRequestService = Depends(get_quiz_service),
 ):
     result = await service.get_quizzes_teacher(query, teacher.profile_id)
     return Response(
@@ -95,7 +98,7 @@ async def get_quizz(
     quiz_id:int,
     teacher: Roles(Role.TEACHER),
     query: Annotated[QuizRequestDetailQuery, Query()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizRequestService = Depends(get_quiz_service),
 ):
     result = await service.get_quiz_teacher(query, teacher.profile_id, quiz_id)
     return Response(
@@ -132,7 +135,7 @@ async def create_quiz_request(
     teacher: Roles(Role.TEACHER),
     query: Annotated[QuizRequestCreate, Body()],
     redis: Annotated[Redis, Depends(get_redis_client)],
-    service: QuizService = Depends(get_quiz_service)
+    service: QuizRequestService = Depends(get_quiz_service)
 ):
     """Upsert quiz request and immediately return an SSE progress stream."""
     quiz_request_id, job_status, is_cached, idem_key = await service.create_quiz_request(teacher.profile_id, query)
@@ -201,7 +204,7 @@ async def save_quiz_requets(
     quiz_id: Annotated[int, FastAPIPath(..., description="ID of the quiz request to finalize")],
     payload: Annotated[SaveQuizRequestPayload, Body(...)],
     teacher: Roles(Role.TEACHER),
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizRequestService = Depends(get_quiz_service),
 ):
     await service.update_publish_status(
         teacher_id=teacher.profile_id,
@@ -226,7 +229,7 @@ async def regenerate_stimulus_soal(
     _: Roles(Role.TEACHER),
     soal_id: Annotated[int, FastAPIPath()],
     payload: Annotated[SoalRegenerateRequest, Body()],
-    service: QuizService = Depends(get_quiz_service),
+    service: SoalService = Depends(get_soal_service),
 ):
     updated = await service.regenerate_cluster(soal_id, payload.feedback)
     return Response(message=get_response_message(), data=[_to_soal_response(s) for s in updated])
@@ -242,7 +245,7 @@ async def edit_soal(
     _: Roles(Role.TEACHER),
     soal_id: Annotated[int, FastAPIPath()],
     payload: Annotated[SoalEditRequest, Body()],
-    service: QuizService = Depends(get_quiz_service),
+    service: SoalService = Depends(get_soal_service),
 ):
     soal = await service.edit_soal(soal_id, payload)
     return Response(message=get_response_message(), data=_to_soal_response(soal))
@@ -258,11 +261,12 @@ async def delete_quiz(
     teacher: Roles(Role.TEACHER),
     quiz_id: Annotated[int, FastAPIPath()],
     payload: Annotated[QuizDeleteRequest, Body()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizRequestService = Depends(get_quiz_service),
 ):
     result = await service.delete_quiz(teacher.profile_id, quiz_id, payload.classroom_id)
     return Response(message="Berhasil hapus quizz", data=result)
 
+# ini
 @router_teacher_quizz.get(
     "/quizzes/{quiz_id}/students",
     description="Requires the TEACHER role.",
@@ -274,7 +278,7 @@ async def get_list_student_progress(
     quiz_id: Annotated[int, Path()],
     teacher: Roles(Role.TEACHER),
     query: Annotated[QuizRequestQuery, Query()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizRequestService = Depends(get_quiz_service),
 ):
     result = await service.get_students(query, quiz_id, teacher.profile_id)
     return Response(
@@ -282,6 +286,7 @@ async def get_list_student_progress(
         data=result
     )
 
+# ini
 @router_teacher_quizz.get(
     "/quizzes/{quiz_id}/student-results",
     description=(
@@ -296,7 +301,7 @@ async def get_student_quiz_results(
     teacher: Roles(Role.TEACHER),
     query: Annotated[QuizRequestStudentDetailQuery, Query()],
     quiz_id: Annotated[int, Path()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizResultService = Depends(get_quiz_result_service),
 ):
     results = await service.get_student_quiz_result_from_teacher(quiz_id, query, teacher.profile_id)
     return Response(message=get_response_message(), data=results)
@@ -318,7 +323,7 @@ router_student_quizz = APIRouter(prefix="/students", tags=["students"], route_cl
 async def get_list_quizzes(
     student: Roles(Role.STUDENT),
     query: Annotated[QuizRequestStudentQuery, Query()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizTakingService = Depends(get_quiz_taking_service),
 ):
     result = await service.get_quizzes_student(query, student.profile_id)
     return Response(
@@ -349,7 +354,7 @@ async def get_list_quizzes(
 async def start_quiz(
     student: Roles(Role.STUDENT),
     quiz_id: Annotated[int, Path()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizTakingService = Depends(get_quiz_taking_service),
 ):
     stream_gen = await service.initialize_and_stream_quiz(
         student_id=student.profile_id, quiz_id=quiz_id
@@ -373,7 +378,7 @@ async def start_quiz(
 async def finish_quiz(
     student: Roles(Role.STUDENT),
     quiz_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizTakingService = Depends(get_quiz_taking_service),
 ):
     await service.finish_and_enqueue_review(quiz_id=quiz_id, student_id=student.profile_id)
     return Response(
@@ -394,7 +399,7 @@ async def finish_quiz(
 async def get_my_quiz_results(
     student: Roles(Role.STUDENT),
     quiz_request_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizResultService = Depends(get_quiz_result_service),
 ):
     results = await service.get_quiz_results(quiz_request_id, student.profile_id)
     return Response(message=get_response_message(), data=results)
@@ -412,7 +417,7 @@ async def submit_soal_answer(
     student: Roles(Role.STUDENT),
     soal_id: Annotated[int, FastAPIPath()],
     payload: Annotated[SoalSubmitRequest, Body()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizTakingService = Depends(get_quiz_taking_service),
 ):
     await service.submit_answer(soal_id, student.profile_id, payload)
     return Response(message=get_response_message(), data={"soal_id": soal_id, "status": "saved"})
@@ -430,7 +435,7 @@ async def submit_step_soal_answer(
     student: Roles(Role.STUDENT),
     soal_id: Annotated[int, FastAPIPath()],
     payload: Annotated[AddStepRequest, Body()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizTakingService = Depends(get_quiz_taking_service),
 ):
     result = await service.add_step(payload, soal_id, student.profile_id)
     return Response(message=get_response_message(), data=result)
@@ -447,7 +452,7 @@ async def submit_step_soal_answer(
 async def delete_step_soal_answer(
     student: Roles(Role.STUDENT),
     step_id: Annotated[int, FastAPIPath()],
-    service: QuizService = Depends(get_quiz_service),
+    service: QuizTakingService = Depends(get_quiz_taking_service),
 ):
     result = await service.delete_step(step_id, student.profile_id)
     return Response(message="Berhasil hapus step", data=result)

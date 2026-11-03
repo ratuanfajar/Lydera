@@ -23,10 +23,9 @@ def get_teacher_service(
     repo: TeacherRepository = Depends(get_teacher_repository),
     user_repo: UserRepository = Depends(get_user_repository),
     classroom_repo: ClassroomRepository = Depends(get_classroom_repository),
-    content_repo: ContentRepository = Depends(get_content_repository),
     db: AsyncSession = Depends(get_db),
 ) -> TeacherService:
-    return TeacherService(user_repo, classroom_repo, repo, content_repo, db)
+    return TeacherService(user_repo, classroom_repo, repo, db)
 
 def get_student_repository(db: AsyncSession = Depends(get_db)) -> StudentRepository:
     return StudentRepository(db)
@@ -35,8 +34,6 @@ def get_student_service(
     repo: StudentRepository = Depends(get_student_repository),
     user_repo: UserRepository = Depends(get_user_repository),
     classroom_repo: ClassroomRepository = Depends(get_classroom_repository),
-    content_repo: ContentRepository = Depends(get_content_repository),
-    quiz_repo: QuizRepository = Depends(get_quiz_repository),
     db: AsyncSession = Depends(get_db),
 ) -> StudentService:
-    return StudentService(user_repo, repo, quiz_repo, classroom_repo, content_repo, db)
+    return StudentService(user_repo, repo, classroom_repo, db)

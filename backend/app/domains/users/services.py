@@ -5,27 +5,11 @@ from app.domains.users.models.teacher import Teacher
 from app.domains.classrooms.repositories.repository import ClassroomRepositoryInterface
 from app.domains.users.repositories.repository import TeacherRepositoryInterface, StudentRepositoryInterface, UserRepositoryInterface
 from app.domains.users.schemas import TeacherCreate, StudentCreate, Login, ProfileResponse, StudentDashboardRequest, StudentDashboardResponse
-from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.core.db import AsyncSession
-from app.core.exceptions import ForbiddenException, ValidationException, NotFoundException
+from app.core.exceptions import ValidationException, NotFoundException
 from app.core.security import create_access_token, verify_password
-from app.domains.users.schemas.student_dashboard_request import StudentTaskStatus
-from app.domains.users.schemas.student_tasks_request import StudentTaskRequest
-from app.domains.contents.repositories.interface import ContentRepositoryInterface
-from app.domains.contents.schemas.module.student_module_response import StudentModuleResponse, StudentModuleWithoutChaptersResponse
-from app.domains.contents.schemas.module.student_module_request import StudentModuleRequest, StudentModuleStatus
-from app.domains.contents.schemas.module.student_module_detail_request import StudentModuleDetailRequest
-from app.domains.contents.schemas.blocks.block_response import BlockResponse
-from app.domains.contents.schemas.chapters.student_chapter_detail_response import StudentChapterDetailResponse, StudentChapterDetailWithoutProgressResponse
-from app.domains.contents.models.chapter import Chapter
-from app.domains.users.schemas.taecher_dashboard_request import TeacherDashboardRequest
-from app.domains.users.schemas.taecher_dashboard_response import TeacherDashboardResponse
-from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
-from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse, TeacherModuleWithoutChapterResponse
-from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
-from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
-from app.domains.quizz.repositories.interface import QuizRepositoryInterface
-from app.domains.quizz.schemas.quiz_request_student_query import QuizRequestStudentQueryStatus
+from app.domains.users.schemas.teacher_dashboard_request import TeacherDashboardRequest
+from app.domains.users.schemas.teacher_dashboard_response import TeacherDashboardResponse
 
 class UserService:
     def __init__(
@@ -83,13 +67,11 @@ class TeacherService:
         user_repo: UserRepositoryInterface,
         classroom_repo: ClassroomRepositoryInterface,
         teacher_repo: TeacherRepositoryInterface,
-        content_repo: ContentRepositoryInterface,
         db: AsyncSession,
     ):
         self.user_repo = user_repo
         self.teacher_repo = teacher_repo
         self.classroom_repo = classroom_repo
-        self.content_repo = content_repo
         self.db = db
 
     async def create_teacher(self, dto: TeacherCreate) -> Teacher:
@@ -113,7 +95,6 @@ class TeacherService:
             if not classroom_info:
                 raise NotFoundException("User tidak punya kelas ini")
             
-
             await self.db.commit()
             return TeacherDashboardResponse(
                 classroom_info=classroom_info,
@@ -124,45 +105,17 @@ class TeacherService:
         except Exception as e:
             raise e
 
-    async def get_teacher_modules(self, dto: TeacherModuleRequest, teacher_id: int) -> list[TeacherModuleWithoutChapterResponse]:
-            try:
-                raw_modules = await self.content_repo.get_all_modules_teachers(dto.classroom_id, teacher_id, dto.status, dto.search)
-                modules = [TeacherModuleWithoutChapterResponse.model_validate(m) for m in raw_modules]
-                return modules
-            except Exception as e:
-                raise e
-            
-    async def get_teacher_module(self, dto: TeacherModuleDetailRequest, module_id:int, teacher_id: int) -> TeacherModuleResponse:
-            try:
-                raw_module = await self.content_repo.get_detail_module_teacher(module_id, dto.classroom_id, teacher_id)
-                if not raw_module:
-                    raise ForbiddenException("Module tidak punya akses ataut tidak ada")
-                module = TeacherModuleResponse.model_validate(raw_module)
-                return module
-            except Exception as e:
-                raise e            
-        
-    async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> ChapterDetailResponse:
-        chapter = await self.content_repo.get_chapter_by_id(chapter_id, teacher_id)
-        if not chapter:
-            raise ForbiddenException("Tidak mempunyai akses atau tidak ada")
-        return ChapterDetailResponse.model_validate(chapter)
-
 class StudentService:
     def __init__(
         self,
         user_repo: UserRepositoryInterface,
         student_repo: StudentRepositoryInterface,
-        quiz_repo: QuizRepositoryInterface,
         classroom_repo: ClassroomRepositoryInterface,
-        content_repo: ContentRepositoryInterface,
         db: AsyncSession
     ):
         self.user_repo = user_repo
         self.student_repo = student_repo
         self.classroom_repo = classroom_repo
-        self.content_repo = content_repo
-        self.quiz_repo = quiz_repo
         self.db = db
 
     async def create_student(self, dto: StudentCreate):
@@ -186,7 +139,6 @@ class StudentService:
             if not classroom_info:
                 raise NotFoundException("User tidak punya kelas ini")
 
-    
             return StudentDashboardResponse(
                 classroom_info=classroom_info,
                 exam_not_done=tasks.get("exam_not_done"),
@@ -196,75 +148,3 @@ class StudentService:
         
         except Exception as e:
             raise e
-        
-    async def get_tasks_student(self, dto: StudentTaskRequest, student_id: int) -> StudentTaskResponse:
-            try:
-                match dto.status:
-                    case StudentTaskStatus.ALL:
-                        modules = await self.content_repo.get_all_modules_student(dto.classroom_id, student_id, StudentModuleStatus.NOT_DONE)
-                        exams = await self.quiz_repo.get_quizzes_student(dto.classroom_id, student_id, QuizRequestStudentQueryStatus.NOT_DONE)
-        
-                    case StudentTaskStatus.MODULE:
-                        modules = await self.content_repo.get_all_modules_student(dto.classroom_id, student_id, StudentModuleStatus.NOT_DONE)
-                        exams = []
-        
-                    case StudentTaskStatus.EXAM:
-                        modules = []
-                        exams = await self.quiz_repo.get_quizzes_student(dto.classroom_id, student_id, QuizRequestStudentQueryStatus.NOT_DONE)
-        
-                    case _:
-                        raise ValueError(f"Status tidak valid: {dto.status}")
-    
-                await self.db.commit()
-                return StudentTaskResponse(
-                    exams=exams,
-                    modules=modules
-                )
-            
-            except Exception as e:
-                raise e
-            
-    async def get_student_modules(self, dto: StudentModuleRequest, student_id: int) -> list[StudentModuleWithoutChaptersResponse]:
-            try:
-                raw_modules = await self.content_repo.get_all_modules_student(dto.classroom_id, student_id, dto.status)
-                modules = [StudentModuleWithoutChaptersResponse.model_validate(m) for m in raw_modules]
-                return modules
-            except Exception as e:
-                raise e
-            
-    async def get_student_module(self, dto: StudentModuleDetailRequest, student_id: int, module_id:int) -> StudentModuleResponse:
-            try:
-                raw_module = await self.content_repo.get_detail_module_student(module_id,dto.classroom_id, student_id)
-                if not raw_module:
-                    raise NotFoundException("Module tidak ditemukan")            
-                module = StudentModuleResponse.model_validate(raw_module)
-                return module
-            except Exception as e:
-                raise e
-            
-    async def start_chapter(self, student_id: int, chapter_id: int) -> StudentChapterDetailWithoutProgressResponse:
-        has_access = await self.content_repo.validate_student_chapter_access(chapter_id, student_id)
-        if not has_access:
-            raise ForbiddenException(detail="Anda tidak memiliki akses ke chapter ini.")
-        
-        chapter = await self.content_repo.student_get_blocks_by_chapter_id(chapter_id=chapter_id, student_id=student_id)
-        if not chapter:
-            raise NotFoundException(detail="Chapter tidak ditemukan.")
-        await self.content_repo.student_create_chapter_progress(student_id, chapter_id)
-        await self.db.commit()
-        return StudentChapterDetailWithoutProgressResponse.model_validate(chapter)
-
-    async def mark_chapter_as_completed(self, student_id: int, chapter_id: int) -> bool:
-        has_access = await self.content_repo.validate_student_chapter_access(chapter_id, student_id)
-        if not has_access:
-            raise ForbiddenException("Anda tidak memiliki akses ke chapter ini.")
-        
-        updated = await self.content_repo.student_update_chapter_progress( student_id=student_id, chapter_id=chapter_id, ) 
-
-        if not updated: 
-            raise NotFoundException( 
-                detail="Progres chapter tidak ditemukan." 
-            ) 
-        await self.db.commit()
-        return True
-            

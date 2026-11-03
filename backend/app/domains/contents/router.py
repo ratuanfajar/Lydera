@@ -30,7 +30,7 @@ from app.domains.contents.schemas import (
 )
 from app.domains.jobs.schemas import JobStatus
 from app.domains.contents.depedencies import get_content_service
-from app.domains.contents.services import ContentService
+from app.domains.contents.services.content_service import ContentService
 from app.domains.jobs.depedencies import get_job_service
 from app.domains.jobs.services import JobService
 from app.core.config import settings

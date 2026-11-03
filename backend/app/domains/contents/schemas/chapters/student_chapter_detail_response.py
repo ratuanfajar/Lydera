@@ -52,3 +52,18 @@ class StudentChapterDetailWithoutBlockResponse(BaseModel):
             return value[0] if value else None
 
         return value
+
+class BlockPaginationMeta(BaseModel):
+    page: int
+    per_page: int
+    total_blocks: int
+    total_pages: int
+
+class StudentChapterDetailV2Response(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    title: str | None = None
+    number: int | None = None
+    blocks: list[BlockResponse] = Field(default_factory=list)
+    pagination: BlockPaginationMeta

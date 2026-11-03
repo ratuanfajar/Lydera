@@ -6,7 +6,8 @@ from sqlalchemy.dialects.postgresql import insert
 from app.tasks.progress_tasks import enqueue_chapter_progress_reset_job, enqueue_module_progress_job
 from sqlalchemy.orm import contains_eager, selectinload
 from app.domains.contents.models import Block, Module, Chapter, Fase, Cp, ModuleStatus
-from app.domains.contents.repositories.interface import ContentRepositoryInterface
+from app.domains.contents.repositories.interfaces.module_interface import ModuleRepositoryInterface
+from app.domains.contents.repositories.interfaces.content_interface import ContentRepositoryInterface
 from app.core.db import AsyncSession
 from app.domains.contents.models.module_progress import ModuleProgress
 from app.domains.contents.schemas.module.student_module_request import StudentModuleStatus
@@ -17,7 +18,7 @@ from app.domains.users.models.student import student_classrooms
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleStatus
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateResponse
 
-class ContentRepository(ContentRepositoryInterface):
+class ContentRepository(ModuleRepositoryInterface, ContentRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
 
@@ -50,6 +51,42 @@ class ContentRepository(ContentRepositoryInterface):
         )
         result = await self.db.scalars(stmt)
         return result.unique().first()
+
+    async def student_get_paginated_blocks(
+        self, chapter_id: int, student_id: int, limit: int, offset: int
+    ) -> tuple[Chapter | None, list[Block], int]:
+        has_access = await self.validate_student_chapter_access(chapter_id, student_id)
+        if not has_access:
+            raise ForbiddenException(
+                detail="Anda tidak memiliki akses ke chapter ini."
+            )
+        stmt_chapter = (
+            select(Chapter)
+            .join(Chapter.module)
+            .where(
+                Chapter.id == chapter_id,
+                Module.status == ModuleStatus.PUBLISH,
+            )
+        )
+        chapter = (await self.db.scalars(stmt_chapter)).first()
+        if not chapter:
+            return None, [], 0
+
+        stmt_count = (
+            select(func.count(Block.id))
+            .where(Block.chapter_id == chapter_id)
+        )
+        total_blocks = (await self.db.scalar(stmt_count)) or 0
+
+        stmt_blocks = (
+            select(Block)
+            .where(Block.chapter_id == chapter_id)
+            .order_by(Block.reading_order)
+            .limit(limit)
+            .offset(offset)
+        )
+        blocks = list((await self.db.scalars(stmt_blocks)).all())
+        return chapter, blocks, total_blocks
 
     async def get_teacher_blocks(self, block_ids: list[int], teacher_id: int) -> list[Block]:
         unique_ids = list(set(block_ids))

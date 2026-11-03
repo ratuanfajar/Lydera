@@ -10,7 +10,9 @@ from app.domains.quizz.models import (
     QuizRequest, QuizRequestChapter, Soal, SoalJawaban, SoalJawabanLangkah,
     SoalLangkah, SoalOpsi, SoalStimulus,
 )
-from app.domains.quizz.repositories.interface import QuizRepositoryInterface
+from app.domains.quizz.repositories.interfaces.quiz_request_interface import QuizRequestRepositoryInterface
+from app.domains.quizz.repositories.interfaces.soal_interface import SoalRepositoryInterface
+from app.domains.quizz.repositories.interfaces.quiz_progress_interface import QuizProgressRepositoryInterface
 from app.domains.quizz.schemas.quiz_request_query import QuizRequestQueryStatus
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.quizz.schemas.soal_create_request import SoalCreateRequest
@@ -21,7 +23,7 @@ from app.core.exceptions import NotFoundException
 from app.domains.users.models.student import Student
 
 
-class QuizRepository(QuizRepositoryInterface):
+class QuizRepository(QuizRequestRepositoryInterface, SoalRepositoryInterface, QuizProgressRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
 
