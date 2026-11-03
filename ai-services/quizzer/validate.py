@@ -2,9 +2,15 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 
 from quizzer import config, prompts
+from quizzer.stimulus import registry
 from common import llm
 
 MAX_TOKENS = 3072
+AUDIT_FLAGS = (
+    ("data_lengkap", False, "Langkah atau kunci memakai data yang tidak ada di soal atau stimulus."),
+    ("opsi_di_luar_soal", True, "Ada opsi yang merujuk hal yang tidak ada di soal atau stimulus."),
+    ("opsi_kontradiktif", True, "Ada opsi yang bertentangan dengan dirinya sendiri."),
+)
 
 
 def validate_soal(source_text: str, question_text: str, options: dict, correct_option: str, stimulus_text: str = "") -> dict:
@@ -60,6 +66,9 @@ def verification_issues(data: dict, blind, audit, has_stimulus: bool) -> list[st
         issues.append(f"Opsi {', '.join(map(str, others))} juga benar.")
     if audit.get("stem_ambigu") is True:
         issues.append("Stem ambigu.")
+    for key, expected, message in AUDIT_FLAGS:
+        if audit.get(key) is expected:
+            issues.append(message)
     if audit.get("readable_setia") is False:
         issues.append("Teks siap-baca tidak setia pada markup LaTeX atau tabel.")
     if has_stimulus and audit.get("stimulus_dibutuhkan") is False:
@@ -69,6 +78,18 @@ def verification_issues(data: dict, blind, audit, has_stimulus: bool) -> list[st
     return issues
 
 
+def is_blocking(verification: dict, data: dict) -> bool:
+    """True bila soal tidak bisa dijawab dengan benar: jawab buta berbeda, langkah tidak valid, opsi lain juga benar, atau data atau opsi merujuk hal di luar soal."""
+    blind, audit = verification.get("blind"), verification.get("audit")
+    if blind is not None and not isinstance(blind, Exception) and not blind["matches"]:
+        return True
+    if not isinstance(audit, dict):
+        return False
+    claimed = audit.get("opsi_lain_benar")
+    others = [label for label in (claimed if isinstance(claimed, list) else []) if label != data["correct_option"]]
+    return audit.get("langkah_valid") is False or bool(others) or audit.get("data_lengkap") is False or audit.get("opsi_di_luar_soal") is True
+
+
 def markup_text(data: dict) -> str:
     parts = []
     if data.get("markup"):
@@ -76,6 +97,8 @@ def markup_text(data: dict) -> str:
     stimulus = data.get("stimulus")
     if isinstance(stimulus, dict) and stimulus.get("source_markup"):
         parts.append(stimulus["source_markup"])
+    if registry.is_typed(stimulus):
+        parts.append(json.dumps({"jenis": stimulus["jenis"], "spesifikasi": stimulus.get("spesifikasi")}, ensure_ascii=False))
     return "\n".join(parts)
 
 

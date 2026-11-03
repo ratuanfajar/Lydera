@@ -22,9 +22,8 @@ class FakeRepo:
         return [SimpleNamespace(reading_order=10, block_type="text", readable_text="Materi sumber.")]
 
     async def save_evaluation(self, jawaban, evaluation_data):
-        self.saved.append((jawaban.id, evaluation_data["error_type"]))
+        self.saved.append((jawaban.id, evaluation_data["langkah_ke"]))
         jawaban.evaluated_at = "sudah"
-        jawaban.justification_points = evaluation_data["justification_points"]
 
 
 class FakeDb:
@@ -90,19 +89,18 @@ def make_soal(id, question="Soal?"):
     )
 
 
-def make_jawaban(id, soal_id=None, correct=False, evaluated=None, points=None):
+def make_jawaban(id, soal_id=None, correct=False, evaluated=None, steps=1, determinable=None, step=None):
     return SimpleNamespace(
         id=id,
         soal_id=soal_id or id,
         is_correct=correct,
         selected_option="B",
         evaluated_at=evaluated,
-        justification_points=points,
-        langkah=[SimpleNamespace(urutan=1, teks="Langkah siswa.")],
-        divergence_step=None,
-        error_type=None,
-        diagnosis=None,
-        personalized_justification=None,
+        langkah=[SimpleNamespace(urutan=n, teks="Langkah siswa.") for n in range(1, steps + 1)],
+        divergence_step=step,
+        diagnosis="Keterangan." if determinable is not None else None,
+        letak_kutipan="Langkah siswa." if step else None,
+        letak_dapat_ditentukan=determinable,
         needs_review=False,
     )
 
@@ -113,13 +111,8 @@ def fake_evaluate(source, stimulus, question, options, correct, key, conclusion,
     if question == "permanen":
         raise ValueError("tidak menghasilkan poin")
     return {
-        "divergence_step": 1,
-        "error_type": "salah_hitung",
-        "diagnosis": "d",
-        "justification_points": [{"point": "p", "step_ref": 1}],
-        "personalized_justification": "1. p",
-        "needs_review": False,
-        "issues": [],
+        "dapat_ditentukan": True, "langkah_ke": 1, "kutipan": "Langkah siswa.", "keterangan": "k",
+        "needs_review": False, "issues": [],
     }
 
 
@@ -144,7 +137,7 @@ def test_evaluate_menyimpan_yang_berhasil_dan_mencatat_yang_gagal(mixed_repo):
     outcome = run_evaluation(mixed_repo, redis, db)
     assert outcome.failed == {12}
     assert outcome.busy is False
-    assert mixed_repo.saved == [(11, "salah_hitung")]
+    assert mixed_repo.saved == [(11, 1)]
     assert db.commits == 2
     assert lock.released
     assert redis.names == [("evaluaizer_lock:7:9", evaluation.LOCK_SECONDS)]
@@ -178,7 +171,7 @@ def test_evaluate_tetap_jalan_saat_redis_cooldown_putus():
     db = FakeDb()
     outcome = run_evaluation(repo, BrokenRedis(FakeLock(free=True)), db)
     assert outcome.failed == {32}
-    assert repo.saved == [(31, "salah_hitung")]
+    assert repo.saved == [(31, 1)]
     assert db.commits == 2
 
 
@@ -194,7 +187,7 @@ def test_evaluate_lock_terpakai_menandai_busy_tanpa_menyimpan(mixed_repo):
 
 def test_evaluate_lock_kedaluwarsa_saat_dilepas_tidak_menggagalkan():
     expired = FakeLock(free=True, expired=True)
-    repo = FakeRepo([make_soal(1)], [make_jawaban(21, 1, evaluated="x", points=[{"point": "p"}])])
+    repo = FakeRepo([make_soal(1)], [make_jawaban(21, 1, evaluated="x", determinable=True, step=1)])
     outcome = run_evaluation(repo, FakeRedis(expired))
     assert outcome.busy is False
     assert expired.released
@@ -205,31 +198,39 @@ def test_evaluate_lock_kedaluwarsa_saat_dilepas_tidak_menggagalkan():
     [
         (make_jawaban(1), True),
         (make_jawaban(2, correct=True), False),
-        (make_jawaban(3, evaluated="x", points=None), True),
-        (make_jawaban(4, evaluated="x", points=[{"point": "p", "step_ref": None}]), False),
+        (make_jawaban(3, steps=0), False),
+        (make_jawaban(4, evaluated="x", determinable=True, step=1), False),
+        (make_jawaban(5, correct=True, steps=0), False),
     ],
 )
-def test_needs_evaluation_sesuai_status_jawaban(jawaban, expected):
+def test_needs_evaluation_hanya_untuk_jawaban_salah_yang_punya_langkah_dan_belum_dievaluasi(jawaban, expected):
     assert evaluation.needs_evaluation(jawaban) is expected
-
-
-def legacy_jawaban():
-    jawaban = make_jawaban(7, evaluated="x")
-    jawaban.diagnosis, jawaban.personalized_justification = "lama", "paragraf lama"
-    return jawaban
 
 
 @pytest.mark.parametrize(
     "jawaban",
-    [None, make_jawaban(5, correct=True, evaluated="x"), make_jawaban(6), legacy_jawaban()],
+    [None, make_jawaban(5, correct=True, evaluated="x", determinable=True), make_jawaban(6), make_jawaban(7, steps=0)],
 )
-def test_justification_kosong_untuk_jawaban_tanpa_poin_baru(jawaban):
-    assert services._justification(jawaban) is None
+def test_letak_kesalahan_kosong_untuk_jawaban_benar_tanpa_langkah_atau_belum_dievaluasi(jawaban):
+    assert services._letak_kesalahan(jawaban) is None
 
 
-def test_justification_membawa_poin_dengan_nomor_langkah():
-    jawaban = make_jawaban(8, evaluated="x", points=[{"point": "p", "step_ref": 2}])
-    assert services._justification(jawaban).points[0].step_ref == 2
+def test_letak_kesalahan_membawa_langkah_kutipan_dan_keterangan():
+    result = services._letak_kesalahan(make_jawaban(8, evaluated="x", determinable=True, step=2))
+    assert (result.dapat_ditentukan, result.langkah_ke, result.kutipan, result.keterangan) == (True, 2, "Langkah siswa.", "Keterangan.")
+
+
+def test_letak_kesalahan_tidak_dapat_ditentukan_tanpa_langkah_dan_kutipan():
+    result = services._letak_kesalahan(make_jawaban(9, evaluated="x", determinable=False))
+    assert result.dapat_ditentukan is False and result.langkah_ke is None and result.kutipan is None
+
+
+def test_jawaban_salah_tanpa_langkah_tidak_memanggil_model(monkeypatch):
+    calls = []
+    monkeypatch.setattr(evaluation.evaluaizer_evaluate, "evaluate_scratchwork", lambda *args: calls.append(args))
+    repo = FakeRepo([make_soal(1)], [make_jawaban(41, 1, steps=0)])
+    outcome = run_evaluation(repo, FakeRedis(FakeLock(free=True)))
+    assert calls == [] and outcome.failed == set() and repo.saved == []
 
 
 def test_evaluation_arguments_menyusun_sumber_opsi_dan_langkah():

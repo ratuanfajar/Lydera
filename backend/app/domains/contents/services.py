@@ -8,6 +8,7 @@ from app.tasks.file_tasks import cleanup_module_files_task
 from app.domains.contents.schemas.cp_response import CpResponse
 paths.setup()
 from annoter import annoter_regenerate
+from common.speakable import manual_reading_issues
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Any, Dict, List, Sequence
 from app.domains.contents.models import Block, Fase, Module, Chapter, Cp, ModuleStatus
@@ -18,6 +19,7 @@ from app.core.config import settings
 from app.tasks.progress_tasks import enqueue_chapter_progress_reset_job, enqueue_module_progress_job
 from app.domains.contents.schemas.blocks.regenerate_request import RegenerateRequest
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateDetailResponse, RegenerateResponse
+from app.domains.contents.schemas.blocks.block_edit import BlockEditRequest, BlockEditResponse
 
 UNMERGEABLE_TYPES = {"image", "table", "formula"}
 MAX_BLOCK_CHARS = 350
@@ -69,6 +71,39 @@ class ContentService:
             await enqueue_chapter_progress_reset_job(cid)
         
         return RegenerateResponse(block_ids=dto.block_ids, readable_text=dto.feedback)
+
+    async def edit_block(self, block_id: int, teacher_id: int, payload: BlockEditRequest) -> BlockEditResponse:
+        """Edit langsung satu blok; bacaan blok khusus diturunkan ulang dari sumber, atau memakai readable_text guru apa adanya."""
+        (block,) = await self.repo.get_teacher_blocks([block_id], teacher_id)
+        if block.block_type in ("text", "heading"):
+            if payload.readable_text is None or not payload.readable_text.strip():
+                raise BadRequestException("blok teks atau heading: kirim readable_text tidak kosong")
+            problems = manual_reading_issues(payload.readable_text)
+            if problems:
+                raise BadRequestException(" ".join(problems))
+            changes = {"readable_text": payload.readable_text.strip(), "review_priority": "normal"}
+            issues: list[str] = []
+        else:
+            try:
+                edited = await asyncio.to_thread(
+                    annoter_regenerate.edit, block.block_type,
+                    readable_text=payload.readable_text, source_markup=payload.source_markup, tabel=payload.tabel,
+                )
+            except ValueError as exc:
+                raise BadRequestException(str(exc))
+            issues = edited.issues
+            changes = {"readable_text": edited.text, "review_priority": "high" if issues else "normal"}
+            if edited.source_markup is not None:
+                changes["source_markup"] = edited.source_markup
+            if edited.tabel is not None:
+                changes.update(tabel=edited.tabel, ringkasan=edited.ringkasan)
+        await self.repo.bulk_update_readable_text([{"id": block.id, **changes}])
+        await enqueue_chapter_progress_reset_job(block.chapter_id)
+        return BlockEditResponse(
+            block_id=block.id, block_type=block.block_type, readable_text=changes["readable_text"],
+            source_markup=changes.get("source_markup", block.source_markup), ringkasan=changes.get("ringkasan", block.ringkasan),
+            tabel=changes.get("tabel", block.tabel), review_priority=changes["review_priority"], issues=issues,
+        )
 
     async def regenerate_special_blocks(self, dto: RegenerateRequest, teacher_id: int, job_service) -> list[RegenerateDetailResponse]:
         blocks = await self.repo.get_teacher_blocks(dto.block_ids, teacher_id)

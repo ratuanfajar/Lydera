@@ -1,7 +1,10 @@
+from common import guardrails
+
 SECTION_ORDER = ("ROLE", "TASK", "CONTEXT", "RULES", "OUTPUT FORMAT", "EXAMPLES")
 
 
 def build_prompt(*, role, task, context=None, rules=None, output_format=None, examples=None) -> str:
+    rules = [*([rules] if isinstance(rules, str) else rules or []), *guardrails.UNTRUSTED_RULES]
     bodies = {
         "ROLE": role,
         "TASK": task,
@@ -14,7 +17,11 @@ def build_prompt(*, role, task, context=None, rules=None, output_format=None, ex
 
 
 def build_input(**sections) -> str:
-    return "\n\n".join(_section(name.replace("_", " ").upper(), body) for name, body in sections.items() if body)
+    return "\n\n".join(_section(name.replace("_", " ").upper(), _guarded(name, body)) for name, body in sections.items() if body)
+
+
+def _guarded(name: str, body):
+    return guardrails.wrap(name, _render(body)) if name in guardrails.DATA_TAGS else body
 
 
 def _section(name: str, body) -> str:

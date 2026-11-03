@@ -1,7 +1,7 @@
 import pytest
 
-from annoter import speakable as module
-from annoter.speakable import speakable
+from common import speakable as module
+from common.speakable import speakable
 
 
 @pytest.mark.parametrize(

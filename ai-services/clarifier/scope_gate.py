@@ -4,24 +4,63 @@ import re
 
 from clarifier import config
 from common import jsonutil
+from common import guardrails
 from common import llm
+from common.prompt_format import build_prompt
 
-CLASSIFIER_SYSTEM = (
-    "Anda menentukan apakah pertanyaan siswa masih relevan dengan materi yang tersedia di kelasnya.\n\n"
-    "# Kelas\n"
-    "- inti: langsung tentang isi materi yang diberikan\n"
-    "- perluasan: bukan isi materi persis, tapi masih penerapan/pengembangan/konteks dari domain "
-    "mata pelajaran yang sama -- termasuk asal-usul atau sejarah singkat suatu KONSEP matematika\n"
-    "- campuran: pertanyaan berisi BEBERAPA sub-pertanyaan digabung jadi satu kalimat -- SEBAGIAN "
-    "tentang materi/domain mata pelajaran ini, SEBAGIAN LAGI domain lain sama sekali (mis. "
-    "pemrograman/coding, mata pelajaran lain). Isi juga field \"bagian_di_luar_topik\" berisi "
-    "ringkasan singkat bagian yang di luar topik.\n"
-    "- di_luar_topik: SELURUH pertanyaan domain lain (tidak ada bagian yang nyambung sama sekali), "
-    "ATAU sudah melenceng ke BIOGRAFI PRIBADI seorang tokoh (kisah hidup, tanggal lahir, karier) "
-    "walau tokoh itu terkait matematika\n\n"
-    "# Output\n"
-    'JSON: {"klass": "inti"|"perluasan"|"campuran"|"di_luar_topik", "alasan": "...", '
-    '"bagian_di_luar_topik": "..." (isi cuma kalau klass campuran, kosongkan kalau tidak)}'
+CLASSIFIER_SYSTEM = build_prompt(
+    role="Anda penyaring cakupan untuk asisten belajar matematika siswa tunanetra.",
+    task="Tentukan apakah pertanyaan siswa masih relevan dengan materi yang tersedia di kelasnya, lalu pilih satu kelas.",
+    context=[
+        "inti: langsung tentang isi materi yang diberikan.",
+        "perluasan: bukan isi materi persis, tetapi masih penerapan, pengembangan, atau konteks dari domain mata pelajaran yang sama, termasuk asal-usul atau sejarah singkat suatu konsep matematika.",
+        "campuran: pertanyaan berisi beberapa sub-pertanyaan yang digabung dalam satu kalimat; sebagian tentang materi atau domain mata pelajaran ini, sebagian lagi domain lain sama sekali (misalnya pemrograman atau mata pelajaran lain).",
+        "di_luar_topik: seluruh pertanyaan domain lain tanpa bagian yang nyambung, atau sudah melenceng ke biografi pribadi seorang tokoh (kisah hidup, tanggal lahir, karier) walau tokoh itu terkait matematika.",
+    ],
+    rules=[
+        "Tulis alasan singkat lebih dulu, baru pilih kelas, supaya pilihan mengikuti alasan.",
+        "Isi bagian_di_luar_topik hanya bila kelasnya campuran, berupa ringkasan singkat bagian yang di luar topik; selain itu kosongkan.",
+    ],
+    output_format='JSON: {"alasan": "...", "klass": "inti"|"perluasan"|"campuran"|"di_luar_topik", "bagian_di_luar_topik": "..."}',
+    examples="""Materi:
+<teks_modul>
+sudut pusat dan sudut keliling lingkaran.
+</teks_modul>
+Pertanyaan:
+<pertanyaan_siswa>
+Berapa besar sudut keliling bila sudut pusatnya 80 derajat?
+</pertanyaan_siswa>
+{"alasan": "Langsung menerapkan hubungan sudut pusat dan sudut keliling.", "klass": "inti", "bagian_di_luar_topik": ""}
+
+Materi:
+<teks_modul>
+sudut pusat dan sudut keliling lingkaran.
+</teks_modul>
+Pertanyaan:
+<pertanyaan_siswa>
+Di kehidupan sehari-hari, lingkaran dipakai untuk apa saja?
+</pertanyaan_siswa>
+{"alasan": "Bukan isi materi persis, tetapi penerapan konsep lingkaran.", "klass": "perluasan", "bagian_di_luar_topik": ""}
+
+Materi:
+<teks_modul>
+sudut pusat dan sudut keliling lingkaran.
+</teks_modul>
+Pertanyaan:
+<pertanyaan_siswa>
+Jelaskan sudut keliling dan buatkan programnya dalam Python.
+</pertanyaan_siswa>
+{"alasan": "Bagian sudut keliling sesuai materi, bagian pemrograman domain lain.", "klass": "campuran", "bagian_di_luar_topik": "membuat program Python"}
+
+Materi:
+<teks_modul>
+sudut pusat dan sudut keliling lingkaran.
+</teks_modul>
+Pertanyaan:
+<pertanyaan_siswa>
+Resep nasi goreng yang enak bagaimana?
+</pertanyaan_siswa>
+{"alasan": "Tidak ada hubungannya dengan matematika.", "klass": "di_luar_topik", "bagian_di_luar_topik": ""}""",
 )
 
 _COMPOUND_MARKERS = re.compile(
@@ -59,7 +98,7 @@ def check_scope(question: str, top_chunks: list[dict]) -> dict:
 
     # Zona abu-abu ATAU pertanyaan majemuk -- serahkan ke LLM classifier, pakai chunk paling mirip
     context =f"{best['heading']}: {best['text'][:500]}"
-    prompt = f"Materi paling relevan yang tersedia: {context}\n\nPertanyaan siswa: {question}"
+    prompt = f"Materi:\n{guardrails.wrap('teks_modul', context)}\nPertanyaan:\n{guardrails.wrap('pertanyaan_siswa', question)}"
     try:
         raw = llm.complete_text(CLASSIFIER_SYSTEM, prompt, model=config.CHAT_MODEL, max_tokens=250)
     except llm.ContentFilterError:

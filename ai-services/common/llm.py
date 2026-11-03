@@ -6,6 +6,7 @@ from pathlib import Path
 from openai import APIConnectionError, APITimeoutError, BadRequestError, InternalServerError, OpenAI, RateLimitError
 
 from common import config
+from common import guardrails
 from common import jsonutil
 
 RETRYABLE = (RateLimitError, APIConnectionError, APITimeoutError, InternalServerError)
@@ -58,7 +59,7 @@ def _complete(system: str, user: str, model: str | None, max_tokens: int | None,
         max_tokens=max_tokens or config.TEXT_MAX_TOKENS,
         effort=effort or config.REASONING_EFFORT,
         messages=[
-            {"role": "system", "content": system},
+            {"role": "system", "content": guardrails.ensure(system)},
             {"role": "user", "content": user},
         ],
     )
@@ -83,7 +84,7 @@ def complete_vision_json(system: str, user: str, image_path: Path, *, model: str
             max_tokens=max_tokens or config.VISION_MAX_TOKENS,
             effort=config.VISION_EFFORT,
             response_format={"type": "json_object"},
-            messages=[{"role": "system", "content": system}, {"role": "user", "content": content}],
+            messages=[{"role": "system", "content": guardrails.ensure(system)}, {"role": "user", "content": content}],
         )
         try:
             data = jsonutil.parse_json(response.choices[0].message.content or "")

@@ -27,21 +27,38 @@ Guru upload PDF bab (pilih bagian body dari preview)
      gambar: klasifikasi 3 percobaan (tanpa konteks, dengan konteks, penentu akhir); dekoratif dilewati;
      selain itu dideskripsikan dengan prompt per jenis; jenisnya disimpan sebagai blocks.image_kind
   -> backend ingest_annotated_json: block ke PostgreSQL
-  -> guru review per blok, feedback memicu regenerasi blok itu saja
+  -> guru review per blok: edit langsung (teks, rumus, tabel, gambar) atau feedback memicu regenerasi blok itu saja (spec 0008)
   -> rilis ke siswa
 ```
 
 ## Alur Quizzer
 
 ```
-block satu bab (DB) -> segment (per heading) -> context (ringkas) -> generate (satu soal per segmen)
-  -> validate (jawab ulang independen oleh model keluarga lain) -> backend simpan soal
-  -> guru validasi: LOTS diedit langsung, HOTS lewat feedback + regenerasi cluster
+blok tiap bab (DB) + CP + kuota HOTS/LOTS dari guru
+  -> segment (blok dan karakter, heading hanya titik potong) -> points (poin materi, LLM) -> mapping (slot bab x level, kuota ditegakkan kode)
+  -> generate (satu soal per slot; LOTS tanpa stimulus, HOTS dengan stimulus teks, tabel, gambar SVG, atau campuran pilihan model)
+  -> checks (kode) -> shuffle -> validate (jawab buta + audit oleh model keluarga lain; temuan berat memicu satu regenerasi)
+  -> backend simpan soal -> guru validasi: edit langsung soal dan stimulus, atau feedback + regenerasi cluster HOTS (spec 0008)
+  -> guru publish: kunci jawaban terkunci (edit dan regenerasi ditolak) dan kuis dapat dikerjakan siswa
 ```
 
-## Alur Chatbot
+Bentuk stimulus dan kontrak render klien: spec 0007 dan ADR 0012.
 
-Blok bab di-embed (`text-embedding-3-large`, 3072 dimensi) ke `block_embedding`, bersama indeks kata kunci (`lexical_tsv`) dan bentuk kanonik rumus (`formula_norm`). Pertanyaan siswa melewati pencarian hibrida (vektor, kata kunci, rumus persis, digabung RRF), scope gate, grader, lalu agen (jawaban dikembalikan sebagai bacaan `message` dan tampilan `message_markup` berisi LaTeX) dengan satu alat eksternal terbatas (`search_oer`, enam host OER kurasi, skor minimal 0,6) dan sitasi yang diverifikasi. Cache query dan riwayat di Redis.
+## Alur Evaluaizer
+
+Hanya jawaban salah yang punya langkah tulisan siswa dianalisis. Model membandingkan langkah siswa dengan langkah kunci yang sudah disetujui guru dan hanya menunjuk letak kesalahan pertama (`langkah_ke`, `kutipan`, `keterangan`); kode memeriksa bahwa kutipan benar-benar ada pada langkah itu. Spec 0009 dan ADR 0013.
+
+## Alur Clarifier
+
+Clarifier adalah satu chatbot asisten belajar yang berdiri sendiri: tidak membahas kuis dan tidak punya halaman terpisah. Selama siswa mengerjakan kuis, Clarifier dikunci untuk siswa itu.
+
+Blok bab di-embed (`text-embedding-3-large`, 3072 dimensi) ke `block_embedding` per chunk (dikemas menurut ukuran karakter, ADR 0015), bersama indeks kata kunci (`lexical_tsv`) dan bentuk kanonik rumus (`formula_norm`). Pengindeksan dijalankan worker begitu anotasi satu bab selesai, atau manual lewat endpoint reindex. Pertanyaan siswa melewati penyaring peniru instruksi, pencarian hibrida (vektor, kata kunci, rumus persis, digabung RRF), scope gate, grader, lalu agen dengan alat eksternal terbatas (`search_oer`, enam host OER kurasi, skor minimal 0,6) dan sitasi yang diverifikasi. Jawaban memuat bacaan `message`, tampilan `message_markup` (LaTeX), pasangan `rumus`, `tabel` opsional dengan bacaannya, dan blok tabel atau gambar asli dari modul. Cache query dan riwayat di Redis.
+
+Latihan soal buatan AI hanya di antarmuka chat (ADR 0014): model memanggil `request_practice`, backend membuat soal dengan komponen Quizzer dan menyimpannya di Redis tanpa menulis DB, lalu siswa menjawab dengan mengetik huruf pilihan. Soal tidak ditinjau guru, tidak masuk nilai, dan dibatasi 10 permintaan per siswa per jam.
+
+## Pagar prompt
+
+Semua prompt dilindungi lapisan anti-injeksi bersama (ADR 0016): aturan otomatis di prompt sistem, pembatas tag untuk masukan tak tepercaya, penyaring pola, dan pemeriksa kebocoran di keluaran.
 
 ## Runtime
 

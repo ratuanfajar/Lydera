@@ -1,6 +1,6 @@
 # 0010. Clarifier: pencarian hibrida dan sumber luar OER saja
 
-- Status: diterima
+- Status: diterima; bagian chunk digantikan oleh [0015](0015-chunk-clarifier-berbasis-ukuran.md) (2026-11-03)
 - Tanggal: 2026-10-28
 
 ## Konteks

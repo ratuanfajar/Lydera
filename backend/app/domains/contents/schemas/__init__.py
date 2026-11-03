@@ -7,4 +7,5 @@ from app.domains.contents.schemas.module.module_create import ModuleCreate
 from app.domains.contents.schemas.module.module_response import ModuleResponse
 from app.domains.contents.schemas.blocks.regenerate_request import RegenerateRequest
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateResponse
+from app.domains.contents.schemas.blocks.block_edit import BlockEditRequest, BlockEditResponse
 from app.domains.contents.schemas.module.module_progress_response import ModuleProgressResponse

@@ -4,8 +4,8 @@ import re
 from dataclasses import dataclass, field
 
 from annoter import prompts
-from annoter.phrases import UNREADABLE
-from annoter.speakable import speakable
+from common.phrases import UNREADABLE
+from common.speakable import speakable
 from common import cache, config, llm
 from common.math_text import latex_issues, spoken_table, strip_tags, table_issues, table_readable, table_summary
 

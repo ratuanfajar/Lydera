@@ -8,7 +8,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from annoter import annotate, config
-from annoter.resilience import Breaker
+from common.resilience import Breaker
 
 logger = logging.getLogger("annoter")
 

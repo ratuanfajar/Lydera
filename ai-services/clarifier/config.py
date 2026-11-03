@@ -6,6 +6,7 @@ CHAT_MODEL = (os.getenv("CHAT_MODEL") or "gpt-5.4-mini").strip()
 CHAT_MAX_TOKENS = int((os.getenv("CHAT_MAX_TOKENS") or "1024").strip())
 MAX_TOOL_ITERATIONS = int((os.getenv("MAX_TOOL_ITERATIONS") or "10").strip())
 TOP_K_CHUNKS = int((os.getenv("TOP_K_CHUNKS") or "5").strip())
+TABLE_MAX_CHARS = 6000
 
 EMBEDDING_API_KEY = common_config.EMBEDDING_API_KEY
 EMBEDDING_BASE_URL = common_config.EMBEDDING_BASE_URL
@@ -19,3 +20,7 @@ SCOPE_SIM_LOW = float((os.getenv("SCOPE_SIM_LOW") or "").strip() or "0.30")
 SEARCH_API_KEY = os.getenv("SEARCH_API_KEY") or ""
 SEARCH_API_URL = os.getenv("SEARCH_API_URL") or "https://api.tavily.com/search"
 OER_MIN_SCORE = float((os.getenv("OER_MIN_SCORE") or "").strip() or "0.6")
+
+PRACTICE_SOURCE_MAX_CHARS = 6000
+PRACTICE_MAX_CHUNKS = 4
+PRACTICE_LABEL = "Latihan buatan AI, belum ditinjau guru, dan tidak masuk nilai."

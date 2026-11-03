@@ -37,6 +37,9 @@ class QuizRepositoryInterface(ABC):
         raise NotImplementedError
     @abstractmethod
     async def get_quiz_request(self, quiz_request_id: int) -> QuizRequest | None: raise NotImplementedError
+
+    @abstractmethod
+    async def has_quiz_progress(self, quiz_request_id: int) -> bool: raise NotImplementedError
     @abstractmethod
     async def get_chapter_links(self, quiz_request_id: int) -> Sequence[QuizRequestChapter]: raise NotImplementedError
     @abstractmethod
@@ -66,7 +69,7 @@ class QuizRepositoryInterface(ABC):
         jawaban_id:int,
         selected_option: str,
         is_correct: bool,
-        langkah: list[str]
+        langkah: list[str] | None
     ) -> None: raise NotImplementedError
 
     @abstractmethod
@@ -96,7 +99,7 @@ class QuizRepositoryInterface(ABC):
     @abstractmethod
     async def update_stimulus_text(
         self, stimulus: SoalStimulus, readable_text: str, source_markup: str = "",
-        ringkasan: str | None = None, tabel: dict | None = None,
+        ringkasan: str | None = None, tabel: dict | None = None, spesifikasi: dict | None = None,
     ) -> None: raise NotImplementedError
     @abstractmethod
     async def replace_soal_opsi(self, soal_id: int, options: dict[str, str]) -> None: raise NotImplementedError

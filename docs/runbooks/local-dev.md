@@ -32,6 +32,12 @@ Redis dan PostgreSQL harus sudah jalan. Cek: `GET /health` dan dokumentasi inter
 
 Jika uvicorn gagal dengan `Failed to canonicalize script path`, jalankan `uv run python -m uvicorn app.main:app --host 0.0.0.0 --port 8000`.
 
+## Setelah menarik perubahan chunker atau prompt
+
+- Reindex Clarifier untuk bab yang sudah dianotasi: `POST /api/clarifier/classrooms/{id}/reindex` atau `/api/clarifier/chapters/{id}/reindex` (peran guru; worker harus jalan). Tanpa ini pencarian memakai chunk lama.
+- Versi prompt anotasi yang naik membuat cache lama di `ai-services/.cache` tidak terpakai; anotasi dihitung ulang saat dipakai.
+- Api dan worker perlu di-restart agar memuat kode baru.
+
 ## Debug satu tahap AI
 
 Modul di `ai-services/annoter/` dan `ai-services/quizzer/` punya CLI; jalankan dari `ai-services/` dengan `uv run python -m <fitur>.<modul> ...` (mis. `python -m annoter.batch --pdf ...`). Output MinerU di `ai-services/annoter/output`, cache MLLM di `ai-services/.cache` (hapus cache bila perlu hasil segar).

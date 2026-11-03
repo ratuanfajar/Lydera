@@ -27,6 +27,7 @@ from app.domains.quizzer.schemas import (
     SoalStatusResponse,
     SoalSubmitRequest,
     SoalSubmitResponse,
+    StimulusEditRequest,
 )
 from app.domains.quizzer.services import QuizService
 from app.tasks.quiz_tasks import TTL_3_MINUTES, process_quiz_request_task
@@ -218,7 +219,7 @@ async def save_quiz_requets(
 
 @router_teacher_quizz.post(
     "/soal/stimulus/regenerate/{soal_id}",
-    description="Requires the TEACHER role. Hanya berlaku untuk soal HOTS (stimulus_id terisi) -- meregenerasi seluruh cluster.",
+    description="Requires the TEACHER role. Hanya berlaku untuk soal HOTS (stimulus_id terisi) -- meregenerasi seluruh cluster. Hanya untuk kuis draft yang belum dikerjakan siswa.",
     response_model=Response[list[SoalResponse]],
     status_code=status.HTTP_200_OK,
     responses=COMMON_VALIDATION_RESPONSES,
@@ -237,7 +238,7 @@ async def regenerate_stimulus_soal(
 
 @router_teacher_quizz.patch(
     "/soal/{soal_id}",
-    description="Requires the TEACHER role. Hanya berlaku untuk soal berdiri sendiri (stimulus_id kosong, biasanya LOTS).",
+    description="Requires the TEACHER role. Edit langsung soal, opsi, kunci, langkah, dan kesimpulan; berlaku untuk soal LOTS maupun HOTS. Hanya untuk kuis draft yang belum dikerjakan siswa; kuis publish atau yang sudah dikerjakan dibalas 400 (kunci terkunci).",
     response_model=Response[SoalResponse],
     status_code=status.HTTP_200_OK,
     responses=COMMON_VALIDATION_RESPONSES,
@@ -250,6 +251,25 @@ async def edit_soal(
 ):
     soal = await service.edit_soal(soal_id, teacher.profile_id, payload)
     return Response(message=get_response_message(), data=_to_soal_response(soal))
+
+@router_teacher_quizz.patch(
+    "/soal/{soal_id}/stimulus",
+    description=(
+        "Requires the TEACHER role. Edit langsung stimulus pada bentuk aslinya: source_markup untuk stimulus teks, "
+        "spesifikasi (dan narasi opsional) untuk stimulus bertipe. Bacaan diturunkan ulang dan seluruh soal di cluster diverifikasi ulang. Hanya untuk kuis draft yang belum dikerjakan siswa."
+    ),
+    response_model=Response[list[SoalResponse]],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def edit_stimulus(
+    teacher: Roles(Role.TEACHER),
+    soal_id: Annotated[int, FastAPIPath()],
+    payload: Annotated[StimulusEditRequest, Body()],
+    service: QuizService = Depends(get_quiz_service),
+):
+    updated = await service.edit_stimulus(soal_id, teacher.profile_id, payload)
+    return Response(message=get_response_message(), data=[_to_soal_response(s) for s in updated])
 
 @router_teacher_quizz.delete(
     "/quizzes/{quiz_id}",
@@ -350,8 +370,10 @@ async def finish_quiz(
     description=(
         "Requires the STUDENT role. Simpan jawaban + langkah pengerjaan siswa untuk satu soal. "
         "Tidak ada evaluasi LLM di sini -- justifikasi untuk jawaban salah baru dihitung saat "
-        "siswa minta hasil lewat GET /evaluaizer/student/quizzes/{id}/results. Satu siswa cuma bisa submit "
-        "sekali per soal."
+        "siswa minta hasil lewat GET /evaluaizer/student/quizzes/{id}/results. Jawaban boleh dikirim ulang "
+        "selama sesi kuis belum selesai dan waktu pengerjaan belum habis (toleransi 10 detik; sesudahnya 400). Kiriman baru "
+        "menimpa jawaban; `langkah` yang tidak dikirim mempertahankan langkah lama, `langkah` yang dikirim (termasuk daftar "
+        "kosong) menggantinya, dan baris langkah kosong dibuang."
     ),
     response_model=Response[SoalSubmitResponse],
     status_code=status.HTTP_201_CREATED,

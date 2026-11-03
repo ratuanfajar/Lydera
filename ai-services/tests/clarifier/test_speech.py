@@ -113,7 +113,7 @@ def test_finalize_tanpa_sumber_terverifikasi_memakai_pesan_cadangan(verbalizer):
 
 def test_system_prompt_meminta_latex_di_summary_dan_kata_di_bidang_lain():
     assert "LaTeX di antara tanda dolar" in agent.SYSTEM_PROMPT
-    assert "JANGAN memakai tanda dolar" in agent.SYSTEM_PROMPT
+    assert "jangan memakai tanda dolar atau simbol" in agent.SYSTEM_PROMPT
 
 
 def raise_error(latex):
@@ -238,3 +238,13 @@ def test_pangkat_atau_subskrip_tanpa_isi_menghapus_markup(verbalizer, formula):
 @pytest.mark.parametrize("formula", [r"90^\circ", "x^2", "a_1", "x^{10}"])
 def test_pangkat_dan_subskrip_berisi_tidak_ditandai(verbalizer, formula):
     assert speech.derive_message(f"Nilainya ${formula}$ saja.")[1] is not None
+
+
+def test_pasangan_rumus_unik_berurutan_dengan_bacaan_verbalizer(verbalizer):
+    pairs = speech.formula_pairs("Pusat $P(a, b)$ dan persamaan $x^2 = 4$, lalu $P(a, b)$ lagi.")
+    assert pairs == [{"latex": "P(a, b)", "bacaan": "<P(a, b)>"}, {"latex": "x^2 = 4", "bacaan": "<x^2 = 4>"}]
+
+
+def test_teks_tanpa_rumus_tidak_menghasilkan_pasangan(verbalizer):
+    assert speech.formula_pairs("Fungsi memetakan anggota domain.") == []
+    assert verbalizer == []

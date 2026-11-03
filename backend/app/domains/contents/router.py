@@ -20,6 +20,7 @@ from app.domains.contents.schemas.blocks.block_review_response import BlockPrevi
 from app.domains.contents.schemas.chapters.ingest_annonated_request import IngestAnnotatedRequest
 from app.tasks.progress_tasks import enqueue_module_progress_job
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateDetailResponse
+from app.domains.contents.schemas.blocks.block_edit import BlockEditRequest, BlockEditResponse
 from app.domains.contents.schemas.chapters.chapter_create import ChapterCreate
 from annoter import annoter_regenerate
 
@@ -52,6 +53,26 @@ async def bulk_regenerate_text(
 ):
     result = await content_service.regenerate_text_blocks(payload, teacher.profile_id)
     return Response(message="Text blocks updated successfully", data=result)
+
+
+@router_blocks.patch(
+    "/{block_id}",
+    description=(
+        "Requires the TEACHER role. Edit langsung satu blok. Rumus: source_markup (LaTeX) atau readable_text. "
+        "Tabel: tabel terstruktur atau readable_text. Gambar, teks, heading: readable_text. readable_text yang dikirim dipakai apa adanya."
+    ),
+    response_model=Response[BlockEditResponse],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def edit_block(
+    block_id: Annotated[int, FastAPIPath()],
+    payload: Annotated[BlockEditRequest, Body()],
+    teacher: Roles(Role.TEACHER),
+    content_service: ContentService = Depends(get_content_service),
+):
+    result = await content_service.edit_block(block_id, teacher.profile_id, payload)
+    return Response(message=get_response_message(), data=result)
 
 
 @router_blocks.post("/bulk-regenerate/special", response_model=Response[list[RegenerateDetailResponse]])

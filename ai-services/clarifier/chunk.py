@@ -1,5 +1,4 @@
-"""Konversi block jadi chunk untuk embedding: semua block di bawah satu heading digabung jadi
-satu Chunk, bukan satu block satu Chunk (lihat evaluasi retrieval chatbot)."""
+"""Konversi block jadi chunk untuk embedding: block dikemas menurut ukuran karakter, heading hanya dipakai sebagai titik potong pilihan."""
 
 from __future__ import annotations
 
@@ -8,7 +7,10 @@ from dataclasses import dataclass, field
 
 from clarifier.formula_text import normalize_formula
 
-MAX_CHUNK_CHARS = 1500
+MAX_CHUNK_CHARS = 1200
+TARGET_CHUNK_CHARS = 600
+MIN_TAIL_CHARS = 250
+OVERLAP_MAX_CHARS = 300
 FORMULA_SEPARATOR = ";"
 
 _METADATA = re.compile(r"\bISBN\b|Dilarang memperbanyak|Hak Cipta Dilindungi", re.IGNORECASE)
@@ -28,13 +30,11 @@ class Chunk:
 
 def build_chunks(chapter_id: int, blocks: list[dict]) -> list[Chunk]:
     """`blocks`: dict dengan field id, block_type, readable_text, reading_order, source_markup (opsional), urut reading_order.
-    Batas chunk = tiap heading; block sebelum heading pertama masuk chunk "Pembuka". Section yang lebih
-    panjang dari MAX_CHUNK_CHARS dipecah di batas block; section metadata penerbit (ISBN, hak cipta) dilewati."""
-    chunks: list[Chunk] = []
-    for section in _sections(blocks):
-        if not _is_metadata(section):
-            chunks.extend(_split(chapter_id, section))
-    return chunks
+    Chunk berisi block berurutan sampai sekitar TARGET_CHUNK_CHARS lalu dipotong di heading berikutnya, atau di batas block sebelum MAX_CHUNK_CHARS;
+    block pertama tiap chunk tidak pernah sama dengan block pertama chunk lain karena itu dipakai sebagai rujukan sitasi."""
+    units = [unit for section in _sections(blocks) if not _is_metadata(section) for unit in section["units"]]
+    groups = _merge_tail(_pack(units))
+    return [_chunk(chapter_id, group) for group in _with_overlap(groups)]
 
 
 def _sections(blocks: list[dict]) -> list[dict]:
@@ -42,49 +42,77 @@ def _sections(blocks: list[dict]) -> list[dict]:
     current: dict | None = None
     for block in blocks:
         if block["block_type"] == "heading":
-            if current:
-                sections.append(current)
-            current = {"heading": block["readable_text"], "heading_id": block["id"], "heading_order": block["reading_order"], "entries": []}
-            continue
-        if current is None:
-            current = {"heading": "Pembuka", "heading_id": None, "heading_order": block["reading_order"], "entries": []}
-        current["entries"].append(block)
-    if current:
-        sections.append(current)
+            current = {"heading": block["readable_text"], "units": []}
+            sections.append(current)
+        elif current is None:
+            current = {"heading": "Pembuka", "units": []}
+            sections.append(current)
+        current["units"].append({"block": block, "heading": current["heading"]})
     return sections
 
 
 def _is_metadata(section: dict) -> bool:
-    return any(_METADATA.search(text) for text in (section["heading"], *(entry["readable_text"] for entry in section["entries"])))
+    return any(_METADATA.search(text) for text in (section["heading"], *(unit["block"]["readable_text"] for unit in section["units"])))
 
 
-def _split(chapter_id: int, section: dict) -> list[Chunk]:
-    heading_id = section["heading_id"]
-    if not section["entries"]:
-        return [Chunk(chapter_id, section["heading"], [heading_id], section["heading_order"], section["heading_order"], section["heading"])]
-    groups: list[list[dict]] = [[]]
+def _is_heading(unit: dict) -> bool:
+    return unit["block"]["block_type"] == "heading"
+
+
+def _length(unit: dict) -> int:
+    return len(unit["block"]["readable_text"])
+
+
+def _pack(units: list[dict]) -> list[list[dict]]:
+    groups: list[list[dict]] = []
+    current: list[dict] = []
     size = 0
-    for entry in section["entries"]:
-        length = len(entry["readable_text"])
-        if groups[-1] and size + length > MAX_CHUNK_CHARS:
-            groups.append([])
-            size = 0
-        groups[-1].append(entry)
-        size += length
-    return [_chunk(chapter_id, section, group, with_heading=index == 0) for index, group in enumerate(groups)]
+    for unit in units:
+        too_long = size + _length(unit) > MAX_CHUNK_CHARS
+        heading_cut = _is_heading(unit) and size >= TARGET_CHUNK_CHARS
+        if any(not _is_heading(held) for held in current) and (too_long or heading_cut):
+            groups.append(current)
+            current = [groups[-1].pop()] if len(groups[-1]) > 1 and _is_heading(groups[-1][-1]) else []
+            size = _size(current)
+        current.append(unit)
+        size += _length(unit)
+    if current:
+        groups.append(current)
+    return groups
 
 
-def _chunk(chapter_id: int, section: dict, entries: list[dict], with_heading: bool) -> Chunk:
-    heading_ids = [section["heading_id"]] if with_heading and section["heading_id"] is not None else []
-    first_order = section["heading_order"] if with_heading else entries[0]["reading_order"]
+def _merge_tail(groups: list[list[dict]]) -> list[list[dict]]:
+    if len(groups) > 1 and _size(groups[-1]) < MIN_TAIL_CHARS and _size(groups[-2]) + _size(groups[-1]) <= MAX_CHUNK_CHARS:
+        groups[-2].extend(groups.pop())
+    return groups
+
+
+def _size(group: list[dict]) -> int:
+    return sum(_length(unit) for unit in group)
+
+
+def _with_overlap(groups: list[list[dict]]) -> list[list[dict]]:
+    result = [groups[0]] if groups else []
+    for previous, group in zip(groups, groups[1:]):
+        last = previous[-1]
+        carry = len(previous) > 1 and not _is_heading(last) and _length(last) <= OVERLAP_MAX_CHARS
+        result.append([last, *group] if carry else group)
+    return result
+
+
+def _chunk(chapter_id: int, group: list[dict]) -> Chunk:
+    blocks = [unit["block"] for unit in group]
+    heading = group[0]["heading"]
+    parts = [] if _is_heading(group[0]) else [f"{heading}:"]
+    parts += [f"{block['readable_text']}:" if block["block_type"] == "heading" else block["readable_text"] for block in blocks]
     return Chunk(
         chapter_id=chapter_id,
-        heading=section["heading"],
-        block_ids=[*heading_ids, *(entry["id"] for entry in entries)],
-        reading_order_start=first_order,
-        reading_order_end=entries[-1]["reading_order"],
-        text=f"{section['heading']}: " + " ".join(entry["readable_text"] for entry in entries),
-        formula_norm=FORMULA_SEPARATOR.join(_unique(formula for entry in entries for formula in _formulas(entry))),
+        heading=heading,
+        block_ids=[block["id"] for block in blocks],
+        reading_order_start=blocks[0]["reading_order"],
+        reading_order_end=blocks[-1]["reading_order"],
+        text=" ".join(parts).removesuffix(":"),
+        formula_norm=FORMULA_SEPARATOR.join(_unique(formula for block in blocks for formula in _formulas(block))),
     )
 
 

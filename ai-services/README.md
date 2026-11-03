@@ -36,11 +36,11 @@ blok tiap bab (di DB) + CP bab + kuota HOTS/LOTS per bab dari guru
   -> segment        potong berdasar blok dan karakter (target 4.000, maksimal 8.000), heading hanya memilih titik potong
   -> points         LLM mengekstrak poin materi per segmen (di-cache), lalu poin kembar antar segmen dibuang (kemiripan kata)
   -> mapping        LLM mengusulkan poin untuk tiap slot (bab, level); kode menegakkan kuota dan mengisi kekurangan
-  -> generate       satu soal per slot dari poin + teks sumbernya (stimulus teks saja untuk C4-C5)
+  -> generate       satu soal per slot dari poin + teks sumbernya (LOTS tanpa stimulus; HOTS wajib stimulus: teks, tabel, gambar SVG, atau campuran, dipilih model)
   -> checks         kode: struktur opsi, rujukan visual, kunci jauh lebih panjang dari opsi lain
   -> shuffle        kode: acak urutan opsi dengan target kunci seimbang per bab
-  -> validate       model validator lintas keluarga: jawab buta + audit langkah dan kesimpulan (hanya menandai soal)
-  -> perbaikan      satu kali regenerasi dengan daftar masalah dari pemeriksaan kode sebagai koreksi
+  -> validate       model validator lintas keluarga: jawab buta + audit langkah dan kesimpulan
+  -> perbaikan      satu kali regenerasi dengan daftar masalah dari pemeriksaan kode atau temuan audit berat sebagai koreksi; yang masih bermasalah hanya ditandai
   -> laporan        coverage_report (poin terpakai, diminta vs jadi, slot gagal, diperbaiki)
 ```
 
@@ -61,6 +61,38 @@ Model yang dipakai adalah nama *deployment* di resource Azure itu: `gpt-5.4-mini
 
 Perintah CLI dijalankan dari `ai-services/` sebagai modul paket, mis. `uv run python -m annoter.annotate content_list.json annotated.json`.
 
+## Menjalankan secara runut
+
+`ai-services/` bukan server: ia pustaka komputasi murni yang dipanggil backend (API dan worker taskiq) dan tidak menyentuh database. Ada dua cara menjalankannya.
+
+### A. Lewat sistem penuh (backend)
+
+Semua perintah dari root repo kecuali disebut lain.
+
+1. Pasang dependensi: `uv sync`.
+2. Siapkan env: salin `ai-services/.env.example` ke `ai-services/.env` (kunci Azure, opsional `SEARCH_API_KEY`) dan `backend/.env.example` ke `backend/.env` (database, Redis, JWT). Jangan commit file `.env`.
+3. Nyalakan PostgreSQL dengan ekstensi pgvector dan Redis.
+4. Migrasi database: `cd backend && uv run alembic upgrade head`.
+5. API: `cd backend && uv run python -m uvicorn app.main:app --host 0.0.0.0 --port 8000` (pakai `python -m` bila `uvicorn` gagal dengan `Failed to canonicalize script path`).
+6. Worker taskiq di terminal lain: `cd backend && uv run taskiq worker app.core.taskiq:broker app.tasks.mineru_tasks app.tasks.quiz_tasks app.tasks.process_exam_review_tasks app.tasks.chatbot_tasks app.tasks.progress_tasks app.tasks.email_tasks app.tasks.file_tasks app.tasks.evaluaizer_tasks`.
+7. Periksa: `GET http://localhost:8000/health` dan dokumentasi di `/docs`.
+8. Urutan alur data (Postman "Lydera" berisi contoh tiap langkah):
+   1. Guru mengunggah PDF bab: worker menjalankan MinerU lalu Annoter (butuh waktu beberapa menit per bab).
+   2. Guru meninjau blok hasil anotasi, mengonfirmasi (ingest ke DB), lalu mempublikasikan modul.
+   3. Clarifier diindeks: otomatis oleh worker begitu anotasi satu bab selesai (siswa baru melihat hasilnya setelah modul dipublikasikan). Edit blok sesudahnya tidak memicu reindex otomatis; panggil manual `POST /api/clarifier/chapters/{id}/reindex` atau `POST /api/clarifier/classrooms/{id}/reindex` (peran guru). Wajib dijalankan ulang untuk bab yang sudah ada setelah chunker berubah.
+   4. Guru membuat kuis (Quizzer, progres lewat SSE), meninjau atau mengedit soal, lalu mempublikasikannya.
+   5. Siswa mengerjakan kuis; Evaluaizer menganalisis jawaban salah yang punya langkah. Selama kuis berlangsung Clarifier dikunci untuk siswa itu.
+   6. Siswa memakai Clarifier (tanya jawab dan latihan soal di chat) di luar waktu kuis.
+
+### B. Tanpa database, lewat CLI per modul
+
+Dari folder `ai-services/` (butuh `ai-services/.env`; hanya Annoter yang butuh MinerU dan modelnya):
+
+1. Ekstraksi layout satu PDF: `uv run python -m annoter.run_mineru --pdf <berkas.pdf> --out annoter/output/<bab>`, atau seluruh PDF per window halaman: `uv run python -m annoter.batch --pdf <berkas.pdf> --out annoter/output/<bab>`.
+2. Anotasi semua window satu bab (tanpa ingest ke DB): `uv run python -m annoter.annoter_pipeline --outputs annoter/output/<bab>`. Satu window saja: `uv run python -m annoter.annotate <content_list.json> <annotated.json>`.
+3. Quizzer, Evaluaizer, dan Clarifier tidak punya CLI produksi karena butuh data dari DB; fungsinya dipanggil backend. Untuk mencoba: `evaluaizer/eval/run_eval.py` (36 panggilan Azure) dan skrip di `quizzer/eval/`. Kedua jenis skrip ini memanggil Azure dan berbayar, jalankan hanya saat perlu.
+4. Tes murni tanpa jaringan, DB, atau LLM nyata, dari root repo: `uv run pytest -q`.
+
 ## Konfigurasi
 
 Dibaca `config.py` dari `ai-services/.env`.
@@ -79,6 +111,8 @@ Dibaca `config.py` dari `ai-services/.env`.
 | `SCOPE_SIM_HIGH` / `SCOPE_SIM_LOW` | `0.60` / `0.30` | Ambang similarity scope gate chatbot |
 | `SEARCH_API_KEY` / `SEARCH_API_URL` | kosong / `https://api.tavily.com/search` | Pencarian sumber OER (Clarifier) |
 | `OER_MIN_SCORE` | `0.6` | Skor relevansi minimum hasil pencarian OER |
+| `QUIZ_MARKUP_ENABLED` | kosong (menyala) | Isi `0` agar soal ditulis tanpa LaTeX; samakan nilainya di API dan worker |
+| `QUIZ_STIMULUS_TYPES` | kosong (semua jenis) | Jenis stimulus yang boleh dipilih model, dipisah koma (`tabel`, `gambar`, `campuran`); `teks` membatasi ke stimulus teks; samakan di API dan worker |
 
 Konstanta bersama ada di `common/config.py` (bukan env, ubah lewat kode):
 
@@ -91,12 +125,12 @@ Konstanta bersama ada di `common/config.py` (bukan env, ubah lewat kode):
 | `VISION_MAX_TOKENS` | `1800` | Batas token panggilan vision |
 | `LLM_MAX_WORKERS` | `4` | Jumlah panggilan LLM paralel |
 | `CACHE_DIR` | `ai-services/.cache` | Lokasi cache hasil MLLM |
-| `FORMULA_PROMPT_VERSION` | `2` | Kunci cache rumus; naikkan bila prompt rumus berubah (tidak menghapus cache tabel dan gambar) |
-| `TABLE_PROMPT_VERSION` | `3` | Kunci cache tabel; naikkan bila prompt tabel berubah |
+| `FORMULA_PROMPT_VERSION` | `3` | Kunci cache rumus; naikkan bila prompt rumus berubah (tidak menghapus cache tabel dan gambar) |
+| `TABLE_PROMPT_VERSION` | `5` | Kunci cache tabel; naikkan bila prompt tabel berubah |
 | `TABLE_MAX_TOKENS` | `4000` | Batas keluaran model penglihatan untuk tabel (memuat seluruh sel) |
-| `PROMPT_VERSION` | `10` | Ikut jadi cache key; naikkan kalau prompt atau model anotasi berubah supaya cache lama tidak terpakai |
+| `PROMPT_VERSION` | `13` | Ikut jadi cache key; naikkan kalau prompt atau model anotasi berubah supaya cache lama tidak terpakai |
 
-Konstanta per fitur ada di `<fitur>/config.py`. Annoter (`annoter/config.py`): `OUTPUT_DIR` (`annoter/output`, lokasi hasil ekstraksi MinerU; backend memakai setting `OUTPUT_DIR` sendiri), `CLASSIFY_MAX_TOKENS` (`300`), `CLASSIFY_CONTEXT_CHARS` (`400`, teks tetangga untuk percobaan 2 dan 3), `CLASSIFY_MIN_CONFIDENCE` (`4`, keyakinan minimal agar gambar dekoratif dilewati). Quizzer (`quizzer/config.py`): `QUIZ_MODEL` `gpt-5.4-mini` dan `QUIZ_VALIDATOR_MODEL` `grok-4.3` (keluarga model lain dari generator).
+Konstanta per fitur ada di `<fitur>/config.py`. Annoter (`annoter/config.py`): `OUTPUT_DIR` (`annoter/output`, lokasi hasil ekstraksi MinerU; backend memakai setting `OUTPUT_DIR` sendiri), `CLASSIFY_MAX_TOKENS` (`300`), `CLASSIFY_CONTEXT_CHARS` (`400`, teks tetangga untuk percobaan 2 dan 3), `CLASSIFY_MIN_CONFIDENCE` (`4`, keyakinan minimal agar gambar dekoratif dilewati). Quizzer (`quizzer/config.py`): `QUIZ_MODEL` `gpt-5.4-mini` dan `QUIZ_VALIDATOR_MODEL` `grok-4.3` (keluarga model lain dari generator), `BREAKER_THRESHOLD` (`5`, galat sistemik beruntun sebelum job berhenti cepat dengan pesan layanan model tidak tersedia), `STIMULUS_TYPES` (env `QUIZ_STIMULUS_TYPES`, bawaan `*` = semua jenis), dan batas teknis spesifikasi stimulus (`STIMULUS_MAX_LEAVES`, `STIMULUS_MAX_CHARS`, `STIMULUS_MAX_DEPTH`, `STIMULUS_MAX_SVG_CHARS`, `SVG_MAX_ELEMENTS`).
 
 Nama variabel env di atas generik (tidak berprefiks proyek) — cek tidak bentrok kalau proses ini jalan berdampingan dengan layanan lain di mesin yang sama.
 
@@ -104,7 +138,9 @@ Semua fitur memakai `gpt-5.4-mini` (kecuali validator Quizzer); bedanya di `reas
 
 ## Format prompt
 
-Semua prompt Annoter disusun `common/prompt_format.build_prompt(role, task, context, rules, output_format, examples)` dengan heading tetap `# ROLE`, `# TASK`, `# CONTEXT`, `# RULES`, `# OUTPUT FORMAT`, `# EXAMPLES` (bagian kosong dilewati). Pesan user (data) disusun `build_input(**bagian)` dengan heading dari nama argumen (`surrounding_text_not_image_content` menjadi `# SURROUNDING TEXT NOT IMAGE CONTENT`). Teksnya ada di `annoter/prompts.py`.
+Semua prompt (Annoter, Quizzer, Evaluaizer, Clarifier, dan prompt bersama di `common/`) memakai format baku di bawah ini, dijaga `tests/common/test_prompts_format.py`. Teknik dipilih menurut tugas: contoh few-shot untuk klasifikasi dan format keluaran, kolom alasan singkat sebelum keputusan untuk penilaian, dan daftar periksa sebelum menutup untuk agen. Aturan anti-injeksi ditambahkan otomatis (lihat Pagar prompt).
+
+Prompt Annoter disusun `common/prompt_format.build_prompt(role, task, context, rules, output_format, examples)` dengan heading tetap `# ROLE`, `# TASK`, `# CONTEXT`, `# RULES`, `# OUTPUT FORMAT`, `# EXAMPLES` (bagian kosong dilewati). Pesan user (data) disusun `build_input(**bagian)` dengan heading dari nama argumen (`surrounding_text_not_image_content` menjadi `# SURROUNDING TEXT NOT IMAGE CONTENT`). Teksnya ada di `annoter/prompts.py`.
 
 | Komponen | Teknik | Catatan |
 |---|---|---|
@@ -132,7 +168,7 @@ uv run python -m annoter.batch --pdf modul.pdf [--out DIR] [--max-pages 3] \
 
 **preprocess.py** — `preprocess(content_list_path) -> list[Block]`. Ubah `content_list.json` jadi blok ter-route (`heading`, `text`, `formula`, `table`, `image`). Blok `header`/`footer`/`page_number` dibuang. Teks dengan rumus inline `$...$` dipecah jadi segmen.
 
-**annotate.py** — `annotate_window(content_list_path, breaker=None) -> WindowResult` (blok, jumlah gagal, jumlah berpanggilan LLM); dispatch per rute lewat kamus `ANNOTATORS`, blok berpanggilan LLM yang gagal disimpan kosong berprioritas `high`. `resilience.py` berisi `Breaker` (pemutus setelah 5 galat sistemik beruntun) dan `is_systemic`; `priority.py` berisi aturan `review_priority`; `phrases.py` menyatukan frasa 'tidak terbaca'. Heading dan teks dibersihkan tag/spasi tanpa LLM; rumus, tabel, gambar dikonversi lewat MLLM, paralel sebesar `LLM_MAX_WORKERS`, urutan baca tetap terjaga. Menghitung `review_priority` untuk membantu guru memprioritaskan pengecekan.
+**annotate.py** — `annotate_window(content_list_path, breaker=None) -> WindowResult` (blok, jumlah gagal, jumlah berpanggilan LLM); dispatch per rute lewat kamus `ANNOTATORS`, blok berpanggilan LLM yang gagal disimpan kosong berprioritas `high`. `common/resilience.py` berisi `Breaker` (pemutus setelah 5 galat sistemik beruntun, dipakai bersama Quizzer) dan `is_systemic`; `priority.py` berisi aturan `review_priority`; `phrases.py` menyatukan frasa 'tidak terbaca'. Heading dan teks dibersihkan tag/spasi tanpa LLM; rumus, tabel, gambar dikonversi lewat MLLM, paralel sebesar `LLM_MAX_WORKERS`, urutan baca tetap terjaga. Menghitung `review_priority` untuk membantu guru memprioritaskan pengecekan.
 ```
 uv run python -m annoter.annotate content_list.json [annotated.json]
 ```
@@ -142,8 +178,6 @@ Field tiap blok: `block_type`, `reading_order`, `page`, `readable_text`, `review
 - Rumus: `common/formula.py` (`convert_checked`) dipanggil langsung oleh `annotate.py`; verbalisasi LaTeX -> Bahasa Indonesia (model teks).
 - `table.py`: tabel -> `TableResult(text, ringkasan, tabel, issues)` (model vision, dari gambar tabel + HTML hasil OCR). Model menghasilkan tabel terstruktur `{judul, kolom, baris}` dan satu kalimat `topik`; bacaan linear (`math_text.table_readable`) dan ringkasan (`math_text.table_summary`) disusun kode dari tabel itu. Sel diverbalisasi (`math_text.spoken_table`). Bila struktur tidak valid, bacaan memakai `deskripsi` dari model dan blok diberi prioritas `high`. `annoter_regenerate.regenerate` mengembalikan `Regenerated(text, ringkasan, tabel, issues)`.
 - `image.py`: gambar/grafik -> `ImageAnnotation(kind, text, uncertain)`. `annotate_image` memanggil `classify_image` (tiga percobaan, di-cache per percobaan di namespace `image_kind` dan `image_kind_final`), melewati gambar dekoratif yang yakin, lalu `_describe` dengan prompt per jenis (namespace `image`).
-
-**speakable.py** — pembersih deterministik deskripsi gambar setelah teks model: kutip dibuang, satuan dan pecahan ber-garis miring dibaca 'per', minus, pangkat angka murni, superskrip, panah, dan simbol relasi diganti kata; pola ambigu dibiarkan dan ditandai `description_issues`; elipsis tidak diubah. Dipakai `image.annotate_image` dan `annoter_regenerate`.
 
 **prompts.py** — seluruh teks prompt Annoter: rumus, tabel, gambar umum, per jenis gambar (`KIND_RULES`), klasifikasi (`image_classifier_*`), dan penentu akhir (`image_arbiter_*`), plus aturan bersama (`NO_OPENER_RULE`, `PLAIN_TEXT_RULE`, `GREEK_RULE`, `FEEDBACK_RULE`). Fungsi `*_system` menyusun system prompt, `*_input` menyusun pesan user.
 
@@ -181,7 +215,9 @@ regenerate(block_type, feedback, *, source_markup="", image_path=None, caption="
 
 **validate.py** — `verify_soal(source_text, data, stimulus_text)`: model `QUIZ_VALIDATOR_MODEL` (keluarga berbeda dari generator) menjawab buta (`validate_soal`) dan mengaudit langkah, kesimpulan, opsi lain yang benar, stem ambigu, dan kebutuhan stimulus (`audit_soal`). Tidak pernah melempar; kegagalan infrastruktur tercatat sebagai catatan. Hasilnya hanya menandai soal (tanpa regenerasi); Bloom bukan syarat lolos.
 
-**revise.py / quizzer_regenerate.py** — `compute_regeneration(all_blocks, source_start, source_end, stimulus_text, target_soal, sibling_soal, feedback)` dipanggil backend saat guru memberi feedback ke satu soal HOTS: mengedit soal lama (bukan generate dari nol), merevisi stimulus bila perlu, lalu `review_soal` (pemeriksaan kode + verifikasi) menghasilkan daftar masalah untuk tanda review. `review_soal` juga dipanggil backend setelah guru mengedit soal LOTS secara manual.
+**revise.py / quizzer_regenerate.py** — `compute_regeneration(all_blocks, source_start, source_end, stimulus_source_markup, stimulus_readable, target_soal, sibling_soal, feedback, stimulus_jenis=None, stimulus_spec=None)` (dua argumen terakhir untuk stimulus bertipe: spesifikasi direvisi lewat `revise_stimulus_typed`, divalidasi registry, lalu soal sekelompok di-recheck) dipanggil backend saat guru memberi feedback ke satu soal HOTS: mengedit soal lama (bukan generate dari nol), merevisi stimulus bila perlu, lalu `review_soal` (pemeriksaan kode + verifikasi) menghasilkan daftar masalah untuk tanda review. `review_soal` juga dipanggil backend setelah guru mengedit soal LOTS secara manual.
+
+**stimulus/** — stimulus bertipe (spec 0007, ADR 0012). `registry.py` memetakan nama jenis ke `StimulusKind` (`base.py`: `validate`, `narrate`, `finalize`, `keys`, `raw_keys`, `derived_keys`, `describe`, `available`). Jenis: `tabel` (sel boleh LaTeX; bacaan diturunkan lewat linearisasi tabel bersama), `gambar` (SVG tulisan LLM dan deskripsi; `gambar.py` menolak DOCTYPE, ENTITY, skrip, tautan, `style`, dan `url()` non-lokal, memeriksa daftar putih elemen dan atribut, lalu menulis ulang SVG bersih), `campuran` (komponen berurutan). `registry.check(stimulus)` memeriksa keluaran generator; `registry.derive(stimulus, issues)` menurunkan `readable_text`, `tabel`, `ringkasan`, dan spesifikasi akhir bersama `skema_versi`. `text.py` berisi pembantu bersama. Jenis aktif ditentukan env `QUIZ_STIMULUS_TYPES` (bawaan semua jenis; `teks` saja membatasi ke stimulus teks).
 
 **quizzer_pipeline.py** — `compute_for_quiz(chapters, on_progress=None, seed=None) -> {"items", "report"}`: orkestrasi di atas dengan isolasi kegagalan per slot, anggaran `MAX_GENERATIONS_PER_SLOT` generate per slot, dan paralel sebesar `LLM_MAX_WORKERS`. Dipanggil backend lewat `backend/app/tasks/quiz_tasks.py`.
 
@@ -191,45 +227,80 @@ regenerate(block_type, feedback, *, source_markup="", image_path=None, caption="
 
 ## Modul (evaluaizer/)
 
-**evaluate.py** — `evaluate_scratchwork(source_text, stimulus_text, question_text, options, correct_option, correct_langkah, kesimpulan, student_option, student_langkah) -> dict` untuk satu jawaban salah: satu panggilan LLM (`EVALUAIZER_MODEL`, effort `EVALUAIZER_EFFORT`) menghasilkan `divergence_step` (nomor langkah siswa), `error_type`, `diagnosis`, dan `justification_points` (`[{point, step_ref}]`, `step_ref` = nomor langkah kunci). Hasil diperiksa `checks.result_issues`; bila ada masalah satu kali perbaikan, dan hasil yang lebih baik dikembalikan dengan `needs_review` bila masih bermasalah. `personalized_justification` adalah poin yang digabung bernomor. Tanpa cache (hasil disimpan backend).
+**evaluate.py** — `evaluate_scratchwork(source_text, stimulus_text, question_text, options, correct_option, correct_langkah, kesimpulan, student_option, student_langkah) -> dict` untuk satu jawaban salah yang punya langkah tertulis siswa (tanpa langkah: `ValueError`, backend tidak memanggilnya): satu panggilan LLM (`EVALUAIZER_MODEL`, effort `EVALUAIZER_EFFORT`) membandingkan langkah siswa dengan langkah kunci dan menghasilkan `dapat_ditentukan`, `langkah_ke` (nomor langkah siswa yang pertama salah, null bila semua langkah benar atau tak dapat ditentukan), `kutipan` (isi langkah itu persis), dan `keterangan` (satu atau dua kalimat netral). Satu putaran perbaikan otomatis bila pemeriksa menemukan masalah; sisa temuan menandai `needs_review`.
 
-**prompts.py** — prompt format seragam dengan satu contoh few-shot; langkah siswa dibungkus `<catatan_pengerjaan_siswa>` dan diperlakukan sebagai data. Siswa tanpa langkah tetap dievaluasi (penjelasan mengapa opsi keliru lalu langkah benar), tanpa kalimat meta.
+**prompts.py** — prompt format seragam dengan satu contoh few-shot; langkah siswa dibungkus `<catatan_pengerjaan_siswa>` dan diperlakukan sebagai data. Cara siswa yang sah dinilai pada caranya sendiri, melompati langkah bukan kesalahan, dan langkah berisi nilai saja dinyatakan tak dapat ditentukan.
 
-**checks.py** — pemeriksaan kode: `error_type` valid, `divergence_step` dalam jangkauan langkah siswa, 2 sampai 8 poin, `step_ref` dalam jangkauan langkah kunci, tanpa simbol mentah (`common/notation_check`), markdown, atau kalimat meta tentang catatan yang hilang.
+**checks.py** — pemeriksaan kode: tipe `dapat_ditentukan`, `langkah_ke` dalam jangkauan, `kutipan` benar-benar ada pada langkah yang ditunjuk, dan `keterangan` tanpa simbol mentah, markdown, huruf bukan Latin, tanda tanya atau seru, kata ganda berurutan, atau istilah internal.
 
-**eval/** — `cases.json` (16 kasus dengan kebenaran dasar `divergence_step`, termasuk 6 kasus langkah siswa berantakan) dan `run_eval.py` (3 ulangan, juri `QUIZ_VALIDATOR_MODEL`): `uv run python -m evaluaizer.eval.run_eval <berkas_keluaran.json>` dari `ai-services/`. Spec [0004](../docs/specs/0004-evaluaizer-justifikasi-berpoin.md), ADR [0009](../docs/adr/0009-evaluaizer-justifikasi-berpoin.md).
+**eval/** — `cases.json` (26 kasus dengan kebenaran dasar `accepted_divergence` dan `dapat_ditentukan`, termasuk kasus langkah berantakan dan 11 skenario penulisan langkah) dan `run_eval.py` (3 ulangan, tanpa model juri): `uv run python -m evaluaizer.eval.run_eval [berkas_keluaran.json]` dari `ai-services/`. Spec [0009](../docs/specs/0009-evaluaizer-letak-kesalahan-dari-langkah-siswa.md), ADR [0013](../docs/adr/0013-evaluaizer-hanya-letak-kesalahan.md) (menggantikan [0009](../docs/adr/0009-evaluaizer-justifikasi-berpoin.md)).
 
 ## Alur Pipeline — Clarifier (RAG hibrida)
 
 ```
-guru publish/edit bab
+anotasi satu bab selesai (backend/app/tasks/mineru_tasks.py), atau reindex manual oleh guru
   -> reindex (backend/app/tasks/chatbot_tasks.py, taskiq)
-       blocks (DB) -> chunk.build_chunks: satu section di bawah heading = satu chunk (dipecah di batas
-       block bila lebih dari 1.500 karakter; section ISBN/hak cipta dilewati); tiap chunk juga membawa
+       blocks (DB) -> chunk.build_chunks: block dikemas menurut ukuran karakter (target 600, maksimal 1.200,
+       overlap satu block); heading hanya titik potong; section ISBN/hak cipta dilewati; tiap chunk juga membawa
        formula_norm (bentuk kanonik semua rumus, dari source_markup) ->
        llm_ext.embed_texts (teks lafal) -> block_embeddings (pgvector + lexical_tsv + formula_norm)
+       (siswa baru melihat hasilnya setelah modul dipublikasikan)
 
-siswa bertanya (sesi di-scope ke CLASSROOM, bukan satu chapter)
+siswa mengirim pesan (sesi di-scope ke CLASSROOM, bukan satu chapter; ditolak 400 bila siswa sedang mengerjakan kuis)
+  -> bila ada latihan aktif dan pesan hanya satu huruf A-D: balas hasil latihan (kunci, langkah), selesai
+  -> agent.run: penyaring peniru instruksi (tanpa LLM) menolak sebelum pencarian
   -> search_module lintas SEMUA chapter published di classroom itu (backend/app/domains/clarifier/sync_search.py)
        tiga daftar kandidat (masing-masing 20 teratas), digabung RRF berbobot (k = 60):
          vektor (cosine, bobot 1,0) | kata kunci (tsvector 'simple', hanya token yang muncul di <= 10% chunk, bobot 0,25)
          | rumus persis (substring formula_norm; hanya bila kueri berumus, bobot 2,0)
        similarity tiap hasil tetap cosine
        -> scope_gate.check_scope memakai similarity TERTINGGI di antara hasil:
-            tinggi -> inti, rendah -> di_luar_topik (redirect halus, tanpa tool calling lagi),
+            tinggi -> inti, rendah -> di_luar_topik (balasan penolakan, tanpa tool calling lagi),
             zona abu-abu -> LLM classifier (konteks: chunk dengan similarity tertinggi)
-  -> agent.run (tool-calling loop):
-       search_module (lagi, kena cache Redis) -> search_oer (enam host OER tetap, skor >= 0,6)
-       -> compose_answer (WAJIB): rincian sumber (evidence + justifikasi) + ringkasan
+       -> retrieval_grader menilai relevansi chunk; chunk peniru instruksi dibuang
+  -> tool-calling loop:
+       search_module (lagi, kena cache Redis) | search_oer (enam host OER tetap, skor >= 0,6)
+       -> compose_answer (WAJIB): rincian sumber (evidence + justifikasi) + ringkasan (+ tabel opsional)
+       -> atau request_practice (siswa meminta soal latihan): backend memilih sumber (clarifier.practice),
+          membuat soal dengan quizzer_pipeline.generate_practice, menyimpannya di Redis, lalu membalas
+          dengan soal tanpa kunci
   -> citations.verify_citations   grounding check: evidence harus match konten tool asli
-  -> simpan ke chat_messages (PostgreSQL) + histori hot di Redis (backend/app/domains/clarifier/services.py)
+  -> pemeriksa kebocoran instruksi, lalu simpan ke chat_messages (PostgreSQL) + histori hot di Redis
+     (backend/app/domains/clarifier/services.py)
 ```
 
-Sama seperti quiz: modul `ai-services/clarifier/` murni komputasi + panggilan HTTP eksternal (Azure OpenAI, embedding provider, search API) -- tidak menyentuh PostgreSQL. `search_module` butuh pgvector, jadi backend menyuntikkan hasilnya lewat callable `search_module_executor` (`backend/app/domains/clarifier/sync_search.py`), bukan lewat data statis seperti `blocks` di quiz -- karena tool calling di sini interaktif (LLM yang memutuskan kapan dan berapa kali memanggil). Spec [0005](../docs/specs/0005-clarifier-pencarian-hibrida-dan-sumber-oer.md), ADR [0010](../docs/adr/0010-clarifier-pencarian-hibrida-dan-sumber-oer.md).
+Sama seperti quiz: modul `ai-services/clarifier/` murni komputasi + panggilan HTTP eksternal (Azure OpenAI, embedding provider, search API) -- tidak menyentuh PostgreSQL. `search_module` butuh pgvector, jadi backend menyuntikkan hasilnya lewat callable `search_module_executor` (`backend/app/domains/clarifier/sync_search.py`), bukan lewat data statis seperti `blocks` di quiz -- karena tool calling di sini interaktif (LLM yang memutuskan kapan dan berapa kali memanggil). Spec [0005](../docs/specs/0005-clarifier-pencarian-hibrida-dan-sumber-oer.md) dan [0010](../docs/specs/0010-clarifier-teman-belajar.md), ADR [0010](../docs/adr/0010-clarifier-pencarian-hibrida-dan-sumber-oer.md), [0014](../docs/adr/0014-latihan-soal-clarifier-tanpa-validasi-guru.md), dan [0015](../docs/adr/0015-chunk-clarifier-berbasis-ukuran.md).
+
+## Pagar prompt (guardrails)
+
+`common/guardrails.py` dipakai semua fitur sebagai lapisan berlapis; tidak ada yang bergantung pada satu lapis saja.
+
+- **Aturan di prompt**: `build_prompt` menambah tiga aturan ke RULES tiap prompt sistem (isi tag data dan teks dalam gambar adalah data, jangan membuka instruksi sistem, jangan ganti peran atau format). `llm.complete_*` dan `chat_with_tools` menyisipkan aturan yang sama bila prompt dibuat tanpa `build_prompt`.
+- **Pembatas data**: `build_input` membungkus bagian tak tepercaya (pertanyaan dan jawaban siswa, teks modul, OCR, takarir, LaTeX, umpan balik guru, sumber soal) dalam tag seperti `<pertanyaan_siswa>`; tag penutup buatan di dalam isi dinetralkan, simbol `<` dan `>` matematika tidak diubah.
+- **Penyaring masukan (tanpa LLM)**: `injection_markers` (teks dinormalkan NFKC dan karakter tak terlihat dibuang) mengenali kalimat peniru instruksi (abaikan aturan, tampilkan prompt, tag sistem); ajakan berperan hanya ditandai pada masukan siswa (`strict=True`), tidak pada teks sumber. Riwayat percakapan dibungkus tag dan giliran peniru instruksi disembunyikan, hasil tool masuk ke model dalam tag `teks_modul` atau `teks_sumber_luar`, dan potongan modul peniru instruksi tidak diteruskan. Clarifier menolak pertanyaan seperti itu sebelum pencarian dan model, hasil pencarian luar yang memuatnya dibuang dan topik latihan yang memuatnya dikosongkan, langkah siswa yang memuatnya membuat hasil Evaluaizer `needs_review`, teks sumber soal yang memuatnya menandai soal untuk ditinjau guru, dan blok, gambar, atau tabel anotasi yang memuatnya berprioritas `high`.
+- **Penyaring keluaran**: jawaban Clarifier dan keterangan Evaluaizer yang memuat isi instruksi (nama tool, judul bagian prompt) dibuang dan diganti jawaban aman atau ditolak.
+- **Cakupan**: gerbang cakupan Clarifier menolak topik di luar matematika kelas, aturan agen menolak permintaan kode, esai, tugas lain, konten berbahaya, atau menyuruh berpura-pura, dan pesan penolakan mengarahkan siswa yang tertekan ke guru atau orang dewasa tepercaya.
+- **Batas**: penyaring berbasis pola tidak menangkap semua parafrase; lapisan prompt dan pembatas data yang menanggung sisanya. Belum diukur dengan model nyata.
+
+## Modul (common/)
+
+Kode bersama yang dipakai lebih dari satu fitur (ADR 0004).
+
+**llm.py / cache.py / jsonutil.py / parallel.py / resilience.py** — klien Azure OpenAI dengan retry dan filter konten (`complete_text`, `complete_json`, `complete_vision*`), cache hasil MLLM, parser JSON toleran (termasuk LaTeX), `parallel_map` yang menjaga urutan, dan pemutus sirkuit untuk kegagalan sistemik.
+
+**prompt_format.py / guardrails.py** — `build_prompt` dan `build_input` (format baku, aturan anti-injeksi otomatis, pembatas tag untuk bagian data), serta penyaring peniru instruksi dan pemeriksa kebocoran instruksi (ADR 0016).
+
+**formula.py / formula_check.py / notation_check.py / math_text.py** — verbalizer rumus bersama (`convert_checked`, cache, pemeriksa struktur), pemeriksa bacaan dan sumber rumus, deteksi notasi mentah, serta utilitas teks matematika (pembagi `$...$`, bacaan dan linearisasi tabel, `readable_texts`). Dipakai Annoter, Quizzer, dan Clarifier.
+
+**table_spec.py** — pemeriksa dan narator tabel terstruktur `{judul, kolom, baris}` yang dipakai stimulus Quizzer dan tabel jawaban Clarifier.
+
+**image_prompts.py / image_describe.py / svg_raster.py** — prompt deskripsi gambar dan deskripsi gambar ber-cache lewat model vision (Annoter dan Quizzer), serta rasterisasi SVG ke PNG lewat resvg-py (butuh font; di Docker `fonts-liberation`).
+
+**speakable.py / phrases.py** — pembersih deterministik deskripsi gambar setelah teks model: kutip dibuang, satuan dan pecahan ber-garis miring dibaca 'per', minus, pangkat angka murni, superskrip, panah, dan simbol relasi diganti kata; pola ambigu dibiarkan dan ditandai `description_issues`; elipsis tidak diubah. Dipakai `image.annotate_image` dan `annoter_regenerate`. `phrases.py` memuat frasa 'tidak terbaca' yang dipakai bersama.
 
 ## Modul (clarifier/)
 
-**chunk.py** — `build_chunks(chapter_id, blocks) -> list[Chunk]`. Semua block di bawah satu heading digabung jadi satu chunk berawalan heading; section yang lebih panjang dari `MAX_CHUNK_CHARS` (1.500) dipecah di batas block; section yang heading-nya memuat ISBN, hak cipta, atau larangan memperbanyak dilewati. `Chunk.formula_norm` memuat rumus blok `formula` dan potongan `$...$` blok teks dalam bentuk kanonik, dipisah `;`. Teks yang di-embed tetap teks lafal.
+**chunk.py** — `build_chunks(chapter_id, blocks) -> list[Chunk]`. Block (heading ikut sebagai block) dikemas menurut ukuran karakter: chunk ditutup di heading berikutnya setelah mencapai `TARGET_CHUNK_CHARS` (600) atau di batas block sebelum `MAX_CHUNK_CHARS` (1.200); heading hanya titik potong pilihan, sehingga section pendek bergabung dan section panjang terpecah. Heading tidak ditinggal sendirian di ujung chunk, chunk terakhir di bawah `MIN_TAIL_CHARS` (250) digabung ke sebelumnya, dan block terakhir chunk (maksimal 300 karakter) diulang di awal chunk berikutnya sebagai overlap. Block pertama tiap chunk selalu unik karena dipakai sebagai `reference` sitasi. Block tunggal di atas batas tidak dipecah. Section metadata penerbit (ISBN, hak cipta) dilewati dan teks sebelum heading pertama menjadi "Pembuka". Setiap chunk menyimpan `formula_norm`. Mengganti chunker mewajibkan reindex semua bab.
 
 **formula_text.py** — `normalize_formula(text)`: bentuk kanonik huruf kecil tanpa spasi untuk LaTeX buku dan rumus ketikan siswa (`\frac{1}{x}` dan `1/x` sama-sama `(1)/(x)`, `x^{2}` dan `x²` sama-sama `x^2`). `formula_spans(question)`: rumus di dalam kalimat pertanyaan (panjang kanonik minimal 5 karakter dan memuat operator). Kecocokan memakai substring persis, bukan trigram, karena `pg_trgm` mengabaikan tanda baca.
 
@@ -248,6 +319,12 @@ Sama seperti quiz: modul `ai-services/clarifier/` murni komputasi + panggilan HT
 **scope_gate.py** — `check_scope(question, top_chunks)`: similarity tertinggi di antara hasil retrieval (bukan elemen pertama) untuk kasus jelas, LLM classifier (structured JSON, konteks dari chunk dengan similarity tertinggi) untuk zona abu-abu. Klasifikasi: `inti`/`perluasan`/`campuran`/`di_luar_topik`.
 
 **citations.py** — `verify_citations(sources, tool_outputs)`: grounding check fuzzy-match evidence yang diklaim LLM ke konten mentah tool result (supaya kutipan tidak dikarang). URL OER yang tertukar satu-dua karakter saat disalin model dipetakan ke URL hasil tool yang nyaris sama (kemiripan >= 0,97) dan `reference` dikoreksi ke URL itu.
+
+**table.py** — `build(spec, grounding_texts)`: tabel terstruktur opsional dari `compose_answer`; divalidasi lewat `common/table_spec` (bersama stimulus Quizzer) dan angkanya harus muncul di sumber atau ringkasan; tidak valid berarti `tabel` None plus temuan. Spec [0010](../docs/specs/0010-clarifier-teman-belajar.md) tahap 2.
+
+**practice.py** — latihan soal buatan AI di antarmuka chat: `select_source(topic, executor)` memilih bagian modul relevan sebagai sumber, `stored_form` bentuk simpan, `parse_choice` mengenali pesan berisi satu huruf pilihan, `question_reply` dan `answer_reply` menyusun pesan chat (soal tanpa kunci, lalu hasil dengan kunci dan langkah). Soalnya dibuat `quizzer_pipeline.generate_practice` (generate, pemeriksa kode, jawab buta, dan audit yang sama dengan Quizzer; lolos hanya tanpa temuan apa pun, satu perbaikan, selain itu ditolak). Model hanya memanggil tool `request_practice`; backend yang merangkai semuanya dan menyimpan latihan di Redis, bukan DB. ADR [0014](../docs/adr/0014-latihan-soal-clarifier-tanpa-validasi-guru.md), spec [0010](../docs/specs/0010-clarifier-teman-belajar.md).
+
+**retrieval_grader.py** — `grade_chunks` (LLM menilai relevansi chunk), `safe_chunks` (membuang chunk peniru instruksi), dan `evaluate` (chunk relevan plus teks hasil tool).
 
 **agent.py** — `run(question, history, search_module_executor) -> dict`. Orkestrator: search_module dulu buat scope gate -> tool-calling loop -> `compose_answer` -> verifikasi kutipan. Dipanggil backend (`backend/app/domains/clarifier/services.py`) lewat `asyncio.to_thread`.
 

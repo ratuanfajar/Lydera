@@ -15,7 +15,7 @@ router.py          APIRouter(route_class=WrappedRoute)
 depedencies.py     get_<domain>_repository, get_<domain>_service
 ```
 
-Ejaan `depedencies.py` salah tetapi konsisten di semua domain; domain baru ikut ejaan itu. Domain: base, cities, schools, users, classrooms, contents, quizz, jobs, chatbot, otp. Template acuan: `contents/`.
+Ejaan `depedencies.py` salah tetapi konsisten di semua domain; domain baru ikut ejaan itu. Domain: base, cities, schools, users, classrooms, contents, quizzer, evaluaizer, jobs, clarifier, otp. Template acuan: `contents/`.
 
 `app/core/`: `config` (settings), `db` (Base, get_db), `security` (`Roles(Role.TEACHER)`), `response` (`Response[T]`, `COMMON_*_RESPONSES`), `route` (`WrappedRoute`), `exceptions` (`AppException` turunan), `taskiq`, `redis`, `model_registry`.
 
@@ -34,6 +34,13 @@ Model baru wajib didaftarkan di DUA tempat: `app/core/model_registry.py` dan imp
 ## Kontrak API
 
 Kontrak API ada di koleksi Postman "Lydera" (cloud). Endpoint berubah: jalankan `/api-contract-sync`, yang memperbarui koleksi lewat konektor Postman setelah persetujuan user. Dokumentasi interaktif juga tersedia di `/docs` (OpenAPI FastAPI). Berkas Postman lama di repo sudah dihapus dari worktree.
+
+## Catatan Clarifier, Quizzer, dan Evaluaizer
+
+- Clarifier (`domains/clarifier`): `ChatbotService.ask` menjadi satu-satunya jalur chat. Ia menolak (400) bila siswa sedang mengerjakan kuis di kelas sesi itu, mengenali pesan satu huruf sebagai jawaban latihan, dan memanggil `clarifier.agent.run`. Latihan soal dan kuota (10 per jam, 429) hanya di Redis (`clarifier:practice:*`), tidak ada tulis ke tabel soal.
+- Quizzer: kuis yang sudah publish atau sudah dikerjakan siswa terkunci (edit soal, edit stimulus, regenerasi, dan kembali ke draft ditolak 400); publish hanya untuk kuis berstatus `done`; submit setelah batas waktu plus toleransi 10 detik ditolak.
+- Evaluaizer: hanya jawaban salah yang punya langkah (`needs_evaluation`); hasilnya di kolom `divergence_step`, `diagnosis`, `letak_kutipan`, `letak_dapat_ditentukan` pada `soal_jawaban`.
+- File `app/utils/pdf_cut.py` dan `app/utils/token.py` tidak diimpor di mana pun (kandidat dihapus).
 
 ## Catatan
 

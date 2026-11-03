@@ -1,7 +1,7 @@
 import re
 
 from common import cache, config, llm
-from common.formula_check import has_named_point, spoken_issues
+from common.formula_check import has_named_point, source_issues, spoken_issues
 from common.prompt_format import build_input, build_prompt
 
 FEEDBACK_RULE = (
@@ -186,7 +186,7 @@ def formula_system(*, examples: bool = True, feedback: bool = False, coordinate:
 
 
 def feedback_block(feedback: str) -> str:
-    return f"<feedback_guru>\n{feedback.strip()}\n</feedback_guru>"
+    return feedback.strip()
 
 
 def formula_input(latex: str, feedback: str = "") -> str:
@@ -197,9 +197,17 @@ SYSTEM = formula_system()
 COORDINATE_SYSTEM = formula_system(coordinate=True)
 
 
+COORDINATE_PAIR = re.compile(r"\(\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\)")
+
+
+def spaced_pairs(latex: str) -> str:
+    """Beri spasi setelah koma pada pasangan bilangan seperti (-2,5) supaya tidak terbaca sebagai desimal."""
+    return COORDINATE_PAIR.sub(r"(\1, \2)", latex)
+
+
 def convert_checked(latex: str) -> tuple[str, list[str]]:
     """Ubah satu rumus LaTeX menjadi lafal Bahasa Indonesia (memakai cache) beserta temuan pemeriksa struktur."""
-    latex = latex.strip()
+    latex = spaced_pairs(latex.strip())
     if not latex:
         return "", []
     trivial = _trivial_reading(latex)
@@ -210,7 +218,15 @@ def convert_checked(latex: str) -> tuple[str, list[str]]:
     if spoken is None:
         spoken = _speak_with_retry(latex)
         cache.put("formula", spoken, *key)
-    return spoken, spoken_issues(latex, spoken)
+    spoken = standard_marks(spoken)
+    return spoken, [*spoken_issues(latex, spoken), *source_issues(latex)]
+
+
+BARE_TANYA = re.compile(r"(?<!tanda )\btanya\b")
+
+
+def standard_marks(spoken: str) -> str:
+    return BARE_TANYA.sub("tanda tanya", spoken)
 
 
 def _trivial_reading(latex: str) -> str | None:

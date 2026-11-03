@@ -161,6 +161,10 @@ class QuizRepository(QuizRepositoryInterface):
     async def get_quiz_request(self, quiz_request_id: int) -> QuizRequest | None:
         return await self.db.get(QuizRequest, quiz_request_id)
 
+    async def has_quiz_progress(self, quiz_request_id: int) -> bool:
+        stmt = select(QuizProgress.id).where(QuizProgress.quiz_request_id == quiz_request_id).limit(1)
+        return (await self.db.scalar(stmt)) is not None
+
     async def get_chapter_links(self, quiz_request_id: int) -> Sequence[QuizRequestChapter]:
         stmt = select(QuizRequestChapter).where(QuizRequestChapter.quiz_request_id == quiz_request_id)
         result = await self.db.scalars(stmt)
@@ -332,6 +336,8 @@ class QuizRepository(QuizRepositoryInterface):
                     readable_text=item.data.stimulus.readable_text,
                     ringkasan=item.data.stimulus.ringkasan,
                     tabel=item.data.stimulus.tabel,
+                    jenis=item.data.stimulus.jenis,
+                    spesifikasi=item.data.stimulus.spesifikasi,
                     source_reading_order_start=(
                         item.data.stimulus.source_reading_order_start
                         if item.data.stimulus.source_reading_order_start is not None
@@ -428,8 +434,10 @@ class QuizRepository(QuizRepositoryInterface):
 
     async def update_stimulus_text(
         self, stimulus: SoalStimulus, readable_text: str, source_markup: str = "",
-        ringkasan: str | None = None, tabel: dict | None = None,
+        ringkasan: str | None = None, tabel: dict | None = None, spesifikasi: dict | None = None,
     ) -> None:
+        if spesifikasi is not None:
+            stimulus.spesifikasi = spesifikasi
         stimulus.readable_text = readable_text
         stimulus.source_markup = source_markup
         stimulus.ringkasan = ringkasan
@@ -505,13 +513,16 @@ class QuizRepository(QuizRepositoryInterface):
             progress.completed_at = datetime.now(timezone.utc)
             await self.db.commit()
 
-    async def update_soal_jawaban(self, jawaban_id:int, selected_option: str, is_correct: bool, langkah: list[str]) -> None:
+    async def update_soal_jawaban(self, jawaban_id:int, selected_option: str, is_correct: bool, langkah: list[str] | None) -> None:
         jawaban = await self.db.get(SoalJawaban, jawaban_id)
         if not jawaban:
             return
 
         jawaban.selected_option = selected_option
         jawaban.is_correct = is_correct
+
+        if langkah is None:
+            return
 
         await self.db.execute(
             delete(SoalJawabanLangkah).where(SoalJawabanLangkah.jawaban_id == jawaban_id)
@@ -573,10 +584,9 @@ class QuizRepository(QuizRepositoryInterface):
         await self.db.refresh(progress)
 
     async def save_evaluation(self, jawaban: SoalJawaban, evaluation: dict) -> None:
-        jawaban.divergence_step = evaluation["divergence_step"]
-        jawaban.error_type = evaluation["error_type"]
-        jawaban.diagnosis = evaluation["diagnosis"]
-        jawaban.justification_points = evaluation["justification_points"]
-        jawaban.personalized_justification = evaluation["personalized_justification"]
+        jawaban.divergence_step = evaluation["langkah_ke"]
+        jawaban.diagnosis = evaluation["keterangan"]
+        jawaban.letak_kutipan = evaluation["kutipan"]
+        jawaban.letak_dapat_ditentukan = evaluation["dapat_ditentukan"]
         jawaban.needs_review = evaluation["needs_review"]
         jawaban.evaluated_at = datetime.now(timezone.utc)

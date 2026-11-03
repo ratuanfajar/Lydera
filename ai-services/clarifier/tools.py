@@ -34,6 +34,24 @@ TOOLS_SCHEMA = [
     {
         "type": "function",
         "function": {
+            "name": "request_practice",
+            "description": (
+                "Panggil HANYA bila siswa meminta dibuatkan soal latihan. Sistem yang membuat dan memeriksa soalnya; "
+                "Anda tidak boleh menulis soal sendiri. Setelah memanggil ini, jangan panggil tool lain."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "topic": {"type": "string", "description": "topik latihan sebagai frasa singkat tanpa kata perintah, sesuai permintaan siswa"},
+                    "level": {"type": "integer", "description": "OPSIONAL, 1 sampai 3: 1 mengingat, 2 memahami, 3 menerapkan; bawaan 3"},
+                },
+                "required": ["topic"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "compose_answer",
             "description": (
                 "WAJIB dipanggil untuk menutup jawaban, setelah tool pencarian yang relevan sudah "
@@ -91,6 +109,17 @@ TOOLS_SCHEMA = [
                             "menjadi kata untuk pembaca layar, jadi jangan menulis simbol di luar tanda dolar. "
                             "Satuan ditulis lengkap ('kilometer per jam'). "
                             "Dibacakan pembaca layar."
+                        ),
+                    },
+                    "tabel": {
+                        "type": "object",
+                        "description": (
+                            "OPSIONAL. Sertakan HANYA bila sumber memuat data berbentuk tabel atau jawabannya perbandingan beberapa "
+                            "nilai atau sifat; selain itu kosongkan. Bentuk {\"judul\": \"...\", \"kolom\": [\"...\"], "
+                            "\"baris\": [[\"...\"]]} dengan jumlah sel tiap baris sama dengan jumlah kolom. Semua sel teks biasa "
+                            "tanpa markdown; rumus ditulis LaTeX di antara tanda dolar. Semua angka harus berasal dari hasil tool atau "
+                            "ringkasan. Maksimal sekitar 8 baris. Summary tetap harus bisa dipahami tanpa tabel dan tidak boleh merujuk "
+                            "'tabel di atas'."
                         ),
                     },
                     "suggested_questions": {

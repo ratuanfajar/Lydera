@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from common import math_text
 from quizzer.checks import LABELS
+from quizzer.stimulus import registry
 
 
 def derive_fields(markup: dict, issues: list[str] | None = None) -> tuple[dict, dict | None]:
@@ -61,7 +62,9 @@ def derive(data: dict) -> tuple[dict, list[str]]:
     data = {**data, "question_text": readable["question"], "options": readable["options"],
             "langkah": readable["langkah"], "kesimpulan": readable["kesimpulan"], "markup": soal_markup}
     stimulus = data.get("stimulus")
-    if isinstance(stimulus, dict):
+    if registry.is_typed(stimulus):
+        data["stimulus"] = registry.derive(stimulus, issues)
+    elif isinstance(stimulus, dict):
         source = stimulus_markup(stimulus)
         reading = derive_stimulus(source, issues)
         data["stimulus"] = {
@@ -71,6 +74,12 @@ def derive(data: dict) -> tuple[dict, list[str]]:
     return data, list(dict.fromkeys(issues))
 
 
+def typed_stimulus_issues(data: dict) -> list[str]:
+    """Periksa spesifikasi stimulus bertipe pada keluaran generator; kosong bila stimulus teks atau null."""
+    stimulus = data.get("stimulus")
+    return registry.check(stimulus) if registry.is_typed(stimulus) else []
+
+
 def markup_issues(data: dict) -> list[str]:
     """Periksa LaTeX inline dan tabel pada keluaran generator sebelum diturunkan menjadi teks siap-baca."""
     texts = [data["question_text"], data["kesimpulan"], *data["options"].values(), *data["langkah"]]
@@ -78,6 +87,7 @@ def markup_issues(data: dict) -> list[str]:
     issues = []
     if isinstance(stimulus, dict):
         texts.append(str(stimulus.get("readable_text", "")))
+        texts.append(str(stimulus.get("narasi", "")))
         if stimulus.get("tabel") is not None:
             issues.extend(math_text.table_issues(stimulus["tabel"]))
             if not issues:

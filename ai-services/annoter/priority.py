@@ -2,7 +2,8 @@ import re
 
 from annoter import image
 from annoter.preprocess import Block, Route
-from annoter.speakable import description_issues
+from common import guardrails
+from common.speakable import description_issues
 from annoter.table import TableResult
 from common.notation_check import has_raw_notation
 
@@ -11,6 +12,8 @@ TABLE_CELL = re.compile(r"<td[^>]*>(.*?)</td>", re.DOTALL)
 
 
 def review_priority(block: Block) -> str:
+    if guardrails.injection_markers(f"{block.text} {block.caption}", strict=False):
+        return "high"
     if block.route in (Route.HEADING, Route.TEXT):
         return "low"
     if block.route == Route.TABLE and table_degraded(block.table_html):
@@ -23,13 +26,13 @@ def escalate(block: Block, flagged: bool) -> str:
 
 
 def table_flagged(result: TableResult) -> bool:
-    return bool(result.issues) or has_raw_notation(result.text)
+    return bool(result.issues) or has_raw_notation(result.text) or bool(guardrails.injection_markers(result.text, strict=False))
 
 
 def image_priority(result: image.ImageAnnotation) -> str:
     if result.kind == image.DECORATIVE:
         return "normal"
-    if result.uncertain or not result.text or result.kind in image.HIGH_REVIEW_KINDS or description_issues(result.text):
+    if result.uncertain or not result.text or result.kind in image.HIGH_REVIEW_KINDS or description_issues(result.text) or guardrails.injection_markers(result.text, strict=False):
         return "high"
     return "normal"
 

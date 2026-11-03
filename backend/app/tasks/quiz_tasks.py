@@ -36,6 +36,8 @@ def _to_soal_create_request(item: dict) -> SoalCreateRequest:
             readable_text=stim_raw.get("readable_text", ""),
             ringkasan=stim_raw.get("ringkasan"),
             tabel=stim_raw.get("tabel"),
+            jenis=stim_raw.get("jenis") or "teks",
+            spesifikasi=stim_raw.get("spesifikasi"),
             source_reading_order_start=stim_raw.get("source_reading_order_start"),
             source_reading_order_end=stim_raw.get("source_reading_order_end"),
         )

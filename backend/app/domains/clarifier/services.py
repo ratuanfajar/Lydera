@@ -1,31 +1,58 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 import json
 import logging
+from datetime import datetime, timedelta, timezone
 
 from app.core.config import settings
 from app.core.db import AsyncSession
-from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
+from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException, TooManyRequestException
 from app.core.redis import get_redis_client
 from app.domains.clarifier.models import ChatSession
 from app.domains.clarifier.repositories.repository import ChatbotRepository
 from app.domains.clarifier.sync_search import make_search_module_executor
+from app.domains.clarifier.schemas.chat import BlokSumber, ChatSessionResponseWithMessage
 from app.utils import paths
-from app.domains.clarifier.schemas.chat import ChatSessionResponseWithMessage
 
 paths.setup()
 from clarifier import agent as clarifier_agent
 from clarifier import chunk as clarifier_chunk
 from clarifier import llm_ext
 from clarifier import config as ai_config
+from clarifier import practice as clarifier_practice
+from quizzer import quizzer_pipeline
 
 
 logger = logging.getLogger(__name__)
 
 
+def _block_payload(block) -> dict:
+    image_url = (
+        f"{settings.BASE_URL}/static/annotations/{block.chapter_id}/raw-{block.chapter_id}/auto/images/{block.image_file}"
+        if block.image_file else None
+    )
+    return BlokSumber(
+        id=block.id, block_type=block.block_type, readable_text=block.readable_text, caption=block.caption,
+        ringkasan=block.ringkasan, tabel=block.tabel, image_url=image_url,
+    ).model_dump()
+
+
 def _history_key(session_id: int) -> str:
     return f"chatbot:history:{session_id}"
+
+
+def _practice_key(session_id: int) -> str:
+    return f"clarifier:practice:{session_id}"
+
+
+PRACTICE_TTL_SECONDS = 2 * 60 * 60
+PRACTICE_RATE_LIMIT = 10
+PRACTICE_RATE_WINDOW_SECONDS = 60 * 60
+PRACTICE_RATE_MESSAGE = "Kamu sudah banyak meminta latihan. Coba lagi sebentar lagi."
+PRACTICE_NO_SOURCE_MESSAGE = "Bagian modul tentang topik yang kamu minta tidak ditemukan di kelasmu. Coba sebut topik dengan kata lain."
+PRACTICE_DECLINED_MESSAGE = "Maaf, belum bisa membuat soal latihan yang sesuai dengan modul untuk topik ini. Coba minta lagi atau pilih topik lain."
 
 
 class ChatbotService:
@@ -87,15 +114,55 @@ class ChatbotService:
         return await self.repo.get_list_sessions(student_id, classroom_id)
     # --- Tanya jawab ---
 
-    async def ask(self, session_id: int, student_id: int, question: str) -> dict:
+    async def _start_practice(self, session_id: int, student_id: int, request: dict, executor) -> dict:
+        topic = request["topic"]
+        if not topic:
+            return clarifier_practice.declined_reply(PRACTICE_NO_SOURCE_MESSAGE)
+        await self._ensure_practice_quota(student_id)
+        try:
+            source = await asyncio.to_thread(clarifier_practice.select_source, topic, executor)
+        except Exception:
+            logger.exception("pencarian sumber latihan sesi %s gagal", session_id)
+            return clarifier_practice.declined_reply(PRACTICE_DECLINED_MESSAGE)
+        if source is None:
+            return clarifier_practice.declined_reply(PRACTICE_NO_SOURCE_MESSAGE)
+        generated = await asyncio.to_thread(quizzer_pipeline.generate_practice, topic, source["text"], request["level"])
+        if generated["soal"] is None:
+            logger.warning("latihan sesi %s topik %r ditolak: %s", session_id, topic, generated["issues"])
+            return clarifier_practice.declined_reply(PRACTICE_DECLINED_MESSAGE)
+        stored = clarifier_practice.stored_form(generated["soal"], source["headings"])
+        await get_redis_client().set(_practice_key(session_id), json.dumps(stored, ensure_ascii=False), ex=PRACTICE_TTL_SECONDS)
+        return clarifier_practice.question_reply(stored)
+
+    async def _ensure_practice_quota(self, student_id: int) -> None:
+        redis_client = get_redis_client()
+        key = f"clarifier:practice-rate:{student_id}"
+        count = await redis_client.incr(key)
+        if count == 1:
+            await redis_client.expire(key, PRACTICE_RATE_WINDOW_SECONDS)
+        if count > PRACTICE_RATE_LIMIT:
+            raise TooManyRequestException(PRACTICE_RATE_MESSAGE)
+
+    async def _answer_practice(self, session_id: int, question: str) -> dict | None:
+        choice = clarifier_practice.parse_choice(question)
+        if choice is None:
+            return None
+        raw = await get_redis_client().getdel(_practice_key(session_id))
+        return None if raw is None else clarifier_practice.answer_reply(json.loads(raw), choice)
+
+    async def _get_session(self, session_id: int, student_id: int) -> ChatSession:
         session = await self.repo.get_session(session_id, student_id)
         if session is None:
             raise NotFoundException("Sesi chat tidak ditemukan")
+        return session
 
-        history = await self._get_history(session_id)
-        search_module_executor = make_search_module_executor(session.classroom_id, ai_config.TOP_K_CHUNKS)
+    async def ask(self, session_id: int, student_id: int, question: str) -> dict:
+        session = await self._get_session(session_id, student_id)
+        await self._ensure_no_active_quiz(session.classroom_id, student_id)
 
-        result = await asyncio.to_thread(clarifier_agent.run, question, history, search_module_executor)
+        result, citations = await self._answer_practice(session_id, question), None
+        if result is None:
+            result, citations = await self._agent_reply(session, session_id, student_id, question)
 
         await self.repo.add_message(session_id, "user", question)
         await self.repo.add_message(
@@ -104,7 +171,7 @@ class ChatbotService:
             result["message"],
             content_markup=result.get("message_markup"),
             tool_calls=result.get("tool_calls"),
-            citations=result.get("sources"),
+            citations=citations,
             scope_klass=result["scope"]["klass"],
         )
         await self.db.commit()
@@ -116,6 +183,38 @@ class ChatbotService:
             logger.warning("riwayat Redis sesi %s tidak tersimpan", session_id, exc_info=True)
 
         return result
+
+    async def _agent_reply(self, session: ChatSession, session_id: int, student_id: int, question: str) -> tuple[dict, list[dict] | None]:
+        history = await self._get_history(session_id)
+        search_module_executor = make_search_module_executor(session.classroom_id, ai_config.TOP_K_CHUNKS)
+
+        result = await asyncio.to_thread(clarifier_agent.run, question, history, search_module_executor)
+        if result["status"] == "practice_requested":
+            return await self._start_practice(session_id, student_id, result["practice"], search_module_executor), None
+        citations = copy.deepcopy(result.get("sources"))
+        await self._attach_source_blocks(session.classroom_id, result.get("sources"))
+        return result, citations
+
+    async def _attach_source_blocks(self, classroom_id: int, sources: list[dict] | None) -> None:
+        """Tabel dan gambar asli pada chunk sumber modul yang terverifikasi, lengkap dengan deskripsi Annoter, supaya klien menampilkannya di samping jawaban."""
+        modul = [s for s in sources or [] if s.get("source_type") == "modul" and s.get("verified") and str(s.get("reference", "")).isdigit()]
+        if not modul:
+            return
+        try:
+            blocks = await self.repo.get_visual_blocks_for_references(classroom_id, [int(s["reference"]) for s in modul])
+        except Exception:
+            logger.warning("blok sumber untuk kelas %s tidak terbaca", classroom_id, exc_info=True)
+            return
+        for source in modul:
+            source["blok"] = [_block_payload(block) for block in blocks.get(int(source["reference"]), [])]
+
+    async def _ensure_no_active_quiz(self, classroom_id: int, student_id: int) -> None:
+        """Clarifier tidak boleh dipakai saat siswa sedang mengerjakan kuis (sesi dimulai, belum selesai, dan belum melewati batas waktu)."""
+        now = datetime.now(timezone.utc)
+        for progress, quiz in await self.repo.get_started_unfinished_quizzes(classroom_id, student_id):
+            deadline = min(progress.started_at + timedelta(minutes=quiz.max_duration_minutes), quiz.end_time)
+            if now <= deadline:
+                raise BadRequestException("Clarifier tidak dapat dipakai saat kuis sedang berlangsung.")
 
     async def get_history(self, session_id: int, student_id: int) -> list:
         session = await self.repo.get_session(session_id, student_id)

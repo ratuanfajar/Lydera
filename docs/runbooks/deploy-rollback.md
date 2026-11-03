@@ -16,6 +16,8 @@ Actions, "Build and Deploy", Run workflow: isi `image_tag` (default `test`), bia
 
 Actions, Run workflow: isi `rollback_tag` dengan versi lama yang masih ada di GHCR (mis. `1.0.0`). Job rollback tidak membangun image; hanya menjalankan `deploy.sh` dengan tag lama.
 
+Setelah rilis yang mengubah chunker Clarifier, reindex semua bab yang sudah terindeks (`POST /api/clarifier/classrooms/{id}/reindex`); perubahan versi prompt anotasi tidak membutuhkan langkah tambahan.
+
 Rollback tidak membalik migrasi database. Jika rilis yang dibatalkan membawa migrasi, jalankan `alembic downgrade` secara terpisah dan hati-hati; jangan jalankan otomatis.
 
 ## Secrets yang dipakai workflow

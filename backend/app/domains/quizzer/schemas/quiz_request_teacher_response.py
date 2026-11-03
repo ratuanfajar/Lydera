@@ -56,6 +56,8 @@ class QuestionStimulusResponse(BaseModel):
     readable_text: str
     ringkasan: Optional[str] = None
     tabel: Optional[dict] = None
+    jenis: str = "teks"
+    spesifikasi: Optional[dict] = None
     review_status: str
     source_reading_order_start: int
     source_reading_order_end: int

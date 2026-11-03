@@ -1,10 +1,19 @@
+import json
+
 from common.formula import PLAIN_TEXT_RULE
 from quizzer import config
+from quizzer.stimulus import registry
 from common.prompt_format import build_input, build_prompt
 
 JSON_ONLY = "Keluarkan HANYA JSON, tanpa markdown."
 
+TYPED_ACTIVE = bool(registry.typed_names())
+
 TEXT_ONLY_RULE = (
+    "Siswa tunanetra tidak melihat gambar; mereka mendengar teks bacaan. Jangan merujuk ke foto, ilustrasi, atau sketsa. "
+    "Soal boleh menyebut 'gambar tadi' atau 'tabel tadi' hanya bila stimulusnya bertipe gambar atau tabel, karena deskripsinya "
+    "dibacakan. Bila soal butuh data, tuliskan seluruh datanya dengan kata, angka, tabel, atau gambar beserta deskripsinya."
+    if TYPED_ACTIVE else
     "Soal, stimulus, opsi, dan langkah tidak boleh bergantung pada gambar. Siswa tunanetra tidak melihat gambar, grafik, "
     "atau diagram, sehingga jangan merujuk ke 'gambar', 'grafik', atau 'diagram' di materi. Bila soal butuh data, "
     + ("tuliskan seluruh datanya dengan kata, angka, rumus, atau tabel terstruktur di dalam stimulus atau soal."
@@ -14,31 +23,41 @@ TEXT_ONLY_RULE = (
 
 LATEX_RULE = (
     "Semua notasi matematika (variabel dengan operator, persamaan, pecahan, pangkat, akar, himpunan, simbol geometri) "
-    "ditulis dalam LaTeX di antara tanda dolar, mis. $f(x) = 2x + 3$ atau $a_1 = 3$; sistem mengubahnya menjadi kata untuk "
+    "ditulis dalam LaTeX di antara tanda dolar, mis. $\\frac{a}{b}$ atau $x^{2}$; sistem mengubahnya menjadi kata untuk "
     "pembaca layar. Di luar tanda dolar hanya kata biasa dan bilangan biasa tanpa simbol operasi."
 )
 
 VERBAL_RULE = (
-    "Tulis rumus dan simbol dengan kata Bahasa Indonesia seperti guru membacakannya, bukan simbol mentah: 'f dari x sama "
-    "dengan dua x ditambah tiga', 'f dari g dari empat', 'a dipetakan ke dua', 'akar kuadrat dari seratus enam puluh', "
-    "'tiga belas kuadrat', 'nol koma tujuh lima'. Jangan memakai tanda dolar, LaTeX, atau simbol seperti panah, kurung "
-    "kurawal, pangkat, akar, atau tanda kali dan kurang."
+    "Tulis rumus dan simbol dengan kata Bahasa Indonesia seperti guru membacakannya, bukan simbol mentah: operator dibaca "
+    "ditambah, dikurangi, dikali, dibagi, sama dengan, per, pangkat, atau akar kuadrat dari; bilangan desimal dibaca dengan "
+    "kata koma. Jangan memakai tanda dolar, LaTeX, atau simbol seperti panah, kurung kurawal, pangkat, akar, atau tanda kali "
+    "dan kurang."
 )
 
 UNIT_RULE = (
-    "Satuan ditulis dengan kata di luar tanda dolar (sentimeter, meter, derajat), bukan singkatan. Panjang ruas ditulis "
-    "dengan garis atas, mis. $\\overline{AC}$ dan $\\overline{AC}^{2}$, bukan $AC$ atau $AC^2$."
+    "Satuan ditulis dengan kata di luar tanda dolar, bukan singkatan."
     if config.MARKUP_ENABLED else
-    "Satuan ditulis dengan kata (sentimeter, meter, derajat), bukan singkatan. Panjang ruas ditulis dengan kata, mis. "
-    "'ruas garis A C' dan 'ruas garis A C kuadrat'."
+    "Satuan ditulis dengan kata, bukan singkatan."
+)
+
+FORMULA_RULE = LATEX_RULE if config.MARKUP_ENABLED else VERBAL_RULE
+
+POINT_NAME_RULE = (
+    "Nama titik, sudut, garis, dan bangun ditulis huruf demi huruf dengan spasi, mis. 'sudut A B C'."
+)
+
+STIMULUS_REFERENCE_RULE = (
+    "Bila soal punya stimulus, soal hanya berisi pertanyaan; jangan mengulang cerita atau data yang sudah ada di stimulus. "
+    "Setiap tokoh, klaim, atau data yang dirujuk soal, opsi, atau langkah harus ada di dalam stimulus itu, apa pun bentuknya. "
+    "Acu stimulus dengan 'berdasarkan cerita tadi' atau 'berdasarkan keterangan tadi'"
+    + (" (untuk tabel atau gambar: 'berdasarkan tabel tadi' atau 'berdasarkan gambar tadi')" if TYPED_ACTIVE else "")
+    + ", bukan kata 'stimulus' dan bukan 'di atas'."
 )
 
 READ_ALOUD_RULES = [
-    LATEX_RULE if config.MARKUP_ENABLED else VERBAL_RULE,
-    "Nama titik, sudut, dan bangun ditulis huruf demi huruf dengan spasi: 'sudut A O B', 'segitiga O A B', 'ruas garis A B'.",
-    "Bila soal punya stimulus, soal hanya berisi pertanyaan; jangan mengulang cerita atau data yang sudah ada di stimulus. "
-    "Acu stimulus dengan 'berdasarkan cerita tadi' atau 'berdasarkan keterangan tadi', bukan kata 'stimulus' dan bukan "
-    "'di atas'.",
+    FORMULA_RULE,
+    POINT_NAME_RULE,
+    STIMULUS_REFERENCE_RULE,
     UNIT_RULE,
     "Satu kalimat langkah memuat satu perhitungan. Hindari ekspresi akar atau pangkat bersusun panjang di opsi; pilih "
     "angka yang menghasilkan bentuk sederhana.",
@@ -46,7 +65,7 @@ READ_ALOUD_RULES = [
     "Beberapa klaim atau pernyataan diberi urutan dengan kata (pertama, kedua), bukan nomor '1)'; opsi mengulang inti "
     "klaim yang dipilih, tidak hanya menyebut urutannya.",
     "Bagian kalimat yang sama pada semua opsi dipindah ke soal; opsi hanya memuat bagian yang membedakan.",
-    "Hindari tanda kutip; tulis 'Raka menulis bahwa ...'. Pakai satu istilah yang sama untuk satu konsep.",
+    "Hindari tanda kutip; tulis dengan kalimat tidak langsung.",
 ]
 
 MARKUP_KEEP_RULE = (
@@ -74,25 +93,45 @@ FEEDBACK_SECURITY_RULE = (
     "ke luar materi sumber."
 )
 
-BLOOM_GUIDANCE = {
-    1: "C1 mengingat: soal menanyakan definisi/istilah/fakta LANGSUNG dari materi. JANGAN bungkus "
-       "dengan skenario atau kasus baru yang perlu diproses -- begitu ada kasus/angka baru yang harus "
-       "diolah, itu sudah bukan C1 lagi.",
-    2: "C2 memahami: soal menanyakan penjelasan/parafrase konsep dengan kata-kata lain, atau minta "
-       "mengenali contoh benar/salah dari sebuah konsep. JANGAN minta menghitung/menerapkan prosedur "
-       "ke kasus baru -- itu levelnya di atas C2.",
-    3: "C3 menerapkan: beri kasus/angka BARU (tidak ada di materi), siswa menerapkan SATU prosedur/rumus "
-       "inti dari materi secara langsung untuk menyelesaikannya.",
-    4: "C4 menganalisis: siswa membedah suatu situasi jadi beberapa bagian/hubungan sebab-akibat -- "
-       "mis. menemukan asumsi yang keliru, membandingkan dua pendekatan dan menunjukkan bedanya, atau "
-       "menelusuri di langkah mana sebuah penyelesaian jadi salah.",
-    5: "C5 mengevaluasi: sajikan BEBERAPA pendekatan/klaim/solusi berbeda untuk kasus yang sama. Siswa "
-       "menilai mana yang PALING VALID/EFISIEN berdasarkan kriteria tertentu. Opsi jawaban WAJIB berupa "
-       "pendekatan/klaim berbeda (mis. 'Cara A benar karena...', 'Cara B salah karena...'), BUKAN sekadar "
-       "angka hasil akhir yang berbeda -- kalau opsinya cuma angka berbeda, itu turun jadi C3.",
+BLOOM_LEVELS = {
+    1: ("Mengingat", "mengingat kembali fakta dan konsep dasar",
+        "mendefinisikan, menggandakan, mendaftar, menghafal, mengulang, menyatakan",
+        "Soal menanyakan langsung hal yang tertulis di materi; siswa cukup mengingat atau mengenalinya tanpa mengolahnya."),
+    2: ("Memahami", "menjelaskan gagasan atau konsep",
+        "mengklasifikasikan, mendeskripsikan, membahas, menjelaskan, mengidentifikasi, menentukan letak, mengenali, "
+        "melaporkan, memilih, menerjemahkan",
+        "Soal meminta siswa mengungkapkan makna konsep, atau mengenali mana yang termasuk dan bukan termasuk konsep itu; "
+        "tidak ada perhitungan pada kasus baru."),
+    3: ("Menerapkan", "memakai informasi dalam situasi baru",
+        "menjalankan, mengimplementasikan, menyelesaikan, menggunakan, mendemonstrasikan, menafsirkan, mengoperasikan, "
+        "menjadwalkan, membuat sketsa",
+        "Soal memberi kasus atau data baru yang belum ada di materi, dan siswa memilih serta menjalankan prosedur dari materi "
+        "untuk memperoleh hasilnya. Berbeda dari C2, yang dituntut adalah melakukan prosedur, bukan menjelaskan konsepnya."),
+    4: ("Menganalisis", "menarik hubungan antargagasan",
+        "membedakan, mengorganisasi, mengaitkan, membandingkan, mengontraskan, memeriksa, bereksperimen, mempertanyakan, "
+        "menguji",
+        "Soal meminta siswa memecah informasi yang diberikan menjadi bagian-bagiannya lalu menelusuri hubungan antar bagian "
+        "itu, misalnya sebab-akibat, perbedaan, urutan, atau letak kekeliruan. Berbeda dari C3, hasil akhirnya bukan angka "
+        "dari prosedur, melainkan kesimpulan tentang hubungan itu. Informasi yang diberikan tidak boleh sudah memuat "
+        "kesimpulan yang menjadi jawaban; siswa yang harus menelusurinya."),
+    5: ("Mengevaluasi", "membenarkan sikap atau keputusan",
+        "menaksir, berargumen, membela, menilai, memilih, mendukung, menghargai, mengkritik, menimbang",
+        "Soal meminta siswa menilai suatu klaim, cara penyelesaian, atau keputusan terhadap kriteria yang dapat dipakai, "
+        "lalu memilih penilaian yang paling dapat dibenarkan beserta alasannya. Berbeda dari C4, siswa tidak hanya menemukan "
+        "hubungan tetapi memutuskan mana yang paling kuat dan mengapa. Penilaian itu tidak boleh sudah tertulis di informasi "
+        "yang diberikan; siswa yang harus menimbangnya."),
 }
 
-GENERATE_RULES = [
+BLOOM_SCALE = "\n".join(
+    f"C{level} {name}: {meaning}. Kata kerja operasional: {verbs}." for level, (name, meaning, verbs, _) in BLOOM_LEVELS.items()
+)
+
+BLOOM_GUIDANCE = {
+    level: f"{name}: {meaning}. Kata kerja operasional: {verbs}. {implication}"
+    for level, (name, meaning, verbs, implication) in BLOOM_LEVELS.items()
+}
+
+SOAL_RULES = [
     "Soal menguji PERSIS poin yang diberikan, bukan bagian materi lain.",
     "Grounding: digroundkan penuh ke materi yang diberikan; jangan mengarang fakta yang tidak ada di materi.",
     "Jangan menyalin ulang soal latihan yang sudah ada di materi.",
@@ -100,32 +139,57 @@ GENERATE_RULES = [
     "batas materi sumber.",
     "Stem: satu fokus masalah saja, tanpa informasi yang tidak relevan.",
     "Stem: hindari kalimat negatif ('manakah yang BUKAN...', '...kecuali') dan negasi ganda.",
+    "Bahasa Indonesia baku, jelas, ringkas, sesuai jenjang SMA; tidak memakai istilah di luar yang sudah dikenalkan di "
+    "materi; pakai satu istilah yang sama untuk satu konsep.",
+    "Setiap huruf, simbol, atau angka yang dipakai soal untuk menyebut suatu besaran atau objek harus dijelaskan maknanya "
+    "di soal atau stimulus.",
+]
+
+OPSI_RULES = [
     "Hanya ada SATU jawaban benar/paling tepat di antara opsi.",
     "Distraktor: tiap opsi salah harus PLAUSIBEL, berdasarkan miskonsepsi umum siswa, bukan opsi yang jelas mustahil "
     "atau konyol.",
     "Semua opsi (benar maupun salah) kira-kira SAMA panjang dan tingkat detailnya; jawaban benar tidak boleh mencolok "
     "karena lebih panjang atau rinci.",
-    "Urutan opsi akan diacak setelah soal dibuat. Pada langkah dan kesimpulan, sebut isi jawaban, jangan huruf opsinya "
-    "(hindari 'opsi B' atau 'jawaban C').",
     "JANGAN pakai opsi 'semua benar' atau 'tidak ada yang benar'.",
     "Semua opsi konsisten tata bahasanya dengan stem dan satu sama lain.",
-    "Bahasa Indonesia baku, jelas, ringkas, sesuai jenjang SMA; tidak memakai istilah di luar yang sudah dikenalkan di "
-    "materi.",
     "Opsi jawaban harus jelas dibedakan kalau dibacakan pembaca layar; hindari perbedaan yang cuma terlihat secara "
     "visual (notasi atau simbol).",
+]
+
+LANGKAH_RULES = [
+    "Urutan opsi akan diacak setelah soal dibuat. Pada langkah dan kesimpulan, sebut isi jawaban, jangan huruf opsinya "
+    "(hindari 'opsi B' atau 'jawaban C').",
     "Langkah penyelesaian berurutan dan lengkap, tidak perlu melihat ulang materi lain.",
+]
+
+PILIHAN_STIMULUS_RULE = (
+    "Untuk C4 dan C5 isi 'pilihan_stimulus' tepat setelah 'analisis_level' dan SEBELUM menulis soal: dua kalimat yang menyebut "
+    "(a) data atau hubungan apa yang dibutuhkan soal dan (b) bentuk stimulus yang paling cepat dipahami untuk itu beserta "
+    "alasannya. Untuk C1 sampai C3 isi null."
+)
+
+GENERATE_RULES = [
+    *SOAL_RULES,
+    *OPSI_RULES,
+    *LANGKAH_RULES,
     TEXT_ONLY_RULE,
     *READ_ALOUD_RULES,
     *([TABLE_RULE] if config.MARKUP_ENABLED else []),
+    "Stimulus mengikuti level: C1 sampai C3 tanpa stimulus ('stimulus': null); C4 dan C5 WAJIB punya stimulus yang tidak null, "
+    "dengan bentuk yang relevan dengan soal seperti diuraikan di bagian STIMULUS pada input.",
     "Isi 'analisis_level' LEBIH DULU: 1-2 kalimat kenapa rancangan soal Anda benar-benar menuntut level Bloom yang "
     "diminta, bukan level lain. Tulis soal final SETELAH itu, konsisten dengan analisis itu.",
+    *([PILIHAN_STIMULUS_RULE] if TYPED_ACTIVE else []),
 ]
 
 GENERATE_OUTPUT = (
-    JSON_ONLY + ' Format: {"analisis_level": "...", "question_text": "...", "options": {"A": "...", "B": "...", '
+    JSON_ONLY + ' Format: {"analisis_level": "...", ' + ('"pilihan_stimulus": "..." atau null, ' if TYPED_ACTIVE else "")
+    + '"question_text": "...", "options": {"A": "...", "B": "...", '
     '"C": "...", "D": "..."}, "correct_option": "A", "langkah": ["langkah 1", "langkah 2"], "kesimpulan": "...", '
     '"stimulus": null}. Bila ada stimulus: "stimulus": {"readable_text": "..."'
     + (', "tabel": null}' if config.MARKUP_ENABLED else "}")
+    + (" atau objek bertipe sesuai bagian stimulus" if TYPED_ACTIVE else "")
 )
 
 GENERATE_SYSTEM = build_prompt(
@@ -133,25 +197,73 @@ GENERATE_SYSTEM = build_prompt(
     task="Buat satu soal pilihan ganda empat opsi dari satu poin materi, pada level Bloom yang diminta.",
     context=(
         "Soal dibacakan oleh pembaca layar kepada siswa tunanetra, sehingga seluruh informasi harus ada dalam teks. "
-        "Guru memilih bab dan Capaian Pembelajaran; soal yang baik mengukur CP itu dari materi sumber."
+        "Guru memilih bab dan Capaian Pembelajaran; soal yang baik mengukur CP itu dari materi sumber.\n\n"
+        "Skala level Bloom yang dipakai (C6 mencipta tidak dipakai karena pilihan ganda tidak menguji penciptaan):\n"
+        + BLOOM_SCALE
     ),
     rules=GENERATE_RULES,
     output_format=GENERATE_OUTPUT,
 )
 
-STIMULUS_INSTRUCTION = (
-    'Isi field "stimulus" dengan objek {"readable_text": "..."} berisi cerita/data/konteks aplikasi dunia nyata yang '
-    "digroundkan ke materi sumber, ditulis sebagai teks, dan soalnya harus butuh stimulus itu untuk dijawab."
+STIMULUS_FORMS = (
+    "narasi kasus, data berbentuk daftar nilai (tabel terstruktur), ekspresi formal (rumus), atau dokumen kontekstual "
+    "yang dirender sebagai teks atau tabel"
+    if config.MARKUP_ENABLED else
+    "narasi kasus, data berbentuk daftar nilai yang ditulis dengan kata dan angka, atau dokumen kontekstual yang ditulis "
+    "sebagai teks"
 )
 
+TYPED_INSTRUCTION = (
+    'Soal level ini WAJIB punya stimulus: field "stimulus" tidak boleh null. '
+    'Isi field "stimulus" dengan konteks yang digroundkan ke materi sumber. Semua data yang dibutuhkan untuk menjawab harus '
+    "lengkap di stimulus, dan soalnya harus butuh stimulus itu untuk dijawab. Pilih bentuk stimulus yang paling sesuai dengan "
+    "kebutuhan soal dengan menimbang jenis informasinya: daftar nilai berpasangan atau berurutan cocok sebagai tabel; bentuk, "
+    "posisi, hubungan antar objek, atau pola yang lebih mudah dipahami bila digambar cocok sebagai gambar; kebutuhan akan "
+    "keduanya atau penjelasan tambahan cocok sebagai campuran; keterangan atau cerita tanpa struktur data cocok sebagai teks. "
+    "Teks bukan pilihan bawaan: pilih teks karena paling cocok, bukan karena paling mudah. "
+    'Semua bentuk berikut setara: objek {"readable_text": "..."} untuk narasi atau dokumen kontekstual yang '
+    'ditulis sebagai teks, atau objek bertipe {"jenis": "<nama jenis>", "narasi": "...", "spesifikasi": {...}} untuk data atau '
+    'bentuk yang strukturnya tersedia di bawah. "narasi" berisi satu atau dua kalimat konteks tanpa mengulang data. Untuk '
+    "jenis bertipe Anda mengisi bentuk mentahnya saja, tanpa menulis teks bacaan: untuk tabel sistem menurunkan bacaan dari "
+    "sel, dan untuk gambar sistem mendeskripsikan gambar yang Anda tulis. Jangan menulis ulang isi tabel atau gambar sebagai "
+    "kalimat. Rumus pada sel tabel ditulis sebagai LaTeX di antara tanda dolar; label di dalam gambar berupa teks biasa tanpa "
+    "tag atau simbol (persen, kali, bagi, sama dengan, tambah): tulis dengan kata. Karena stimulus didengarkan sekali jalan, "
+    "jaga ukurannya ringkas. Jenis bertipe yang tersedia:\n"
+)
 
-def generate_input(point: dict, source_text: str, bloom_level: int, cp_text: str = "", correction: str = "") -> str:
+TEXT_ONLY_INSTRUCTION = (
+    'Soal level ini WAJIB punya stimulus: field "stimulus" tidak boleh null. '
+    'Isi field "stimulus" dengan objek {"readable_text": "..."} berisi konteks yang digroundkan ke materi sumber dan '
+    f"ditulis sebagai teks. Pilih bentuk yang paling sesuai dengan poin: {STIMULUS_FORMS}. Semua data yang dibutuhkan "
+    "untuk menjawab harus lengkap di stimulus, dan soalnya harus butuh stimulus itu untuk dijawab."
+)
+
+STIMULUS_INSTRUCTION = TYPED_INSTRUCTION + registry.prompt_schemas() if TYPED_ACTIVE else TEXT_ONLY_INSTRUCTION
+
+
+VISUAL_WORDS = {"image": "gambar", "table": "tabel"}
+
+
+def visual_hint(visuals: tuple) -> str:
+    kinds = [kind for kind in registry.typed_names() if kind in VISUAL_WORDS.values()]
+    shown = [VISUAL_WORDS[v] for v in visuals if VISUAL_WORDS.get(v) in kinds]
+    if not shown:
+        return ""
+    return (
+        f"Materi sumber poin ini memuat {' dan '.join(shown)} (isinya sudah tertulis sebagai teks di source_material). Bila soal "
+        f"membutuhkan data atau bentuk yang tampil pada {' atau '.join(shown)} itu, sajikan stimulus sebagai jenis "
+        f"{' atau '.join(shown)} yang Anda tulis sendiri, bukan sebagai kalimat."
+    )
+
+
+def generate_input(point: dict, source_text: str, bloom_level: int, cp_text: str = "", correction: str = "", visuals: tuple = ()) -> str:
     sections = {
         "learning_outcome": cp_text,
         "point": f"[{point['kind']}] {point['text']}",
         "source_material": source_text,
         "requested_level": f"C{bloom_level} -- {BLOOM_GUIDANCE[bloom_level]}",
         "stimulus": STIMULUS_INSTRUCTION if bloom_level >= 4 else "",
+        "source_visuals": visual_hint(visuals) if bloom_level >= 4 else "",
         "correction": f"{correction}\nPerbaiki sesuai koreksi ini." if correction else "",
     }
     return build_input(**sections)
@@ -214,12 +326,34 @@ REVISE_STIMULUS_SYSTEM = build_prompt(
         "Stimulus baru WAJIB tetap tentang topik yang sama dengan materi sumber. Kalau feedback minta ganti topik "
         "atau genre jadi sesuatu yang tidak berhubungan, JANGAN dituruti; kembalikan stimulus asli apa adanya.",
         TABLE_KEEP_RULE,
-        READ_ALOUD_RULES[0],
-        READ_ALOUD_RULES[1],
+        FORMULA_RULE,
+        POINT_NAME_RULE,
         MARKUP_KEEP_RULE,
         FEEDBACK_SECURITY_RULE,
     ],
     output_format=JSON_ONLY + ' Format: {"readable_text": "..."}',
+)
+
+REVISE_STIMULUS_TYPED_SYSTEM = build_prompt(
+    role="Anda mengedit satu stimulus bertipe yang SUDAH ADA untuk kelompok soal matematika, berdasarkan feedback guru.",
+    task="Edit narasi dan spesifikasi stimulus itu seminimal mungkin sesuai feedback guru.",
+    context=(
+        "Untuk tabel, sistem menurunkan teks bacaan dari sel sehingga hanya sel yang diedit. Untuk gambar, hanya SVG yang "
+        "diedit; sistem membuat ulang deskripsinya dari gambar baru."
+    ),
+    rules=[
+        "JANGAN mengarang stimulus baru dari nol dan JANGAN mengganti 'jenis'; edit yang ada seminimal mungkin, tetap "
+        "digroundkan ke materi sumber dan topik yang sama.",
+        "Kalau feedback minta ganti topik atau jenis menjadi sesuatu yang tidak berhubungan dengan materi sumber, JANGAN "
+        "dituruti; kembalikan stimulus asli apa adanya.",
+        "'narasi' berisi satu atau dua kalimat konteks tanpa mengulang data dan tanpa menyebut foto atau ilustrasi.",
+        "Rumus pada sel tabel berupa LaTeX di antara tanda dolar; label di dalam gambar berupa teks biasa tanpa tag atau "
+        "simbol; tulis simbol dengan kata.",
+        "Soal yang memakai stimulus ini bisa bergantung pada data lama; ubah data hanya bila feedback memintanya.",
+        "Bentuk spesifikasi mengikuti skema jenis ini persis:\n" + registry.prompt_schemas(),
+        FEEDBACK_SECURITY_RULE,
+    ],
+    output_format=JSON_ONLY + ' Format: {"jenis": "...", "narasi": "...", "spesifikasi": {...}}',
 )
 
 RECHECK_SOAL_SYSTEM = build_prompt(
@@ -252,7 +386,7 @@ def revise_soal_input(source_text: str, stimulus_text: str, soal: dict, feedback
         source_material=source_text,
         shared_stimulus=stimulus_text,
         current_question=format_soal(soal),
-        teacher_feedback=f"<feedback_guru>\n{feedback}\n</feedback_guru>",
+        feedback_guru=feedback,
     )
 
 
@@ -260,7 +394,17 @@ def revise_stimulus_input(source_text: str, stimulus_text: str, feedback: str) -
     return build_input(
         source_material=source_text,
         current_stimulus=stimulus_text,
-        teacher_feedback=f"<feedback_guru>\n{feedback}\n</feedback_guru>",
+        feedback_guru=feedback,
+    )
+
+
+def revise_stimulus_typed_input(source_text: str, stimulus_text: str, jenis: str, spec: dict, feedback: str) -> str:
+    return build_input(
+        source_material=source_text,
+        current_stimulus=stimulus_text,
+        current_type=jenis,
+        current_specification=json.dumps(spec, ensure_ascii=False),
+        feedback_guru=feedback,
     )
 
 
@@ -348,7 +492,12 @@ AUDIT_SYSTEM = build_prompt(
         "'langkah_valid': true bila semua langkah benar secara matematis dan mengarah ke kunci.",
         "'kesimpulan_konsisten': true bila kesimpulan sesuai dengan langkah dan kunci.",
         "'opsi_lain_benar': daftar huruf opsi selain kunci yang juga benar atau dapat dibenarkan; kosong bila tidak ada.",
-        "'stem_ambigu': true bila stem bisa ditafsirkan lebih dari satu cara sehingga jawaban berubah.",
+        "'stem_ambigu': true bila stem bisa ditafsirkan lebih dari satu cara, atau ada kondisi yang tidak ditentukan "
+        "soal tetapi mengubah jawaban, sehingga jawaban berubah.",
+        "'data_lengkap': false bila langkah atau kunci memakai data yang tidak tertulis di soal atau stimulus.",
+        "'opsi_di_luar_soal': true bila ada opsi yang merujuk tokoh, usulan, atau data yang tidak ada di soal atau stimulus.",
+        "'opsi_kontradiktif': true bila ada opsi yang bertentangan dengan dirinya sendiri, misalnya nama cara tidak cocok "
+        "dengan langkah yang diuraikan di opsi itu.",
         "'stimulus_dibutuhkan': true bila soal tidak bisa dijawab tanpa stimulus; null bila soal tidak punya stimulus.",
         "'readable_setia': true bila teks soal yang diberikan (siap-baca, dibacakan ke siswa) setia pada MARKUP LaTeX dan tabel; "
         "false bila ada rumus atau angka yang dibaca berbeda dari markup; null bila tidak ada markup.",
@@ -356,7 +505,8 @@ AUDIT_SYSTEM = build_prompt(
     ],
     output_format=(
         JSON_ONLY + ' Format: {"langkah_valid": true, "kesimpulan_konsisten": true, "opsi_lain_benar": [], '
-        '"stem_ambigu": false, "stimulus_dibutuhkan": null, "readable_setia": null, "masalah": []}'
+        '"stem_ambigu": false, "data_lengkap": true, "opsi_di_luar_soal": false, "opsi_kontradiktif": false, '
+        '"stimulus_dibutuhkan": null, "readable_setia": null, "masalah": []}'
     ),
 )
 

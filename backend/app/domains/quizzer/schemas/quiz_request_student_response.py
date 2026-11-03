@@ -59,6 +59,8 @@ class QuestionStimulusStudentResponse(BaseModel):
     source_markup: str = ""
     ringkasan: Optional[str] = None
     tabel: Optional[dict] = None
+    jenis: str = "teks"
+    spesifikasi: Optional[dict] = None
 
 class QuestionAnswerStudentResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

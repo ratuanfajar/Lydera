@@ -5,6 +5,7 @@ from html.parser import HTMLParser
 from common.formula import convert_checked
 from common.formula_check import complexity_issues
 from common.parallel import parallel_map
+from common.speakable import manual_reading_issues
 
 MAX_SUMMARY_COLUMNS = 6
 GREEK_NAMES = {
@@ -33,6 +34,16 @@ def split_math(text: str) -> list[tuple[bool, str]]:
     if cursor < len(text):
         parts.append((False, text[cursor:]))
     return parts
+
+
+def plain_text_issues(strings: list[str]) -> list[str]:
+    """Temuan bacaan layar pada bagian teks di luar rumus $...$ (rumus diverbalisasi sistem); string kosong dilewati."""
+    issues: list[str] = []
+    for text in strings:
+        outside = " ".join(content for is_math, content in split_math(str(text or "")) if not is_math).strip()
+        if outside:
+            issues.extend(manual_reading_issues(outside))
+    return list(dict.fromkeys(issues))
 
 
 def readable_texts(markups: list[str], issues: list[str] | None = None) -> list[str]:

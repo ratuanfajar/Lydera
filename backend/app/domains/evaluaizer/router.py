@@ -17,9 +17,10 @@ router_evaluaizer = APIRouter(prefix="/evaluaizer", tags=["evaluaizer"], route_c
 @router_evaluaizer.get(
     "/student/quizzes/{quiz_request_id}/results",
     description=(
-        "Requires the STUDENT role. Hasil kuis siswa yang login: untuk soal yang dijawab salah, "
-        "justifikasi personal (perbandingan langkah pengerjaan siswa vs yang benar) biasanya sudah "
-        "dievaluasi di background saat kuis selesai; bila belum, dievaluasi di sini lalu disimpan. "
+        "Requires the STUDENT role. Hasil kuis siswa yang login: opsi benar, langkah_kunci, dan kesimpulan dari Quizzer "
+        "selalu ada. Untuk soal yang dijawab salah DAN punya langkah tertulis siswa, letak_kesalahan (langkah_ke, kutipan, "
+        "keterangan, dapat_ditentukan) biasanya sudah dievaluasi di background saat kuis selesai; bila belum, dievaluasi di sini "
+        "lalu disimpan. Jawaban benar dan jawaban salah tanpa langkah tidak dianalisis (letak_kesalahan null). "
         "Soal dengan evaluasi_diproses true sedang dievaluasi proses lain: ulangi permintaan beberapa detik kemudian."
     ),
     response_model=Response[list[QuizResultItem]],

@@ -13,6 +13,8 @@ class StimulusCreateRequest(BaseModel):
     source_markup: str = ""
     ringkasan: Optional[str] = None
     tabel: Optional[Dict] = None
+    jenis: str = "teks"
+    spesifikasi: Optional[Dict] = None
     source_reading_order_start: Optional[int] = None
     source_reading_order_end: Optional[int] = None
 

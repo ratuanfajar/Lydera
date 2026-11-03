@@ -24,11 +24,7 @@
     "accepted_divergence": [
       1
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_hitung",
-      "salah_konsep"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "tengah_persamaan_linear",
@@ -55,10 +51,7 @@
     "accepted_divergence": [
       2
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_hitung"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "akhir_diskon",
@@ -85,11 +78,7 @@
     "accepted_divergence": [
       2
     ],
-    "accepted_types": [
-      "salah_baca_soal",
-      "salah_prosedur",
-      "salah_konsep"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "geometri_sudut_keliling",
@@ -116,35 +105,7 @@
     "accepted_divergence": [
       2
     ],
-    "accepted_types": [
-      "salah_konsep"
-    ]
-  },
-  {
-    "id": "tanpa_langkah_kuadrat",
-    "source": "Persamaan kuadrat dapat diselesaikan dengan pemfaktoran: cari dua bilangan yang jumlahnya sama dengan koefisien x dan hasil kalinya sama dengan konstanta.",
-    "stimulus": "",
-    "question": "Akar-akar persamaan x kuadrat dikurangi 5x ditambah 6 sama dengan 0 adalah ...",
-    "options": {
-      "A": "2 dan 3",
-      "B": "negatif 2 dan negatif 3",
-      "C": "1 dan 6",
-      "D": "negatif 1 dan negatif 6"
-    },
-    "correct_option": "A",
-    "key_steps": [
-      "Faktorkan menjadi hasil kali dari x dikurangi 2 dan x dikurangi 3 sama dengan 0.",
-      "Maka x sama dengan 2 atau x sama dengan 3."
-    ],
-    "conclusion": "Jadi akar-akarnya adalah 2 dan 3.",
-    "student_option": "C",
-    "student_steps": [],
-    "accepted_divergence": [
-      null
-    ],
-    "accepted_types": [
-      "tanpa_langkah"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "stimulus_tanpa_operasi",
@@ -173,11 +134,7 @@
     "accepted_divergence": [
       2
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_konsep",
-      "salah_baca_soal"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "langkah_benar_salah_pilih",
@@ -202,13 +159,9 @@
       "Hasilnya 32."
     ],
     "accepted_divergence": [
-      null,
-      2
+      null
     ],
-    "accepted_types": [
-      "salah_baca_soal",
-      "lainnya"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "langkah_bersimbol",
@@ -236,9 +189,7 @@
     "accepted_divergence": [
       3
     ],
-    "accepted_types": [
-      "salah_hitung"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "injeksi_prompt",
@@ -266,12 +217,7 @@
       1,
       2
     ],
-    "accepted_types": [
-      "salah_baca_soal",
-      "salah_prosedur",
-      "salah_konsep",
-      "lainnya"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "id": "median_tanpa_urut",
@@ -298,10 +244,7 @@
     "accepted_divergence": [
       2
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_konsep"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "source": "Persamaan linear satu variabel diselesaikan dengan menjaga keseimbangan: operasi yang sama dilakukan pada kedua ruas. Memindahkan suku ke ruas lain mengubah tandanya.",
@@ -328,11 +271,7 @@
     "accepted_divergence": [
       1
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_hitung",
-      "salah_konsep"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "source": "Persamaan linear satu variabel diselesaikan dengan menjaga keseimbangan: operasi yang sama dilakukan pada kedua ruas. Memindahkan suku ke ruas lain mengubah tandanya.",
@@ -358,11 +297,7 @@
     "accepted_divergence": [
       1
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_hitung",
-      "lainnya"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "source": "Diskon adalah potongan harga. Besar diskon sama dengan persentase diskon dikali harga awal, dan harga yang dibayar sama dengan harga awal dikurangi diskon.",
@@ -391,11 +326,7 @@
     "accepted_divergence": [
       3
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_konsep",
-      "salah_baca_soal"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "source": "Persamaan linear satu variabel diselesaikan dengan menjaga keseimbangan: operasi yang sama dilakukan pada kedua ruas. Memindahkan suku ke ruas lain mengubah tandanya.",
@@ -422,11 +353,7 @@
     "accepted_divergence": [
       1
     ],
-    "accepted_types": [
-      "salah_prosedur",
-      "salah_hitung",
-      "salah_konsep"
-    ]
+    "dapat_ditentukan": true
   },
   {
     "source": "Persamaan linear satu variabel diselesaikan dengan menjaga keseimbangan: operasi yang sama dilakukan pada kedua ruas. Memindahkan suku ke ruas lain mengubah tandanya.",
@@ -450,14 +377,9 @@
       "Langsung ketemu, x nya 3, tidak usah dihitung."
     ],
     "accepted_divergence": [
-      1
+      null
     ],
-    "accepted_types": [
-      "salah_konsep",
-      "salah_prosedur",
-      "salah_hitung",
-      "lainnya"
-    ]
+    "dapat_ditentukan": false
   },
   {
     "source": "Diskon adalah potongan harga. Besar diskon sama dengan persentase diskon dikali harga awal, dan harga yang dibayar sama dengan harga awal dikurangi diskon.",
@@ -484,10 +406,321 @@
     "accepted_divergence": [
       2
     ],
-    "accepted_types": [
-      "salah_hitung",
-      "salah_prosedur",
-      "salah_konsep"
-    ]
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_hanya_satu_angka",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan tiga x ditambah empat sama dengan sembilan belas adalah ...",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "7",
+      "D": "15"
+    },
+    "correct_option": "B",
+    "key_steps": [
+      "Kurangi kedua ruas dengan 4, sehingga tiga x sama dengan lima belas.",
+      "Bagi kedua ruas dengan 3, sehingga x sama dengan lima."
+    ],
+    "conclusion": "Jadi nilai x adalah 5.",
+    "student_option": "D",
+    "student_steps": [
+      "15"
+    ],
+    "accepted_divergence": [
+      null
+    ],
+    "dapat_ditentukan": false
+  },
+  {
+    "id": "skenario_hanya_deretan_angka",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan tiga x ditambah empat sama dengan sembilan belas adalah ...",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "7",
+      "D": "15"
+    },
+    "correct_option": "B",
+    "key_steps": [
+      "Kurangi kedua ruas dengan 4, sehingga tiga x sama dengan lima belas.",
+      "Bagi kedua ruas dengan 3, sehingga x sama dengan lima."
+    ],
+    "conclusion": "Jadi nilai x adalah 5.",
+    "student_option": "A",
+    "student_steps": [
+      "19",
+      "15",
+      "3"
+    ],
+    "accepted_divergence": [
+      null
+    ],
+    "dapat_ditentukan": false
+  },
+  {
+    "id": "skenario_langkah_benar_salah_pilih_huruf",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan tiga x ditambah empat sama dengan sembilan belas adalah ...",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "7",
+      "D": "15"
+    },
+    "correct_option": "B",
+    "key_steps": [
+      "Kurangi kedua ruas dengan 4, sehingga tiga x sama dengan lima belas.",
+      "Bagi kedua ruas dengan 3, sehingga x sama dengan lima."
+    ],
+    "conclusion": "Jadi nilai x adalah 5.",
+    "student_option": "A",
+    "student_steps": [
+      "19 - 4 = 15",
+      "15 : 3 = 5"
+    ],
+    "accepted_divergence": [
+      null
+    ],
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_loncat_mental_lalu_salah",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan dua kali buka kurung tiga x dikurangi empat tutup kurung ditambah lima sama dengan dua puluh satu adalah ...",
+    "options": {
+      "A": "2",
+      "B": "3",
+      "C": "4",
+      "D": "5"
+    },
+    "correct_option": "C",
+    "key_steps": [
+      "Kalikan dua ke dalam kurung, sehingga enam x dikurangi delapan ditambah lima sama dengan dua puluh satu.",
+      "Sederhanakan ruas kiri, sehingga enam x dikurangi tiga sama dengan dua puluh satu.",
+      "Tambahkan tiga pada kedua ruas, sehingga enam x sama dengan dua puluh empat.",
+      "Bagi kedua ruas dengan enam, sehingga x sama dengan empat."
+    ],
+    "conclusion": "Jadi nilai x adalah 4.",
+    "student_option": "B",
+    "student_steps": [
+      "6x - 3 = 21",
+      "6x = 18",
+      "x = 3"
+    ],
+    "accepted_divergence": [
+      2
+    ],
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_loncat_mental_dua_langkah",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan dua kali buka kurung tiga x dikurangi empat tutup kurung ditambah lima sama dengan dua puluh satu adalah ...",
+    "options": {
+      "A": "2",
+      "B": "3",
+      "C": "4",
+      "D": "5"
+    },
+    "correct_option": "C",
+    "key_steps": [
+      "Kalikan dua ke dalam kurung, sehingga enam x dikurangi delapan ditambah lima sama dengan dua puluh satu.",
+      "Sederhanakan ruas kiri, sehingga enam x dikurangi tiga sama dengan dua puluh satu.",
+      "Tambahkan tiga pada kedua ruas, sehingga enam x sama dengan dua puluh empat.",
+      "Bagi kedua ruas dengan enam, sehingga x sama dengan empat."
+    ],
+    "conclusion": "Jadi nilai x adalah 4.",
+    "student_option": "B",
+    "student_steps": [
+      "6x - 3 = 21",
+      "x = 3"
+    ],
+    "accepted_divergence": [
+      2
+    ],
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_salah_distribusi_awal",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan dua kali buka kurung tiga x dikurangi empat tutup kurung ditambah lima sama dengan dua puluh satu adalah ...",
+    "options": {
+      "A": "2",
+      "B": "3",
+      "C": "4",
+      "D": "5"
+    },
+    "correct_option": "C",
+    "key_steps": [
+      "Kalikan dua ke dalam kurung, sehingga enam x dikurangi delapan ditambah lima sama dengan dua puluh satu.",
+      "Sederhanakan ruas kiri, sehingga enam x dikurangi tiga sama dengan dua puluh satu.",
+      "Tambahkan tiga pada kedua ruas, sehingga enam x sama dengan dua puluh empat.",
+      "Bagi kedua ruas dengan enam, sehingga x sama dengan empat."
+    ],
+    "conclusion": "Jadi nilai x adalah 4.",
+    "student_option": "B",
+    "student_steps": [
+      "2(3x - 4) + 5 = 6x - 4 + 5",
+      "6x + 1 = 21",
+      "6x = 20",
+      "x = 20 : 6 = 3"
+    ],
+    "accepted_divergence": [
+      1
+    ],
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_salah_pindah_ruas_tengah",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan dua kali buka kurung tiga x dikurangi empat tutup kurung ditambah lima sama dengan dua puluh satu adalah ...",
+    "options": {
+      "A": "2",
+      "B": "3",
+      "C": "4",
+      "D": "5"
+    },
+    "correct_option": "C",
+    "key_steps": [
+      "Kalikan dua ke dalam kurung, sehingga enam x dikurangi delapan ditambah lima sama dengan dua puluh satu.",
+      "Sederhanakan ruas kiri, sehingga enam x dikurangi tiga sama dengan dua puluh satu.",
+      "Tambahkan tiga pada kedua ruas, sehingga enam x sama dengan dua puluh empat.",
+      "Bagi kedua ruas dengan enam, sehingga x sama dengan empat."
+    ],
+    "conclusion": "Jadi nilai x adalah 4.",
+    "student_option": "B",
+    "student_steps": [
+      "2(3x-4)+5=21",
+      "6x-8+5=21",
+      "6x=21-8+5",
+      "6x=18",
+      "x=3"
+    ],
+    "accepted_divergence": [
+      3
+    ],
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_tebak_tanpa_hitung",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan tiga x ditambah empat sama dengan sembilan belas adalah ...",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "7",
+      "D": "15"
+    },
+    "correct_option": "B",
+    "key_steps": [
+      "Kurangi kedua ruas dengan 4, sehingga tiga x sama dengan lima belas.",
+      "Bagi kedua ruas dengan 3, sehingga x sama dengan lima."
+    ],
+    "conclusion": "Jadi nilai x adalah 5.",
+    "student_option": "C",
+    "student_steps": [
+      "Saya tebak saja karena tidak tahu caranya."
+    ],
+    "accepted_divergence": [
+      null
+    ],
+    "dapat_ditentukan": false
+  },
+  {
+    "id": "skenario_campur_bahasa_inggris",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan tiga x ditambah empat sama dengan sembilan belas adalah ...",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "7",
+      "D": "15"
+    },
+    "correct_option": "B",
+    "key_steps": [
+      "Kurangi kedua ruas dengan 4, sehingga tiga x sama dengan lima belas.",
+      "Bagi kedua ruas dengan 3, sehingga x sama dengan lima."
+    ],
+    "conclusion": "Jadi nilai x adalah 5.",
+    "student_option": "D",
+    "student_steps": [
+      "first subtract 4 from both sides so 3x = 15",
+      "then x = 15"
+    ],
+    "accepted_divergence": [
+      2
+    ],
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_berbelit_mengulang_soal",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan tiga x ditambah empat sama dengan sembilan belas adalah ...",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "7",
+      "D": "15"
+    },
+    "correct_option": "B",
+    "key_steps": [
+      "Kurangi kedua ruas dengan 4, sehingga tiga x sama dengan lima belas.",
+      "Bagi kedua ruas dengan 3, sehingga x sama dengan lima."
+    ],
+    "conclusion": "Jadi nilai x adalah 5.",
+    "student_option": "D",
+    "student_steps": [
+      "Soalnya 3x + 4 = 19",
+      "Berarti 3x + 4 sama dengan 19",
+      "Saya cari x nya",
+      "Pertama saya kurangi 4 jadi 3x = 15",
+      "Terus 3x = 15",
+      "Saya anggap 3 itu pangkat jadi x = 15",
+      "Jadi x = 15"
+    ],
+    "accepted_divergence": [
+      6
+    ],
+    "dapat_ditentukan": true
+  },
+  {
+    "id": "skenario_langkah_benar_lengkap_hasil_salah_hitung",
+    "source": "Persamaan linear satu variabel diselesaikan dengan melakukan operasi yang sama pada kedua ruas sampai variabel berdiri sendiri.",
+    "stimulus": "",
+    "question": "Nilai x yang memenuhi persamaan tiga x ditambah empat sama dengan sembilan belas adalah ...",
+    "options": {
+      "A": "3",
+      "B": "5",
+      "C": "7",
+      "D": "15"
+    },
+    "correct_option": "B",
+    "key_steps": [
+      "Kurangi kedua ruas dengan 4, sehingga tiga x sama dengan lima belas.",
+      "Bagi kedua ruas dengan 3, sehingga x sama dengan lima."
+    ],
+    "conclusion": "Jadi nilai x adalah 5.",
+    "student_option": "A",
+    "student_steps": [
+      "Kurangi kedua ruas dengan 4 jadi 3x = 15",
+      "Bagi kedua ruas dengan 3 jadi x = 3"
+    ],
+    "accepted_divergence": [
+      2
+    ],
+    "dapat_ditentukan": true
   }
 ]

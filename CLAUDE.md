@@ -1,6 +1,6 @@
 # Lydera
 
-Aplikasi mobile pembelajaran matematika untuk siswa tunanetra dan guru SLB. Empat fitur AI: **Annoter** (modul PDF menjadi teks siap-TalkBack), **Quizzer** (soal pilihan ganda dari modul teranotasi), **Evaluaizer** (analisis jawaban siswa yang salah), **Clarifier** (tanya jawab RAG dari modul yang sama). Output AI selalu divalidasi guru sebelum sampai ke siswa.
+Aplikasi mobile pembelajaran matematika untuk siswa tunanetra dan guru SLB. Empat fitur AI: **Annoter** (modul PDF menjadi teks siap-TalkBack), **Quizzer** (soal pilihan ganda dari modul teranotasi), **Evaluaizer** (analisis jawaban siswa yang salah), **Clarifier** (tanya jawab RAG dari modul yang sama). Output AI divalidasi guru sebelum sampai ke siswa; satu-satunya pengecualian adalah latihan soal buatan AI di chat Clarifier (ADR 0014).
 
 ## Peta repo
 

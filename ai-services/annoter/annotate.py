@@ -7,12 +7,12 @@ from pathlib import Path
 
 from annoter import config as annoter_config
 from annoter import image, table
-from annoter.phrases import FORMULA_UNREADABLE
+from common.phrases import FORMULA_UNREADABLE
 from annoter.preprocess import Block, Route, preprocess
 from annoter.priority import escalate, image_priority, table_flagged
-from annoter.resilience import Breaker, is_systemic
 from common import config, formula
 from common.math_text import join_spoken, spell_greek, strip_tags
+from common.resilience import Breaker, is_systemic
 
 logger = logging.getLogger("annoter")
 

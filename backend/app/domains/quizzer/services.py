@@ -11,7 +11,7 @@ from app.domains.quizzer.models import Soal
 
 from app.domains.quizzer.models import Soal, SoalJawaban
 from app.domains.quizzer.repositories.interface import QuizRepositoryInterface
-from app.domains.quizzer.schemas import QuizResultItem, SoalJustification, SoalSubmitRequest
+from app.domains.quizzer.schemas import QuizResultItem, SoalSubmitRequest
 
 from app.domains.quizzer.models.quiz_request import QuizRequest, QuizRequestStatus
 from app.domains.quizzer.schemas.quiz_request_query import QuizRequestDetailQuery, QuizRequestQuery
@@ -29,6 +29,9 @@ from app.utils import paths
 paths.setup()
 
 from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
+from types import SimpleNamespace
+
+from common import math_text
 from quizzer import quizzer_regenerate
 from quizzer import readable as quizzer_readable
 from quizzer import segment as quizzer_segment
@@ -50,6 +53,27 @@ def _soal_to_dict(soal: Soal) -> dict:
     }
 
 
+SUBMIT_GRACE = timedelta(seconds=10)
+
+
+def _sent_texts(payload) -> list[str]:
+    texts: list[str] = []
+    for source in (payload, SimpleNamespace(**(payload.markup or {}))):
+        for value in (getattr(source, "question_text", None), getattr(source, "question", None), getattr(source, "kesimpulan", None)):
+            texts.append(value or "")
+        for key in ("options", "langkah"):
+            value = getattr(source, key, None)
+            texts.extend((value.values() if isinstance(value, dict) else value) or [])
+    return texts
+
+
+def _stimulus_dict(stimulus) -> dict:
+    result = {"readable_text": stimulus.readable_text, "source_markup": stimulus.source_markup or ""}
+    if stimulus.jenis != "teks" and stimulus.spesifikasi:
+        result.update(jenis=stimulus.jenis, spesifikasi=stimulus.spesifikasi)
+    return result
+
+
 def _review_dict(soal: Soal) -> dict:
     """Bentuk yang diverifikasi: teks siap-baca (yang didengar siswa) plus markup untuk audit kesetiaan."""
     return {
@@ -60,7 +84,7 @@ def _review_dict(soal: Soal) -> dict:
         "langkah": [l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
         "kesimpulan": soal.kesimpulan,
         "markup": soal.markup,
-        "stimulus": {"readable_text": soal.stimulus.readable_text, "source_markup": soal.stimulus.source_markup or ""} if soal.stimulus else None,
+        "stimulus": _stimulus_dict(soal.stimulus) if soal.stimulus else None,
     }
 
 
@@ -239,6 +263,13 @@ class QuizService:
                 "Kelas atau Quiz Request tidak ditemukan atau Anda tidak memiliki akses."
             )
 
+        if status == QuizRequestStatus.DRAFT and await self.repo.has_quiz_progress(quiz_request_id):
+            raise BadRequestException("Kuis sudah dikerjakan siswa; tidak dapat dikembalikan ke draft.")
+        if status == QuizRequestStatus.PUBLISH:
+            quiz = await self.repo.get_quiz_request(quiz_request_id)
+            if quiz is None or quiz.status != "done":
+                raise BadRequestException("Kuis belum selesai dibuat atau gagal dibuat, belum bisa dipublikasikan.")
+
         updated = await self.repo.update_quiz_status_publish(
             quiz_request_id=quiz_request_id,
             status=status.value,
@@ -277,18 +308,25 @@ class QuizService:
         # await self.redis.delete(*keys_to_delete)
         return True
 
+    async def _ensure_quiz_editable(self, quiz_request_id: int) -> None:
+        """Kunci jawaban terkunci begitu kuis dipublikasikan atau sudah dikerjakan siswa; hanya kuis draft tanpa pengerjaan yang boleh diubah."""
+        quiz = await self.repo.get_quiz_request(quiz_request_id)
+        if quiz is not None and quiz.status_published == QuizRequestStatus.PUBLISH:
+            raise BadRequestException("Kuis sudah dipublikasikan; kembalikan ke draft untuk mengubah soal.")
+        if await self.repo.has_quiz_progress(quiz_request_id):
+            raise BadRequestException("Kuis sudah dikerjakan siswa; soal tidak dapat diubah lagi.")
+
     async def _ensure_soal_owner(self, soal_id: int, teacher_id: int) -> None:
         if not await self.repo.validate_soal_owner(soal_id, teacher_id):
             raise ForbiddenException("Soal tidak ditemukan atau Anda tidak memiliki akses.")
 
     async def edit_soal(self, soal_id: int, teacher_id: int, payload) -> Soal:
-        """Edit langsung (isi soal tidak ditulis LLM; sesudah simpan, validator memverifikasi ulang). Hanya berlaku untuk soal berdiri sendiri (stimulus_id kosong, biasanya LOTS)."""
+        """Edit langsung isi soal (LOTS maupun HOTS); sesudah simpan, validator memverifikasi ulang. Stimulus HOTS diedit lewat edit_stimulus."""
         await self._ensure_soal_owner(soal_id, teacher_id)
         soal = await self.repo.get_soal_by_id(soal_id)
         if soal is None:
             raise NotFoundException("soal tidak ditemukan")
-        if soal.stimulus_id is not None:
-            raise BadRequestException("soal ini punya stimulus, koreksi lewat POST /quizzer/teacher/soal/stimulus/regenerate/{soal_id}")
+        await self._ensure_quiz_editable(soal.quiz_request_id)
 
         touched = False
         try:
@@ -300,7 +338,7 @@ class QuizService:
                 merged = {**_readable_dict(soal), **(soal.markup or {})}
                 merged.update({key: value for key, value in text_fields.items() if value is not None})
                 merged.update(payload.markup or {})
-                problems = quizzer_readable.fields_issues(merged)
+                problems = quizzer_readable.fields_issues(merged) or math_text.plain_text_issues(_sent_texts(payload))
                 if problems:
                     raise BadRequestException("Markup tidak valid: " + "; ".join(problems))
                 try:
@@ -331,6 +369,58 @@ class QuizService:
             updated = await self.repo.get_soal_by_id(soal_id)
         return updated
 
+    async def edit_stimulus(self, soal_id: int, teacher_id: int, payload) -> list[Soal]:
+        """Edit langsung stimulus pada bentuk aslinya; bacaan diturunkan ulang dan seluruh soal di cluster diverifikasi ulang. Tidak ada yang disimpan bila editan tidak valid."""
+        await self._ensure_soal_owner(soal_id, teacher_id)
+        target = await self.repo.get_soal_by_id(soal_id)
+        if target is None:
+            raise NotFoundException("soal tidak ditemukan")
+        if target.stimulus_id is None:
+            raise BadRequestException("soal ini tidak punya stimulus")
+        await self._ensure_quiz_editable(target.quiz_request_id)
+        stimulus = await self.repo.get_stimulus_by_id(target.stimulus_id)
+        if stimulus is None:
+            raise NotFoundException("stimulus tidak ditemukan")
+        typed = stimulus.jenis != "teks" and bool(stimulus.spesifikasi)
+        if typed and payload.spesifikasi is None:
+            raise BadRequestException("stimulus ini bertipe; kirim spesifikasi")
+        if not typed and payload.source_markup is None:
+            raise BadRequestException("stimulus ini teks; kirim source_markup")
+
+        cluster = list(await self.repo.get_soal_by_stimulus(stimulus.id))
+        blocks = await self.repo.get_blocks_for_chapter(stimulus.chapter_id)
+        rows = [{"reading_order": b.reading_order, "block_type": b.block_type, "readable_text": b.readable_text} for b in blocks]
+        current = {
+            "jenis": stimulus.jenis, "spesifikasi": stimulus.spesifikasi,
+            "readable_text": stimulus.readable_text, "source_markup": stimulus.source_markup or "",
+        }
+        edit = {"narasi": payload.narasi, "spesifikasi": payload.spesifikasi} if typed else {"source_markup": payload.source_markup}
+        try:
+            result = await asyncio.to_thread(
+                quizzer_regenerate.compute_stimulus_edit,
+                rows, target.source_reading_order_start, target.source_reading_order_end,
+                current, [_review_dict(s) for s in cluster], edit,
+            )
+        except ValueError as exc:
+            raise BadRequestException(str(exc))
+        except Exception:
+            logger.exception("edit stimulus soal %s gagal", soal_id)
+            raise BadRequestException("Edit stimulus gagal, coba lagi.")
+
+        try:
+            new = result["new_stimulus"]
+            await self.repo.update_stimulus_text(
+                stimulus, new["readable_text"], new["source_markup"], new["ringkasan"], new["tabel"], new.get("spesifikasi"),
+            )
+            for soal in cluster:
+                soal.review_status = "edited"
+                soal.review_priority, soal.validation_notes = _review_flags(result["soal_issues"].get(soal.id, []))
+            await self.db.commit()
+        except Exception:
+            await self.db.rollback()
+            raise
+        return list(await self.repo.get_soal_by_stimulus(stimulus.id))
+
     async def _refresh_review_flags(self, soal: Soal) -> None:
         """Verifikasi ulang soal yang diedit guru (jawab buta + audit) lalu perbarui tanda review; tidak pernah menggagalkan simpan."""
         try:
@@ -358,6 +448,7 @@ class QuizService:
             raise NotFoundException("soal tidak ditemukan")
         if target_soal.stimulus_id is None:
             raise BadRequestException("soal ini tidak punya stimulus, edit langsung lewat PATCH /soal/{id}")
+        await self._ensure_quiz_editable(target_soal.quiz_request_id)
 
         stimulus = await self.repo.get_stimulus_by_id(target_soal.stimulus_id)
         cluster = await self.repo.get_soal_by_stimulus(target_soal.stimulus_id)
@@ -376,6 +467,7 @@ class QuizService:
                 target_soal.source_reading_order_start, target_soal.source_reading_order_end,
                 stimulus.source_markup or "", stimulus.readable_text, _soal_to_dict(target_soal),
                 [_soal_to_dict(s) for s in sibling_soal], feedback,
+                stimulus.jenis, stimulus.spesifikasi,
             )
         except Exception:
             logger.exception("regenerasi soal %s gagal", soal_id)
@@ -386,6 +478,7 @@ class QuizService:
                 await self.repo.update_stimulus_text(
                     stimulus, result["new_stimulus"]["readable_text"], result["new_stimulus"]["source_markup"],
                     result["new_stimulus"]["ringkasan"], result["new_stimulus"]["tabel"],
+                    result["new_stimulus"].get("spesifikasi"),
                 )
 
             for sid, data, issues in result["soal_updates"]:
@@ -553,6 +646,12 @@ class QuizService:
         if not progress or progress.is_done:
             raise BadRequestException("Sesi kuis telah selesai, jawaban tidak dapat diubah.")
 
+        quiz = await self.repo.get_quiz_request(soal.quiz_request_id)
+        if quiz is not None and progress.started_at is not None:
+            deadline = min(progress.started_at + timedelta(minutes=quiz.max_duration_minutes), quiz.end_time)
+            if datetime.now(timezone.utc) > deadline + SUBMIT_GRACE:
+                raise BadRequestException("Waktu pengerjaan kuis telah habis, jawaban tidak dapat diubah.")
+
         existing = await self.repo.get_soal_jawaban(soal_id, student_id)
         is_correct = payload.selected_option.upper() == soal.correct_option.upper()
         if existing is not None:
@@ -570,7 +669,7 @@ class QuizService:
         else:
             try:
                 await self.db.commit()
-                await self.repo.create_soal_jawaban(soal_id, student_id, payload.selected_option, is_correct, payload.langkah)
+                await self.repo.create_soal_jawaban(soal_id, student_id, payload.selected_option, is_correct, payload.langkah or [])
                 await self.db.commit()
             except Exception as e:
                 await self.db.rollback()

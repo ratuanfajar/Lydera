@@ -1,22 +1,12 @@
 import pytest
 
-from annoter import annoter_pipeline, resilience
+from annoter import annoter_pipeline
 from annoter.annotate import Annotated, WindowResult
-
-
-class SystemicError(resilience.SYSTEMIC_ERRORS[0]):
-    def __init__(self):
-        Exception.__init__(self, "jaringan putus")
 
 
 @pytest.fixture
 def window_names():
     return ["p0000-0002", "p0003-0005", "p0006-0008", "p0009-0011"]
-
-
-@pytest.fixture
-def systemic_error():
-    return SystemicError
 
 
 @pytest.fixture

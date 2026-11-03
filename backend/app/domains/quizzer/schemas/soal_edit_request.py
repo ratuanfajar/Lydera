@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 OPTION_LABELS = {"A", "B", "C", "D"}
 MIN_FEEDBACK_CHARS = 3
@@ -39,6 +39,20 @@ class SoalEditRequest(BaseModel):
         if value is not None and (set(value) != OPTION_LABELS or not all(text.strip() for text in value.values())):
             raise ValueError("options harus tepat berisi A, B, C, dan D dengan teks tidak kosong")
         return value
+
+
+class StimulusEditRequest(BaseModel):
+    source_markup: str | None = None
+    narasi: str | None = None
+    spesifikasi: dict | None = None
+
+    @model_validator(mode="after")
+    def exactly_one_form(self):
+        if (self.source_markup is None) == (self.spesifikasi is None):
+            raise ValueError("kirim tepat satu: source_markup (stimulus teks) atau spesifikasi (stimulus bertipe)")
+        if self.source_markup is not None and self.narasi is not None:
+            raise ValueError("narasi hanya untuk stimulus bertipe (bersama spesifikasi)")
+        return self
 
 
 class SoalRegenerateRequest(BaseModel):

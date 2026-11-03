@@ -111,7 +111,7 @@ class AnswerEvaluator:
 
 
 def needs_evaluation(jawaban: SoalJawaban) -> bool:
-    return not jawaban.is_correct and (jawaban.evaluated_at is None or jawaban.justification_points is None)
+    return not jawaban.is_correct and bool(jawaban.langkah) and jawaban.evaluated_at is None
 
 
 def _failure_key(jawaban_id: int) -> str:

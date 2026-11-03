@@ -51,13 +51,25 @@ def build_segments(chapter_id, blocks) -> list[Segment]:
         ))
     return segments
 
+VISUAL_TYPES = ("image", "table")
+
 
 def span_text(blocks, order_start: int, order_end: int) -> str:
     """Teks blok pada rentang reading_order ditambah margin blok di kedua sisi, margin dikurangi bila melebihi SOURCE_MAX_CHARS."""
+    return _join(_span_rows(blocks, order_start, order_end))
+
+
+def visual_kinds(blocks, order_start: int, order_end: int) -> tuple[str, ...]:
+    """Jenis blok visual (image, table) pada jendela sumber yang sama dengan span_text, berurutan tetap."""
+    present = {row["block_type"] for row in _span_rows(blocks, order_start, order_end)}
+    return tuple(kind for kind in VISUAL_TYPES if kind in present)
+
+
+def _span_rows(blocks, order_start: int, order_end: int) -> list[dict]:
     rows = sorted(blocks, key=lambda b: b["reading_order"])
     inside = [i for i, b in enumerate(rows) if order_start <= b["reading_order"] <= order_end]
     if not inside:
-        return ""
+        return []
     low, high = inside[0], inside[-1] + 1
     start, end = max(0, low - config.SOURCE_MARGIN_BLOCKS), min(len(rows), high + config.SOURCE_MARGIN_BLOCKS)
     while (start < low or end > high) and len(_join(rows[start:end])) > config.SOURCE_MAX_CHARS:
@@ -65,7 +77,7 @@ def span_text(blocks, order_start: int, order_end: int) -> str:
             start += 1
         else:
             end -= 1
-    return _join(rows[start:end])
+    return rows[start:end]
 
 
 def _chars(rows) -> int:

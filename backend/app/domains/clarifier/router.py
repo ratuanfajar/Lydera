@@ -26,6 +26,22 @@ from app.domains.clarifier.schemas.chat import ChatSessionQuery, ChatSessionResp
 router_clarifier = APIRouter(prefix="/clarifier", tags=["clarifier"], route_class=WrappedRoute)
 
 
+def _answer_payload(result: dict) -> dict:
+    return {
+        "status": result["status"],
+        "message": result["message"],
+        "message_markup": result.get("message_markup"),
+        "rumus": result.get("rumus") or [],
+        "tabel": result.get("tabel"),
+        "tabel_bacaan": result.get("tabel_bacaan"),
+        "tabel_ringkasan": result.get("tabel_ringkasan"),
+        "sources": result.get("sources"),
+        "suggested_questions": result.get("suggested_questions"),
+        "latihan": result.get("latihan"),
+        "scope_klass": result["scope"]["klass"],
+    }
+
+
 @router_clarifier.post(
     "/chapters/{chapter_id}/reindex",
     description=(
@@ -109,17 +125,8 @@ async def ask_question(
         result = await service.ask(session_id, student.profile_id, payload.question)
     except ValueError as e:
         raise BadRequestException(str(e))
-    return Response(
-        message=get_response_message(),
-        data={
-            "status": result["status"],
-            "message": result["message"],
-            "message_markup": result.get("message_markup"),
-            "sources": result.get("sources"),
-            "suggested_questions": result.get("suggested_questions"),
-            "scope_klass": result["scope"]["klass"],
-        },
-    )
+    return Response(message=get_response_message(), data=_answer_payload(result))
+
 
 @router_clarifier.get(
     "/sessions",

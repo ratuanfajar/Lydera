@@ -4,6 +4,7 @@ import re
 
 import httpx
 
+from common import guardrails
 from clarifier import config
 from clarifier import trusted_domains
 
@@ -50,6 +51,8 @@ def fetch_results(query: str) -> list[dict]:
 
 
 def _is_usable(result: dict) -> bool:
+    if guardrails.injection_markers(f"{result['title']} {result['snippet']}", strict=False):
+        return False
     return bool(result["snippet"]) and trusted_domains.is_trusted(result["url"]) and result["score"] >= config.OER_MIN_SCORE
 
 

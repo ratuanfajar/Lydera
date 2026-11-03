@@ -13,7 +13,7 @@ Bacaan rumus untuk TalkBack dibuat LLM (`common/formula.py`, dipakai Annoter dan
 - `common/formula_check.spoken_issues` memeriksa bacaan terhadap struktur LaTeX di kode: simbol atau angka tersisa, penutup kurang atau berlebih, kurung tidak seimbang atau beruntun, notasi fungsi sederhana yang masih memakai kurung. `convert_checked` mencoba ulang sekali dengan temuan sebagai koreksi.
 - Rumus yang masih bermasalah ditandai: Annoter memberi `review_priority` tinggi; Quizzer membawa temuan sebagai catatan soal (tanpa regenerasi otomatis). Rumus kompleks (bersarang dalam atau panjang) di Quizzer juga ditandai.
 - Rumus memakai versi cache sendiri (`FORMULA_PROMPT_VERSION`) supaya cache tabel dan gambar Annoter tidak terhapus.
-- Saklar `QUIZ_MARKUP_ENABLED` (bawaan mati): soal berumus dengan LaTeX dan tabel hanya aktif bila dinyalakan; bawaannya Quizzer menulis soal dengan kata. Dinyalakan setelah uji dengar nyata.
+- Saklar `QUIZ_MARKUP_ENABLED` (bawaan mati saat ADR ini ditulis; sejak 2026-11-02 bawaan nyala, lihat ADR 0012): soal berumus dengan LaTeX dan tabel hanya aktif bila dinyalakan; bawaannya Quizzer menulis soal dengan kata. Dinyalakan setelah uji dengar nyata.
 - Set uji lintas kategori disimpan di `ai-services/common/eval/` (`formula_cases.json` 62 rumus, `formula_cases_heldout.json` 49 rumus).
 
 ## Hasil evaluasi (3 ulangan per rumus; `gpt-5.4-mini`; juri rekonstruksi `grok-4.3`)

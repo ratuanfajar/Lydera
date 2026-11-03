@@ -1,7 +1,7 @@
 import re
 
-from annoter.phrases import UNCERTAIN_READING
-from common.notation_check import has_raw_notation
+from common.phrases import UNCERTAIN_READING
+from common.notation_check import has_raw_notation, raw_notation_snippets
 
 UNIT_NAMES = {
     "m": "meter", "cm": "sentimeter", "mm": "milimeter", "km": "kilometer", "g": "gram", "kg": "kilogram", "l": "liter",
@@ -43,6 +43,31 @@ def speakable(text: str) -> str:
     for symbol, words in SYMBOL_WORDS.items():
         text = text.replace(symbol, words)
     return SPACE_BEFORE_PUNCTUATION.sub(r"\1", re.sub(r"\s+", " ", text)).strip()
+
+
+MARKDOWN_MARKS = re.compile(r"\*|`|\||\]\(|<[A-Za-z/][^>]*>|^\s*•", re.MULTILINE)
+HEADING_MARK = re.compile(r"^\s*#", re.MULTILINE)
+EXTRA_SYMBOLS = (*SYMBOL_WORDS, *SUPERSCRIPTS, "<", ">", "\\", "π")
+
+
+def _raw_snippets(text: str) -> list[str]:
+    found = [*raw_notation_snippets(text), *(symbol for symbol in EXTRA_SYMBOLS if symbol in text)]
+    found += [match.group(0) for match in (LEFTOVER_SLASH.search(text), LETTER_MINUS_DIGIT.search(text)) if match]
+    return list(dict.fromkeys(found))
+
+
+def manual_reading_issues(text: str) -> list[str]:
+    """Temuan pada teks bacaan yang ditulis tangan: kosong, markdown, atau notasi mentah (dengan potongan yang bermasalah)."""
+    if not text or not text.strip():
+        return ["Teks bacaan tidak boleh kosong."]
+    issues = []
+    if MARKDOWN_MARKS.search(text) or HEADING_MARK.search(text):
+        issues.append("Teks bacaan memuat simbol markdown yang akan dibaca TalkBack sebagai simbol.")
+    snippets = _raw_snippets(text)
+    if snippets:
+        shown = ", ".join(repr(snippet) for snippet in snippets[:5])
+        issues.append(f"Teks bacaan memuat simbol atau rumus mentah ({shown}); tulis dengan kata, atau bungkus rumus dengan tanda dolar pada soal dan stimulus.")
+    return issues
 
 
 def description_issues(text: str) -> list[str]:

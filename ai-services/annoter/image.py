@@ -4,8 +4,9 @@ from dataclasses import dataclass
 from annoter import config as annoter_config
 from annoter import prompts
 from annoter.preprocess import Block
-from annoter.speakable import speakable
+from common.speakable import speakable
 from common import cache, config, llm
+from common.image_describe import describe_cached
 
 NO_KIND = ""
 DECORATIVE = "dekoratif"
@@ -48,13 +49,8 @@ def resolve_final(final: dict) -> tuple[str, bool]:
 
 
 def _describe(block: Block, context: str, prompt_kind: str) -> str:
-    key = _key(block, prompt_kind)
-    cached = cache.get("image", *key)
-    if cached is None:
-        system = prompts.image_system() if prompt_kind == GENERAL else prompts.image_kind_system(prompt_kind)
-        cached = llm.complete_vision(system, prompts.image_input(block.caption, context), block.image_path)
-        cache.put("image", cached, *key)
-    return cached
+    system = prompts.image_system() if prompt_kind == GENERAL else prompts.image_kind_system(prompt_kind)
+    return describe_cached(system, prompts.image_input(block.caption, context), _key(block, prompt_kind), lambda: block.image_path)
 
 
 def _classify(block: Block, context: str) -> dict:

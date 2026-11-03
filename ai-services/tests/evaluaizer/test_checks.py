@@ -1,143 +1,101 @@
 import pytest
 
-from evaluaizer import checks, evaluate
+from evaluaizer import checks
 
-STEPS = 3
-OPTIONS = 2
+STEPS = ["Panjang dikali lebar.", "Dua belas kali lima sama dengan enam puluh.", "Jadi enam puluh."]
 
 
 @pytest.fixture
 def good():
     return {
-        "divergence_step": 2,
-        "error_type": "salah_hitung",
-        "diagnosis": "Kesalahan hitung di langkah dua.",
-        "justification_points": [
-            {"point": "Langkah pertama sudah benar.", "step_ref": 1, "is_divergence": False},
-            {"point": "Jawaban benar adalah lima.", "step_ref": None, "is_divergence": True},
-        ],
+        "penilaian_langkah": v(False, False, False), "dapat_ditentukan": True, "langkah_ke": 1, "kutipan": "Panjang dikali lebar.",
+        "keterangan": "Pada langkah pertama, panjang dikalikan lebar sehingga menghasilkan luas, bukan keliling.",
     }
 
 
+def v(*flags):
+    return list(flags)
+
+
 def issues(result, steps=STEPS):
-    return checks.result_issues(result, steps, OPTIONS)
+    return checks.result_issues(result, steps)
 
 
-def with_points(result, points):
-    return dict(result, justification_points=points)
-
-
-def points_with_first(point, **extra):
-    return [dict(point=point, **extra), {"point": "b", "step_ref": None}]
-
-
-def test_result_issues_hasil_valid_tanpa_masalah(good):
+def test_hasil_valid_tanpa_masalah(good):
     assert issues(good) == []
 
 
-@pytest.mark.parametrize(
-    "override",
-    [
-        {"divergence_step": 4},
-        {"divergence_step": 0},
-        {"divergence_step": True},
-        {"error_type": "ngawur"},
-        {"diagnosis": " "},
-        {"justification_points": []},
-        {"justification_points": "x"},
-    ],
-)
-def test_result_issues_menolak_field_tidak_valid(good, override):
-    assert issues(dict(good, **override))
+def test_tidak_dapat_ditentukan_valid_bila_langkah_dan_kutipan_kosong():
+    result = {"penilaian_langkah": None, "dapat_ditentukan": False, "langkah_ke": None, "kutipan": None, "keterangan": "Hanya tertulis satu bilangan, letak kesalahan tidak dapat ditentukan."}
+    assert issues(result, ["15"]) == []
 
 
-@pytest.mark.parametrize(
-    "points",
-    [
-        [{"point": "a", "step_ref": 3}, {"point": "b", "step_ref": None}],
-        [{"point": "", "step_ref": None}, {"point": "b", "step_ref": None}],
-        [{"point": "x" * 500, "step_ref": None}, {"point": "b", "step_ref": None}],
-        ["teks", "teks"],
-        points_with_first("Hasilnya x = 3 + 4", step_ref=None),
-        points_with_first("**Tebal** kata", step_ref=None),
-        points_with_first("Catatan langkah siswa tidak disertakan.", step_ref=None),
-    ],
-)
-def test_result_issues_menolak_poin_tidak_valid(good, points):
-    assert issues(with_points(good, points))
+def test_semua_langkah_benar_valid_dengan_langkah_ke_kosong():
+    result = {"penilaian_langkah": v(True, True, True), "dapat_ditentukan": True, "langkah_ke": None, "kutipan": None, "keterangan": "Langkah siswa sesuai, tetapi opsi yang dipilih berbeda dari hasilnya."}
+    assert issues(result) == []
 
 
-def test_result_issues_menerima_kata_langkah_kamu_pada_poin_divergensi(good):
-    points = points_with_first("Langkah kamu tidak tepat di bagian ini.", step_ref=None, is_divergence=True)
-    assert issues(with_points(good, points)) == []
+@pytest.mark.parametrize("override", [
+    {"dapat_ditentukan": "ya"},
+    {"dapat_ditentukan": False},
+    {"langkah_ke": 0},
+    {"langkah_ke": 4},
+    {"langkah_ke": True},
+    {"kutipan": None},
+    {"kutipan": ""},
+    {"kutipan": "Luas dikali lebar."},
+    {"langkah_ke": None},
+    {"keterangan": ""},
+    {"keterangan": "a" * 600},
+])
+def test_struktur_salah_dilaporkan(good, override):
+    assert issues({**good, **override})
 
 
-def test_result_issues_tanpa_langkah_siswa_menerima_divergensi_kosong(good):
-    none = dict(good, divergence_step=None, error_type="tanpa_langkah")
-    assert issues(none, steps=0) == []
+def test_kutipan_boleh_berupa_potongan_dan_beda_spasi_atau_tanda_baca(good):
+    assert issues({**good, "kutipan": "panjang   dikali lebar"}) == []
+    assert issues({**good, "penilaian_langkah": v(True, False, False), "langkah_ke": 2, "kutipan": "dua belas kali lima"}) == []
 
 
-def test_result_issues_tanpa_langkah_siswa_menolak_divergensi_berisi(good):
-    assert issues(dict(good), steps=0)
+@pytest.mark.parametrize("text", [
+    "Langkah menulis 3x sama dengan lima belas.",
+    "Langkah menulis x = 3 padahal seharusnya lima.",
+    "Langkah ini memakai **tebal** pada hasilnya.",
+    "Apakah hasilnya sudah benar?",
+    "Hasil pembagian tiga belas belas dibaca keliru.",
+    "Langkah kunci menyebut hasil lima.",
+    "Langkah ini memuat kata Yunani α di hasil.",
+])
+def test_keterangan_bermasalah_ditolak(good, text):
+    assert issues({**good, "keterangan": text})
 
 
-def test_result_issues_tanpa_langkah_menolak_bila_siswa_punya_langkah(good):
-    none = dict(good, divergence_step=None, error_type="tanpa_langkah")
-    assert issues(none)
+def test_kata_ulang_yang_wajar_tidak_ditolak(good):
+    assert issues({**good, "keterangan": "Dua belas kali lima sama dengan enam puluh, bukan sama dengan lima puluh."}) == []
 
 
-@pytest.mark.parametrize(
-    "points",
-    [
-        [{"point": "a", "step_ref": None, "is_divergence": False}, {"point": "b", "step_ref": None, "is_divergence": False}],
-        [{"point": "a", "is_divergence": True}, {"point": "b", "is_divergence": True}],
-        [{"point": "a", "is_divergence": "ya"}, {"point": "b", "is_divergence": True}],
-        [{"point": "Kamu memakai penjumlahan вместо perkalian", "is_divergence": True}, {"point": "b"}],
-        [{"point": "Nilai 3x dipakai", "is_divergence": True}, {"point": "b"}],
-        [{"point": "Sesuai langkah kunci pertama.", "is_divergence": True}, {"point": "b"}],
-    ],
-)
-def test_result_issues_menolak_penanda_divergensi_dan_teks_bermasalah(good, points):
-    assert issues(with_points(good, points))
+def test_kutipan_dengan_awalan_nomor_langkah_tetap_dianggap_berdasar(good):
+    assert issues({**good, "kutipan": "1. Panjang dikali lebar."}) == []
+    assert checks.strip_numbering("3) Terus dua ratus") == "Terus dua ratus"
 
 
-@pytest.mark.parametrize("point", ["Opsi B, yaitu Rp150.000, benar.", "Harganya 150.000 rupiah"])
-def test_result_issues_menerima_angka_dan_opsi_pada_poin_divergensi(good, point):
-    points = [{"point": point, "is_divergence": True}, {"point": "b"}]
-    assert issues(with_points(good, points)) == []
+def test_keterangan_tak_dapat_ditentukan_boleh_menyebut_tidak_ada_langkah_perhitungan():
+    result = {"penilaian_langkah": None, "dapat_ditentukan": False, "langkah_ke": None, "kutipan": None,
+              "keterangan": "Tertulis x nya tiga tanpa menunjukkan proses; tidak ada langkah perhitungan sehingga letak kesalahan tidak dapat ditentukan."}
+    assert issues(result, ["Langsung ketemu x nya 3."]) == []
 
 
-def test_normalize_mengubah_nomor_langkah_string_menjadi_int():
-    normalized = evaluate._normalize({"divergence_step": "2", "justification_points": [{"point": "p", "step_ref": "1"}, "bukan dict"]})
-    assert normalized["divergence_step"] == 2
-    assert normalized["justification_points"][0]["step_ref"] == 1
+@pytest.mark.parametrize("verdicts, step, quote", [
+    (v(True, False, False), 3, "Jadi enam puluh."),
+    (v(True, True, True), 1, "Panjang dikali lebar."),
+    (v(False, True, True), None, None),
+    (v(True, False), 2, "Dua belas kali lima sama dengan enam puluh."),
+    (None, 1, "Panjang dikali lebar."),
+    ([True, "salah", False], 3, "Jadi enam puluh."),
+])
+def test_langkah_ke_harus_konsisten_dengan_penilaian_langkah(good, verdicts, step, quote):
+    assert issues({**good, "penilaian_langkah": verdicts, "langkah_ke": step, "kutipan": quote})
 
 
-def test_finish_membersihkan_poin_dan_menandai_perlu_review(good):
-    result = dict(
-        good,
-        error_type="ngawur",
-        justification_points=[
-            {"point": " satu ", "step_ref": "x", "is_divergence": True},
-            {"point": "", "step_ref": 1},
-            {"point": "dua", "step_ref": 9},
-        ],
-    )
-    finished = evaluate._finish(result, ["masalah"], STEPS, OPTIONS)
-    assert finished["error_type"] == "lainnya"
-    assert finished["needs_review"] is True
-    assert finished["justification_points"] == [
-        {"point": "satu", "step_ref": None, "is_divergence": True},
-        {"point": "dua", "step_ref": None, "is_divergence": False},
-    ]
-    assert finished["personalized_justification"] == "Poin satu. satu Poin dua. dua"
-
-
-def test_finish_membuang_nomor_langkah_di_luar_jangkauan(good):
-    assert evaluate._finish(dict(good, divergence_step=9), [], STEPS, OPTIONS)["divergence_step"] is None
-
-
-@pytest.mark.parametrize("empty", [[], "x", [{"point": " "}]])
-def test_finish_gagal_bila_tidak_ada_poin_valid(good, empty):
-    with pytest.raises(ValueError):
-        evaluate._finish(dict(good, justification_points=empty), [], STEPS, OPTIONS)
+def test_langkah_ke_sama_dengan_false_pertama_valid(good):
+    assert issues({**good, "penilaian_langkah": v(True, False, False), "langkah_ke": 2, "kutipan": "Dua belas kali lima"}) == []

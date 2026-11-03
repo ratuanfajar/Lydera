@@ -28,6 +28,7 @@ dependencies = [
     "httpx>=0.27.0",
     "aiosmtplib>=5.1.3",
     "azure-identity>=1.25.3",
+    "resvg-py>=0.5.0",
 ]
 
 # Torch/torchvision ditarik dari index CUDA (cu126) agar GPU terpakai.
@@ -52,10 +53,7 @@ pythonpath = ["ai-services", "backend"]
 [dependency-groups]
 dev = [
     "ipykernel>=7.3.0",
-    "langchain-openai<0.4",
     "nbformat>=5.11.1",
-    "pandas>=3.0.5",
     "pytest>=9.2.0",
-    "ragas<0.4",
 ]
 

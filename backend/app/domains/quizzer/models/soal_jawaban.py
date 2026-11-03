@@ -17,10 +17,13 @@ class SoalJawaban(Base):
     is_correct: Mapped[bool] = mapped_column(nullable=False)
     # created_at (dari Base/TimestampMixin) merangkap sebagai waktu submit -- tidak perlu kolom sendiri.
 
-    # Diisi belakangan oleh Chain 5 (evaluate_scratchwork), hanya untuk jawaban salah --
-    # evaluated_at null berarti belum dievaluasi; justification_points null pada baris lama memicu evaluasi ulang satu kali.
+    # Diisi belakangan oleh evaluate_scratchwork, hanya untuk jawaban salah yang punya langkah siswa --
+    # evaluated_at null berarti belum dievaluasi. divergence_step = langkah_ke, diagnosis = keterangan.
     divergence_step: Mapped[Optional[int]] = mapped_column(Integer)
     diagnosis: Mapped[Optional[str]] = mapped_column(Text)
+    letak_kutipan: Mapped[Optional[str]] = mapped_column(Text)
+    letak_dapat_ditentukan: Mapped[Optional[bool]] = mapped_column()
+    # Tidak lagi diisi sejak spec 0009 (dihapus di migrasi terpisah).
     personalized_justification: Mapped[Optional[str]] = mapped_column(Text)
     error_type: Mapped[Optional[str]] = mapped_column(Text)
     justification_points: Mapped[Optional[list]] = mapped_column(JSONB(none_as_null=True))

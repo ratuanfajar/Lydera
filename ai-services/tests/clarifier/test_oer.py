@@ -195,8 +195,8 @@ def test_search_oer_tanpa_kunci_tidak_tersedia(monkeypatch):
     assert external_tools.search_oer("x")["available"] is False
 
 
-def test_tools_schema_berisi_tiga_tool_berurutan():
-    assert [t["function"]["name"] for t in tools.TOOLS_SCHEMA] == ["search_module", "search_oer", "compose_answer"]
+def test_tools_schema_berisi_empat_tool_berurutan():
+    assert [t["function"]["name"] for t in tools.TOOLS_SCHEMA] == ["search_module", "search_oer", "request_practice", "compose_answer"]
 
 
 def test_compose_answer_hanya_menerima_sumber_modul_dan_oer():

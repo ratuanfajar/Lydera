@@ -3,6 +3,7 @@ from common import llm
 
 REVISE_SOAL_MAX_TOKENS = 3072
 REVISE_STIMULUS_MAX_TOKENS = 1536
+REVISE_TYPED_STIMULUS_MAX_TOKENS = 10240
 RECHECK_SOAL_MAX_TOKENS = 3072
 
 
@@ -26,6 +27,16 @@ def revise_stimulus(source_text, stimulus_text: str, feedback: str) -> str:
         required_keys=["readable_text"], latex=True,
     )
     return data["readable_text"]
+
+
+def revise_stimulus_typed(source_text, stimulus_text: str, jenis: str, spec: dict, feedback: str) -> dict:
+    """Chain 3.5b untuk stimulus bertipe: edit narasi dan spesifikasi; jenis tidak boleh berubah."""
+    prompt = prompts.revise_stimulus_typed_input(source_text, stimulus_text, jenis, spec, feedback)
+    data = llm.complete_json(
+        prompts.REVISE_STIMULUS_TYPED_SYSTEM, prompt, model=config.QUIZ_MODEL, max_tokens=REVISE_TYPED_STIMULUS_MAX_TOKENS,
+        required_keys=["spesifikasi"], latex=True,
+    )
+    return {"jenis": jenis, "narasi": data.get("narasi") or "", "spesifikasi": data["spesifikasi"]}
 
 
 def recheck_soal_for_new_stimulus(source_text, new_stimulus_text: str, soal: dict) -> dict:

@@ -43,6 +43,16 @@ def derive_message(text: str) -> tuple[str, str | None, list[str]]:
     return spoken, (None if found else text), found
 
 
+def formula_pairs(text: str) -> list[dict]:
+    """Pasangan {latex, bacaan} untuk tiap rumus unik di teks berisi $...$, urut kemunculan; bacaan sama dengan yang ada di `message`."""
+    pairs, seen = [], set()
+    for is_math, content in math_text.split_math(text):
+        if is_math and content.strip() and content not in seen:
+            seen.add(content)
+            pairs.append({"latex": content, "bacaan": math_text.convert_checked(content)[0]})
+    return pairs
+
+
 def plain_text(text: str) -> str:
     """Bacaan darurat tanpa verbalizer: simbol diganti kata dan tidak ada sisa sintaks LaTeX."""
     text = text.replace("\\$", " dolar ").replace("$", " ")

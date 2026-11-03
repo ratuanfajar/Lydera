@@ -1,11 +1,13 @@
 from typing import Sequence
 
 from sqlalchemy import delete, exists, select
+from sqlalchemy.orm import selectinload
 
 from app.core.db import AsyncSession
 from app.domains.classrooms.models.classroom import Classroom
 from app.domains.contents.models import Block, Chapter, Module, ModuleStatus
 from app.domains.clarifier.models import BlockEmbedding, ChapterKb, ChatMessage, ChatSession
+from app.domains.quizzer.models import QuizProgress, QuizRequest
 from app.domains.users.models.student import student_classrooms
 from app.domains.clarifier.schemas.chat import ChatSessionResponseWithMessage
 
@@ -54,6 +56,39 @@ class ChatbotRepository:
             .where(student_classrooms.c.student_id == student_id)
         )
         return bool(await self.db.scalar(stmt))
+
+    async def get_started_unfinished_quizzes(self, classroom_id: int, student_id: int) -> Sequence[tuple[QuizProgress, QuizRequest]]:
+        stmt = (
+            select(QuizProgress, QuizRequest)
+            .join(QuizRequest, QuizRequest.id == QuizProgress.quiz_request_id)
+            .where(
+                QuizRequest.classroom_id == classroom_id,
+                QuizProgress.student_id == student_id,
+                QuizProgress.started_at.is_not(None),
+                QuizProgress.is_done.is_(False),
+            )
+        )
+        return (await self.db.execute(stmt)).all()
+
+    async def get_visual_blocks_for_references(self, classroom_id: int, references: list[int]) -> dict[int, list[Block]]:
+        """Blok tabel dan gambar (bukan dekoratif) pada chunk yang dirujuk tiap `reference` (id blok pertama chunk), hanya dari modul publish di kelas."""
+        if not references:
+            return {}
+        chunk_stmt = (
+            select(BlockEmbedding.block_ids)
+            .join(Chapter, Chapter.id == BlockEmbedding.chapter_id)
+            .join(Module, Module.id == Chapter.module_id)
+            .where(Module.classroom_id == classroom_id, Module.status == ModuleStatus.PUBLISH, BlockEmbedding.block_ids[1].in_(references))
+        )
+        chunks = {ids[0]: list(ids) for ids in (await self.db.scalars(chunk_stmt)).all() if ids}
+        wanted = {block_id for ids in chunks.values() for block_id in ids}
+        if not wanted:
+            return {}
+        block_stmt = select(Block).where(
+            Block.id.in_(wanted), Block.block_type.in_(("table", "image")), Block.image_kind.is_distinct_from("dekoratif"),
+        ).order_by(Block.reading_order)
+        by_id = {block.id: block for block in (await self.db.scalars(block_stmt)).all()}
+        return {reference: [by_id[i] for i in ids if i in by_id] for reference, ids in chunks.items()}
 
     # --- Knowledge base (embeddings) ---
 

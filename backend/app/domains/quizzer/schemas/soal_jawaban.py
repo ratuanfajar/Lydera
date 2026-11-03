@@ -1,11 +1,16 @@
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class SoalSubmitRequest(BaseModel):
     selected_option: str = Field(pattern="^[A-D]$")
-    langkah: list[Annotated[str, Field(max_length=1000)]] | None = Field(default_factory=list, max_length=30)
+    langkah: list[Annotated[str, Field(max_length=1000)]] | None = Field(default=None, max_length=30)
+
+    @field_validator("langkah")
+    @classmethod
+    def drop_blank_steps(cls, value):
+        return None if value is None else [step.strip() for step in value if step.strip()]
 
 class SoalJawabanLangkahResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -18,18 +23,11 @@ class SoalSubmitResponse(BaseModel):
     status: str
 
 
-class JustificationPoint(BaseModel):
-    point: str
-    step_ref: int | None = None
-    is_divergence: bool = False
-
-
-class SoalJustification(BaseModel):
-    divergence_step: int | None
-    error_type: str | None = None
-    diagnosis: str
-    points: list[JustificationPoint] = []
-    personalized_justification: str
+class LetakKesalahan(BaseModel):
+    dapat_ditentukan: bool
+    langkah_ke: int | None = None
+    kutipan: str | None = None
+    keterangan: str
     perlu_ditinjau: bool = False
 
 
@@ -41,7 +39,7 @@ class QuizResultItem(BaseModel):
     kesimpulan: str
     langkah_kunci: list[str]
     is_correct: bool | None
-    justification: SoalJustification | None
+    letak_kesalahan: LetakKesalahan | None
     evaluasi_gagal: bool = False
     evaluasi_diproses: bool = False
     langkah: list[SoalJawabanLangkahResponse]

@@ -4,6 +4,8 @@ CLOSE_ROOT = "selesai akar"
 CLOSE_FRACTION = "selesai pecahan"
 CLOSE_POWER = "selesai pangkat"
 
+STRAY_MARKS = re.compile(r"[?!]")
+EMPTY_SCRIPT = re.compile(r"[_^]\s*\{\s*\}")
 LEFTOVER_SYMBOLS = re.compile(r"[0-9^_{}\\+=×÷√∠△≤≥≠±∓∘∪∩∈∞Ͱ-Ͽ]")
 ATOM = r"-?(?:[A-Za-z0-9.,]+|\\[A-Za-z]+)"
 SIMPLE_ATOM = re.compile(ATOM)
@@ -40,12 +42,21 @@ def has_named_point(latex: str) -> bool:
     return False
 
 
+def source_issues(latex: str) -> list[str]:
+    """Temuan pada rumus sumber yang tampak rusak oleh OCR, terlepas dari bacaannya."""
+    if EMPTY_SCRIPT.search(latex):
+        return ["Rumus sumber memuat subskrip atau superskrip kosong; kemungkinan salah OCR, periksa terhadap sumber."]
+    return []
+
+
 def spoken_issues(latex: str, spoken: str) -> list[str]:
     """Periksa bacaan rumus terhadap strukturnya: simbol tersisa, penutup akar/pecahan/pangkat, kurung seimbang dan tidak beruntun."""
     issues = []
     text = " ".join(spoken.split()).lower()
     if LEFTOVER_SYMBOLS.search(text):
         issues.append("Bacaan masih memuat angka atau simbol; tulis semuanya dengan kata.")
+    if STRAY_MARKS.search(text):
+        issues.append("Bacaan memuat tanda tanya atau seru; tulis hanya lafal rumus tanpa kata atau tanda di luar rumus.")
     for name, marker, (needed, total) in (
         ("akar", CLOSE_ROOT, _roots(latex)),
         ("pecahan", CLOSE_FRACTION, _fractions(latex)),

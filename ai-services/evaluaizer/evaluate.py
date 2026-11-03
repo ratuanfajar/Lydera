@@ -1,34 +1,38 @@
 import logging
 
-from common import llm
+from common import guardrails, llm
 from evaluaizer import checks, config, prompts
 
 logger = logging.getLogger(__name__)
 
-ORDINALS = ("satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan")
-REQUIRED_KEYS = ["divergence_step", "error_type", "diagnosis", "justification_points"]
+INJECTION_ISSUE = "Langkah siswa memuat kalimat yang meniru instruksi kepada model; periksa manual."
+REQUIRED_KEYS = ["penilaian_langkah", "dapat_ditentukan", "langkah_ke", "kutipan", "keterangan"]
 
 
 def evaluate_scratchwork(source_text: str, stimulus_text: str, question_text: str, options: dict, correct_option: str,
                          correct_langkah: list[str], kesimpulan: str, student_option: str, student_langkah: list[str]) -> dict:
-    """Jelaskan letak kesalahan siswa pada jawaban salah sebagai poin bernomor; satu perbaikan bila pemeriksa kode menemukan masalah."""
+    """Tunjukkan letak kesalahan pada langkah tertulis siswa untuk jawaban salah; satu perbaikan bila pemeriksa kode menemukan masalah."""
+    steps = [prompts.clean_step(text) for text in student_langkah[:prompts.MAX_STUDENT_STEPS]]
+    if not steps:
+        raise ValueError("siswa tidak menulis langkah; evaluasi hanya untuk jawaban salah yang punya langkah")
     user = prompts.build_user(
         source_text, stimulus_text, question_text, options, correct_option, correct_langkah, kesimpulan,
-        student_option, student_langkah,
+        student_option, steps,
     )
+    flagged = [INJECTION_ISSUE] if guardrails.injection_markers("\n".join(student_langkah[:prompts.MAX_STUDENT_STEPS])) else []
     first = _normalize(_ask(user))
-    first_issues = _issues(first, student_langkah, correct_langkah)
+    first_issues = checks.result_issues(first, steps)
     if not first_issues:
-        return _finish(first, [], len(student_langkah), len(correct_langkah))
+        return _finish(first, flagged)
     best, best_issues = first, first_issues
     try:
         second = _normalize(_ask(prompts.correction_input(user, first, first_issues)))
-        second_issues = _issues(second, student_langkah, correct_langkah)
+        second_issues = checks.result_issues(second, steps)
         if len(second_issues) < len(first_issues):
             best, best_issues = second, second_issues
     except Exception:
         logger.warning("perbaikan evaluasi gagal; memakai hasil pertama", exc_info=True)
-    return _finish(best, best_issues, len(student_langkah), len(correct_langkah))
+    return _finish(best, [*best_issues, *flagged])
 
 
 def _ask(user: str) -> dict:
@@ -38,17 +42,8 @@ def _ask(user: str) -> dict:
     )
 
 
-def _issues(result: dict, student_langkah: list[str], correct_langkah: list[str]) -> list[str]:
-    return checks.result_issues(result, len(student_langkah), len(correct_langkah))
-
-
 def _normalize(result: dict) -> dict:
-    result["divergence_step"] = _as_int(result.get("divergence_step"))
-    points = result.get("justification_points")
-    if isinstance(points, list):
-        for point in points:
-            if isinstance(point, dict):
-                point["step_ref"] = _as_int(point.get("step_ref"))
+    result["langkah_ke"] = _as_int(result.get("langkah_ke"))
     return result
 
 
@@ -58,29 +53,16 @@ def _as_int(value):
     return value
 
 
-def _in_range(value, upper: int):
-    return value if isinstance(value, int) and not isinstance(value, bool) and 1 <= value <= upper else None
-
-
-def _finish(result: dict, issues: list[str], student_steps: int, key_steps: int) -> dict:
-    raw_points = result["justification_points"] if isinstance(result.get("justification_points"), list) else []
-    points = [
-        {
-            "point": str(point["point"]).strip(), "step_ref": _in_range(point.get("step_ref"), key_steps),
-            "is_divergence": point.get("is_divergence") is True,
-        }
-        for point in raw_points[:len(ORDINALS)] if isinstance(point, dict) and str(point.get("point") or "").strip()
-    ]
-    if not points:
-        raise ValueError("evaluasi tidak menghasilkan poin penjelasan yang dapat dipakai")
+def _finish(result: dict, issues: list[str]) -> dict:
+    determinable = result.get("dapat_ditentukan") is True
+    step = result.get("langkah_ke") if determinable and isinstance(result.get("langkah_ke"), int) else None
+    quote = checks.strip_numbering(str(result["kutipan"])) if step is not None and result.get("kutipan") else None
+    keterangan = str(result.get("keterangan") or "").strip()
+    if not keterangan:
+        raise ValueError("evaluasi tidak menghasilkan keterangan yang dapat dipakai")
+    if guardrails.leaks_instructions(f"{keterangan} {result.get('kutipan') or ''}"):
+        raise ValueError("evaluasi memuat isi instruksi sistem")
     return {
-        "divergence_step": _in_range(result["divergence_step"], student_steps),
-        "error_type": result["error_type"] if result["error_type"] in config.ERROR_TYPES else "lainnya",
-        "diagnosis": str(result.get("diagnosis") or "").strip(),
-        "justification_points": points,
-        "personalized_justification": " ".join(
-            f"Poin {ORDINALS[number - 1]}. {point['point']}" for number, point in enumerate(points, start=1)
-        ),
-        "needs_review": bool(issues),
-        "issues": issues,
+        "dapat_ditentukan": determinable, "langkah_ke": step, "kutipan": quote, "keterangan": keterangan,
+        "needs_review": bool(issues), "issues": issues,
     }

@@ -1,6 +1,6 @@
 # 0009. Evaluaizer: justifikasi berpoin dengan pemeriksa kode
 
-- Status: diterima
+- Status: digantikan oleh [0013](0013-evaluaizer-hanya-letak-kesalahan.md) (2026-11-03)
 - Tanggal: 2026-10
 
 ## Konteks

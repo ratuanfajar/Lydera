@@ -5,7 +5,7 @@ from app.domains.evaluaizer.evaluation import AnswerEvaluator, needs_evaluation
 from app.domains.quizzer.models import SoalJawaban
 from app.domains.quizzer.models.quiz_progress import QuizReviewStatus
 from app.domains.quizzer.repositories.interface import QuizRepositoryInterface
-from app.domains.quizzer.schemas import JustificationPoint, QuizResultItem, SoalJustification
+from app.domains.quizzer.schemas import LetakKesalahan, QuizResultItem
 from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 
@@ -77,7 +77,7 @@ class EvaluaizerService:
                 kesimpulan=soal.kesimpulan,
                 langkah_kunci=[l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
                 is_correct=jawaban.is_correct if jawaban else None,
-                justification=_justification(jawaban),
+                letak_kesalahan=_letak_kesalahan(jawaban),
                 evaluasi_gagal=failed,
                 evaluasi_diproses=processing,
                 langkah=[
@@ -88,14 +88,13 @@ class EvaluaizerService:
         return results
 
 
-def _justification(jawaban: SoalJawaban | None) -> SoalJustification | None:
-    if jawaban is None or jawaban.is_correct or needs_evaluation(jawaban):
+def _letak_kesalahan(jawaban: SoalJawaban | None) -> LetakKesalahan | None:
+    if jawaban is None or jawaban.is_correct or jawaban.evaluated_at is None or jawaban.letak_dapat_ditentukan is None:
         return None
-    return SoalJustification(
-        divergence_step=jawaban.divergence_step,
-        error_type=jawaban.error_type,
-        diagnosis=jawaban.diagnosis or "",
-        points=[JustificationPoint(**point) for point in (jawaban.justification_points or [])],
-        personalized_justification=jawaban.personalized_justification or "",
+    return LetakKesalahan(
+        dapat_ditentukan=jawaban.letak_dapat_ditentukan,
+        langkah_ke=jawaban.divergence_step,
+        kutipan=jawaban.letak_kutipan,
+        keterangan=jawaban.diagnosis or "",
         perlu_ditinjau=jawaban.needs_review,
     )
