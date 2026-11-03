@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, Path, status, Body
+from fastapi import APIRouter, Depends, Path, Query, status, Body
 from app.core.security import CurrentUser, Roles
 from app.core.route import WrappedRoute
 from typing import Annotated
-from app.domains.users.depedencies import get_user_service, get_teacher_service, get_student_service
+from app.domains.users.dependencies import get_user_service, get_teacher_service, get_student_service
 from app.domains.users.services import UserService, TeacherService, StudentService
 from app.domains.classrooms.services import ClassroomService
 from app.domains.classrooms.depedencies import get_classroom_service
@@ -14,16 +14,22 @@ from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.domains.contents.schemas.module.student_module_request import StudentModuleRequest
 from app.domains.contents.schemas.module.student_module_response import StudentModuleResponse, StudentModuleWithoutChaptersResponse
 from app.domains.contents.schemas.module.student_module_detail_request import StudentModuleDetailRequest
-from app.domains.contents.schemas.chapters.student_chapter_detail_response import StudentChapterDetailResponse
-from app.domains.users.schemas.taecher_dashboard_request import TeacherDashboardRequest
-from app.domains.users.schemas.taecher_dashboard_response import TeacherDashboardResponse
+from app.domains.contents.schemas.chapters.student_chapter_detail_response import (
+    StudentChapterDetailResponse,
+    StudentChapterDetailV2Response,
+)
+from app.domains.users.schemas.teacher_dashboard_request import TeacherDashboardRequest
+from app.domains.users.schemas.teacher_dashboard_response import TeacherDashboardResponse
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
 from app.domains.contents.schemas.module.teacher_module_response import TeacherModuleResponse, TeacherModuleWithoutChapterResponse
 from app.domains.contents.schemas.module.teacher_module_detail_request import TeacherModuleDetailRequest
-from app.domains.contents.schemas.blocks.block_response import BlockResponse
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
-from app.domains.contents.depedencies import get_content_service
-from app.domains.contents.services import ContentService
+from app.domains.contents.depedencies import get_module_service, get_chapter_service
+from app.domains.contents.services.module_service import ModuleService
+from app.domains.contents.services.chapter_service import ChapterService
+from app.domains.quizz.depedencies import get_quiz_service
+from app.domains.quizz.services.quiz_request_service import QuizRequestService
+from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 
 router_user = APIRouter(prefix="/users", tags=["users"], route_class=WrappedRoute)
 
@@ -109,7 +115,7 @@ async def get_teacher_dashboard(
 async def get_all_modules_teacher(
     query: Annotated[TeacherModuleRequest, Depends()],
     teacher: Roles(Role.TEACHER),
-    service: TeacherService = Depends(get_teacher_service),
+    service: ModuleService = Depends(get_module_service),
 ):    
     result = await service.get_teacher_modules(
         query,
@@ -129,7 +135,7 @@ async def get_module_teacher(
     query: Annotated[TeacherModuleDetailRequest, Depends()],
     teacher: Roles(Role.TEACHER),
     module_id:int,
-    service: TeacherService = Depends(get_teacher_service),
+    service: ModuleService = Depends(get_module_service),
 ):    
     result = await service.get_teacher_module(
         query,
@@ -150,7 +156,7 @@ async def delete_module_teacher(
     query: Annotated[TeacherModuleDetailRequest, Depends()],
     teacher: Roles(Role.TEACHER),
     module_id:int,
-    service: ContentService = Depends(get_content_service),
+    service: ModuleService = Depends(get_module_service),
 ):    
     result = await service.delete_module(
         teacher.profile_id,
@@ -172,9 +178,9 @@ async def delete_module_teacher(
 async def get_chapter_by_id(
     chapter_id: int,
     teacher: Roles(Role.TEACHER),
-    teacher_service: TeacherService = Depends(get_teacher_service),
+    service: ChapterService = Depends(get_chapter_service),
 ):
-    result = await teacher_service.get_chapter_by_id(chapter_id, teacher.profile_id)
+    result = await service.get_chapter_by_id(chapter_id, teacher.profile_id)
     return Response(
         message="Chapter berhasil didapat",
         data=result
@@ -182,6 +188,7 @@ async def get_chapter_by_id(
 
 # Student
 router_student = APIRouter(prefix="/students", tags=["students"], route_class=WrappedRoute)
+router_student_v2 = APIRouter(prefix="/v2/students", tags=["students-v2"], route_class=WrappedRoute)
 
 @router_student.post(
     "",
@@ -228,7 +235,7 @@ async def get_student_dashboard(
 async def get_student_dashboard_task(
     query: Annotated[StudentTaskRequest, Depends()],
     student: Roles(Role.STUDENT),
-    service: StudentService = Depends(get_student_service),
+    service: QuizRequestService = Depends(get_quiz_service),
 ):    
     result = await service.get_tasks_student(
         query,
@@ -247,7 +254,7 @@ async def get_student_dashboard_task(
 async def get_all_modules_student(
     query: Annotated[StudentModuleRequest, Depends()],
     student: Roles(Role.STUDENT),
-    service: StudentService = Depends(get_student_service),
+    service: ModuleService = Depends(get_module_service),
 ):    
     result = await service.get_student_modules(
         query,
@@ -267,7 +274,7 @@ async def get_detail_module_student(
     module_id: Annotated[int, Path()],
     query: Annotated[StudentModuleDetailRequest, Depends()],
     student: Roles(Role.STUDENT),
-    service: StudentService = Depends(get_student_service),
+    service: ModuleService = Depends(get_module_service),
 ):    
     result = await service.get_student_module(
         query,
@@ -287,7 +294,7 @@ async def get_detail_module_student(
 async def get_detail_chapter_student(
     chapter_id: Annotated[int, Path()],
     student: Roles(Role.STUDENT),
-    service: StudentService = Depends(get_student_service),
+    service: ChapterService = Depends(get_chapter_service),
 ):    
     result = await service.start_chapter(
         student_id=student.profile_id,
@@ -298,6 +305,29 @@ async def get_detail_chapter_student(
         data=result
     )
 
+@router_student_v2.post(
+    "/chapters/{chapter_id}/start",
+    response_model=Response[StudentChapterDetailV2Response],
+    description="Requires the STUDENT role. Paginated blocks (10 per page default).",
+)
+async def get_detail_chapter_student_v2(
+    chapter_id: Annotated[int, Path()],
+    student: Roles(Role.STUDENT),
+    page: Annotated[int, Query(ge=1)] = 1,
+    per_page: Annotated[int, Query(ge=1, le=50)] = 10,
+    service: ChapterService = Depends(get_chapter_service),
+):
+    result = await service.start_chapter_v2(
+        student_id=student.profile_id,
+        chapter_id=chapter_id,
+        page=page,
+        per_page=per_page,
+    )
+    return Response(
+        message="Berhasil mendapatkan data detail chapter",
+        data=result,
+    )
+
 @router_student.post(
     "/chapters/{chapter_id}/mark-complete",
     response_model=Response[bool],
@@ -306,7 +336,7 @@ async def get_detail_chapter_student(
 async def mark_chapter(
     chapter_id: Annotated[int, Path()],
     student: Roles(Role.STUDENT),
-    service: StudentService = Depends(get_student_service),
+    service: ChapterService = Depends(get_chapter_service),
 ):    
     result = await service.mark_chapter_as_completed(
         student_id=student.profile_id,
