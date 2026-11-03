@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, Path, status, Body
+from fastapi import APIRouter, Depends, Path, Query, status, Body
 from app.core.security import CurrentUser, Roles
 from app.core.route import WrappedRoute
-from typing import Annotated
+from typing import Annotated, Optional
 from app.domains.users.depedencies import get_user_service, get_teacher_service, get_student_service
 from app.domains.users.services import UserService, TeacherService, StudentService
 from app.domains.classrooms.services import ClassroomService
@@ -24,6 +24,9 @@ from app.domains.contents.schemas.blocks.block_response import BlockResponse
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
 from app.domains.contents.depedencies import get_content_service
 from app.domains.contents.services import ContentService
+from app.domains.contents.schemas.record_note.record_note_create import RecordNoteCreate
+from app.domains.contents.schemas.record_note.record_note_request import RecordNoteRequest
+from app.domains.contents.schemas.record_note.record_note_response import RecordNoteResponse
 
 router_user = APIRouter(prefix="/users", tags=["users"], route_class=WrappedRoute)
 
@@ -314,6 +317,45 @@ async def mark_chapter(
     )
     return Response(
         message="Selamat telah menyelesaikan chapter",
+        data=result
+    )
+
+
+@router_student.get(
+    "/record-note",
+    response_model=Response[Optional[RecordNoteResponse]],
+    description="Requires the STUDENT role.",
+)
+async def get_record_note_chapter(
+    query: Annotated[RecordNoteRequest, Query()],
+    student: Roles(Role.STUDENT),
+    service: ContentService = Depends(get_content_service),
+):    
+    result = await service.get_record_note(
+        student_id=student.profile_id,
+        chapter_id=query.chapter_id
+    )
+    return Response(
+        message="Berhasil mendapatkan data catatan",
+        data=result
+    )
+
+@router_student.post(
+    "/record-note",
+    response_model=Response[RecordNoteResponse],
+    description="Requires the STUDENT role.",
+)
+async def save_note(
+    student: Roles(Role.STUDENT),
+    body: Annotated[RecordNoteCreate, Body()],
+    service: ContentService = Depends(get_content_service),
+):    
+    result = await service.save_record_note(
+        student_id=student.profile_id,
+        dto=body
+    )
+    return Response(
+        message="Berhasil menyimpan catatan",
         data=result
     )
 

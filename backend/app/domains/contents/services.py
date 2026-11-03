@@ -6,10 +6,12 @@ from app.utils import paths
 from app.domains.jobs.repositories.interface import JobRepositoryInterface
 from app.tasks.file_tasks import cleanup_module_files_task
 from app.domains.contents.schemas.cp_response import CpResponse
+from app.domains.contents.schemas.record_note.record_note_response import RecordNoteResponse
+from app.domains.contents.schemas.record_note.record_note_create import RecordNoteCreate
 paths.setup()
 from annotation import annotation_regenerate
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 from app.domains.contents.models import Block, Fase, Module, Chapter, Cp, ModuleStatus
 from app.domains.contents.repositories.interface import ContentRepositoryInterface
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
@@ -237,6 +239,19 @@ class ContentService:
         raw_blocks_data = self._load_annotated(path)
         blocks_data = self._combine_annotated_blocks(raw_blocks_data, MAX_BLOCK_CHARS)
         return blocks_data
+
+    async def get_record_note(self, chapter_id:int, student_id:int) -> Optional[RecordNoteResponse]: 
+        result = await self.repo.get_note_by_chapter_id(chapter_id, student_id)
+
+        if result is None:
+            return None
+        
+        return RecordNoteResponse.model_validate(result)
+
+    async def save_record_note(self, dto: RecordNoteCreate, student_id:int) -> RecordNoteResponse: 
+        result = await self.repo.save_note(student_id, dto)
+        await self.db.commit()
+        return RecordNoteResponse.model_validate(result)
 
     @staticmethod
     def _load_annotated(annotated_path:str):

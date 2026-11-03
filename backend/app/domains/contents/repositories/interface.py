@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 
-from typing import Sequence
+from typing import Optional, Sequence
 from app.domains.contents.models import Block, Module, Fase, Cp, Chapter, ModuleStatus
 from app.domains.contents.schemas.module.student_module_request import StudentModuleStatus
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleStatus
 from app.domains.contents.schemas.blocks.regenerate_response import RegenerateResponse
+from app.domains.contents.models.record_note import RecordNote
+from app.domains.contents.schemas.record_note.record_note_create import RecordNoteCreate
 
 class ContentRepositoryInterface(ABC):
     # Block
@@ -68,4 +70,10 @@ class ContentRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_current_max_order(self, chapter_id: int) -> int: raise NotImplementedError
+
+    @abstractmethod
+    async def get_note_by_chapter_id(self, chapter_id: int, student_id:int) -> Optional[RecordNote]: raise NotImplementedError
+
+    @abstractmethod
+    async def save_note(self, student_id:int, record_note_create: RecordNoteCreate) -> RecordNote: raise NotImplementedError
     
