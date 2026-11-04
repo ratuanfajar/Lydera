@@ -17,7 +17,7 @@ from app.core.db import AsyncSessionLocal
 from app.domains.jobs.models import Job
 from app.domains.jobs.repositories.repository import JobRepository
 from app.domains.contents.repositories.repository import ContentRepository
-from app.domains.contents.services import ContentService
+from app.domains.contents.services import ChapterService
 from app.tasks.chatbot_tasks import reindex_chapter_task
 
 MAX_RETRIES = 3
@@ -113,12 +113,11 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
             # 3. Database Ingestion
             await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
             content_repo = ContentRepository(db)
-            job_repo = JobRepository(db)
-            content_service = ContentService(content_repo, job_repo, db)
+            chapter_service = ChapterService(content_repo, content_repo, db)
 
             total_blocks = 0
             for json_path in list_json_paths:
-                blocks_inserted = await content_service.ingest_annotated_json(json_path, chapter_id, teacher_id)
+                blocks_inserted = await chapter_service.ingest_annotated_json(json_path, chapter_id, teacher_id)
                 total_blocks += blocks_inserted
             annotation_output_dir = Path(out_dir).parent
             relative_json_paths = [

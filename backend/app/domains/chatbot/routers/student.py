@@ -1,80 +1,35 @@
-from __future__ import annotations
-
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Path as FastAPIPath, Query, status
 
-from app.core.response import Response, get_response_message, COMMON_VALIDATION_RESPONSES
+from app.core.response import COMMON_VALIDATION_RESPONSES, Response, get_response_message
 from app.core.route import WrappedRoute
 from app.core.security import Roles
-from app.utils.role import Role
 from app.domains.chatbot.depedencies import get_chatbot_service
-from app.core.exceptions import ForbiddenException
 from app.domains.chatbot.schemas import (
     ChatAnswerResponse,
     ChatAskRequest,
     ChatMessageResponse,
     ChatSessionCreate,
     ChatSessionResponse,
-    ReindexClassroomQueuedResponse,
-    ReindexQueuedResponse,
 )
-from app.domains.chatbot.services import ChatbotService
-from app.tasks.chatbot_tasks import reindex_chapter_task, reindex_classroom_task
 from app.domains.chatbot.schemas.chat import ChatSessionQuery, ChatSessionResponseWithMessage
+from app.domains.chatbot.services import ChatbotService
+from app.utils.role import Role
 
-router_chatbot = APIRouter(prefix="/chatbot", tags=["chatbot"], route_class=WrappedRoute)
-
-
-@router_chatbot.post(
-    "/chapters/{chapter_id}/reindex",
-    description=(
-        "Requires the TEACHER role. Bangun ulang knowledge base (embedding) chatbot untuk bab ini -- "
-        "panggil setelah publish/edit modul supaya jawaban chatbot ikut sumber terbaru. Diproses "
-        "async lewat taskiq (mirip quiz generator), supaya request ini tidak menunggu batch call "
-        "embedding API selesai."
-    ),
-    response_model=Response[ReindexQueuedResponse],
-    status_code=status.HTTP_202_ACCEPTED,
-    responses=COMMON_VALIDATION_RESPONSES,
+router_chatbot_student = APIRouter(
+    prefix="/chatbot",
+    tags=["chatbot"],
+    route_class=WrappedRoute,
 )
-async def reindex_chapter(
-    _: Roles(Role.TEACHER),
-    chapter_id: Annotated[int, FastAPIPath()],
-):
-    await reindex_chapter_task.kiq(chapter_id=chapter_id)
-    return Response(message=get_response_message(), data={"chapter_id": chapter_id, "status": "queued"})
 
 
-@router_chatbot.post(
-    "/classrooms/{classroom_id}/reindex",
-    description=(
-        "Requires the TEACHER role. Reindex SEMUA chapter published di satu classroom sekaligus -- "
-        "supaya tidak perlu panggil reindex per-chapter manual satu-satu. Tiap chapter tetap "
-        "diproses sebagai task terpisah (lihat app/tasks/chatbot_tasks.py)."
-    ),
-    response_model=Response[ReindexClassroomQueuedResponse],
-    status_code=status.HTTP_202_ACCEPTED,
-    responses=COMMON_VALIDATION_RESPONSES,
-)
-async def reindex_classroom(
-    teacher: Roles(Role.TEACHER),
-    classroom_id: Annotated[int, FastAPIPath()],
-    service: ChatbotService = Depends(get_chatbot_service),
-):
-    is_owner = await service.verify_classroom_teacher(classroom_id, teacher.profile_id)
-    if not is_owner:
-        raise ForbiddenException("Anda bukan pengajar classroom ini.")
-    await reindex_classroom_task.kiq(classroom_id=classroom_id)
-    return Response(message=get_response_message(), data={"classroom_id": classroom_id, "status": "queued"})
-
-
-@router_chatbot.post(
+@router_chatbot_student.post(
     "/sessions",
     description=(
-        "Requires the STUDENT role. Mulai sesi tanya-jawab baru, di-scope ke satu classroom -- "
-        "retrieval otomatis lintas semua chapter published di classroom itu, tidak perlu pilih "
-        "chapter_id manual."
+        "Requires the STUDENT role. Mulai sesi tanya-jawab baru, di-scope ke satu "
+        "classroom -- retrieval otomatis lintas semua chapter published di classroom "
+        "itu, tidak perlu pilih chapter_id manual."
     ),
     response_model=Response[ChatSessionResponse],
     status_code=status.HTTP_201_CREATED,
@@ -86,10 +41,13 @@ async def create_session(
     service: ChatbotService = Depends(get_chatbot_service),
 ):
     session = await service.start_session(student.profile_id, payload.classroom_id)
-    return Response(message=get_response_message(), data={"id": session.id, "classroom_id": session.classroom_id})
+    return Response(
+        message=get_response_message(),
+        data={"id": session.id, "classroom_id": session.classroom_id},
+    )
 
 
-@router_chatbot.post(
+@router_chatbot_student.post(
     "/sessions/{session_id}/messages",
     description="Requires the STUDENT role. Ajukan pertanyaan ke chatbot dalam sesi ini.",
     response_model=Response[ChatAnswerResponse],
@@ -114,7 +72,8 @@ async def ask_question(
         },
     )
 
-@router_chatbot.get(
+
+@router_chatbot_student.get(
     "/sessions",
     description="Requires the STUDENT role. Riwayat sesi.",
     response_model=Response[list[ChatSessionResponseWithMessage]],
@@ -128,11 +87,11 @@ async def list_sessions(
     sessions = await service.list_session(query.classroom_id, student.profile_id)
     return Response(
         message=get_response_message(),
-        data=sessions
+        data=sessions,
     )
 
 
-@router_chatbot.get(
+@router_chatbot_student.get(
     "/sessions/{session_id}/messages",
     description="Requires the STUDENT role. Riwayat pesan dalam sesi ini.",
     response_model=Response[list[ChatMessageResponse]],

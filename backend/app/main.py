@@ -13,7 +13,6 @@ from app.core.config import settings
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import IntegrityError
 
-from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import app.core.model_registry
 from fastapi.encoders import jsonable_encoder
@@ -24,21 +23,32 @@ from app.core.exceptions import AppException
 from app.core.response import Response
 from app.domains.cities.router import router as router_city
 from app.domains.schools.router import router as router_school
-from app.domains.users.router import router_user, router_student, router_teacher, router_student_v2
-from app.domains.classrooms.router import router_classrooms, router_classrooms_types
-from app.domains.contents.router import router_blocks, router_chapters, router_fases, router_modules, router_cps
-from app.domains.quizz.router import router_teacher_quizz, router_student_quizz
-from app.domains.otp.router import router_reset_password
+from app.domains.users.routers import router_student, router_teacher, router_user
+from app.domains.classrooms.routers import router_classrooms, router_classrooms_types
+from app.domains.contents.routers import (
+    router_blocks,
+    router_chapters,
+    router_cps,
+    router_fases,
+    router_modules,
+    router_student_contents,
+    router_student_contents_v2,
+    router_teacher_contents,
+)
+from app.domains.quizz.routers import router_student_quizz, router_teacher_quizz
+from app.domains.otp.router import router_otp
 from app.core.redis import close_redis_client, get_redis_client
-from app.domains.chatbot.router import router_chatbot
+from app.domains.chatbot.routers import router_chatbot_student, router_chatbot_teacher
 
 api_router = APIRouter(prefix="/api")
 api_router.include_router(router_city)
 api_router.include_router(router_school)
 api_router.include_router(router_user)
 api_router.include_router(router_student)
-api_router.include_router(router_student_v2)
+api_router.include_router(router_student_contents_v2)
 api_router.include_router(router_teacher)
+api_router.include_router(router_student_contents)
+api_router.include_router(router_teacher_contents)
 api_router.include_router(router_teacher_quizz)
 api_router.include_router(router_student_quizz)
 api_router.include_router(router_classrooms_types)
@@ -48,8 +58,9 @@ api_router.include_router(router_modules)
 api_router.include_router(router_chapters)
 api_router.include_router(router_fases)
 api_router.include_router(router_cps)
-api_router.include_router(router_chatbot)
-api_router.include_router(router_reset_password)
+api_router.include_router(router_chatbot_teacher)
+api_router.include_router(router_chatbot_student)
+api_router.include_router(router_otp)
 
 
 

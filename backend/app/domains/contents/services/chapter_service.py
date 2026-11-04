@@ -1,7 +1,6 @@
 import json
 import math
 from pathlib import Path
-from sqlalchemy import select
 
 from app.core.config import DEFAULT_AI_OUTPUT_DIR
 from app.core.db import AsyncSession

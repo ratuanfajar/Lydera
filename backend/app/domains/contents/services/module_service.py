@@ -1,6 +1,6 @@
 from app.core.exceptions import ForbiddenException, NotFoundException
 from app.domains.contents.repositories.interfaces.module_interface import ModuleRepositoryInterface
-from app.domains.contents.schemas.module.student_module_request import StudentModuleRequest, StudentModuleStatus
+from app.domains.contents.schemas.module.student_module_request import StudentModuleRequest
 from app.domains.contents.schemas.module.student_module_detail_request import StudentModuleDetailRequest
 from app.domains.contents.schemas.module.student_module_response import StudentModuleResponse, StudentModuleWithoutChaptersResponse
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleRequest
