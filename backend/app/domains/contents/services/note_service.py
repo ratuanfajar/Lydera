@@ -2,15 +2,15 @@ from typing import Optional
 
 from app.core.db import AsyncSession
 from app.domains.contents.models.record_note import RecordNote
-from app.domains.contents.repositories.interfaces.content_interface import (
-    ContentRepositoryInterface,
+from app.domains.contents.repositories.interfaces.note_interface import (
+    NoteRepositoryInterface,
 )
 from app.domains.contents.schemas.record_note.record_note_create import RecordNoteCreate
 from app.domains.contents.schemas.record_note.record_note_response import RecordNoteResponse
 
 
 class RecordNoteService:
-    def __init__(self, repo: ContentRepositoryInterface, db: AsyncSession):
+    def __init__(self, repo: NoteRepositoryInterface, db: AsyncSession):
         self.repo = repo
         self.db = db
 

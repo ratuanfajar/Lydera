@@ -6,7 +6,8 @@ from redis.asyncio import Redis
 
 from app.core.taskiq import broker
 from app.core.db import AsyncSessionLocal
-from app.domains.quizz.repositories.repository import QuizRepository
+from app.domains.quizz.repositories.quiz_request_repository import QuizRequestRepository
+from app.domains.quizz.repositories.soal_repository import SoalRepository
 
 from app.utils import paths
 from app.domains.quizz.schemas.quiz_request_teacher_response import QuizRequestQuestionResponse
@@ -29,7 +30,8 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
     loop = asyncio.get_running_loop()
 
     async with AsyncSessionLocal() as db:
-        repo = QuizRepository(db)
+        repo = QuizRequestRepository(db)
+        soal_repo = SoalRepository(db)
 
         quiz_request = await repo.get_quiz_request(quiz_request_id)
         if quiz_request is None:
@@ -152,7 +154,7 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
                 raise Exception(f"Gagal menyimpan quiz_request_id={quiz_request_id}")
 
             # 5. Load inserted records via repo and serialize with QuizRequestQuestionResponse
-            saved_soals = await repo.get_soal_for_request(quiz_request_id)
+            saved_soals = await soal_repo.get_soal_for_request(quiz_request_id)
             serialized_questions = [
                 QuizRequestQuestionResponse.model_validate(soal).model_dump(mode="json")
                 for soal in saved_soals

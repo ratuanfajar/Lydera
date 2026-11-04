@@ -16,7 +16,8 @@ from app.core.config import settings
 from app.core.db import AsyncSessionLocal
 from app.domains.jobs.models import Job
 from app.domains.jobs.repositories.repository import JobRepository
-from app.domains.contents.repositories.repository import ContentRepository
+from app.domains.contents.repositories.chapter_repository import ChapterRepository
+from app.domains.contents.repositories.module_repository import ModuleRepository
 from app.domains.contents.services import ChapterService
 from app.tasks.chatbot_tasks import reindex_chapter_task
 
@@ -112,8 +113,9 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
 
             # 3. Database Ingestion
             await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
-            content_repo = ContentRepository(db)
-            chapter_service = ChapterService(content_repo, content_repo, db)
+            chapter_repo = ChapterRepository(db)
+            module_repo = ModuleRepository(db)
+            chapter_service = ChapterService(chapter_repo, module_repo, db)
 
             total_blocks = 0
             for json_path in list_json_paths:

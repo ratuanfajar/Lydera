@@ -6,7 +6,7 @@ from app.core.config import DEFAULT_AI_OUTPUT_DIR
 from app.core.db import AsyncSession
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.domains.contents.models import Block, Chapter, Module, ModuleStatus
-from app.domains.contents.repositories.interfaces.content_interface import ContentRepositoryInterface
+from app.domains.contents.repositories.interfaces.chapter_interface import ChapterRepositoryInterface
 from app.domains.contents.repositories.interfaces.module_interface import ModuleRepositoryInterface
 from app.domains.contents.schemas.blocks.block_response import BlockResponse
 from app.domains.contents.schemas.chapters.chapter_detail_response import ChapterDetailResponse
@@ -23,7 +23,7 @@ PRIORITY_MAP = {"high": 3, "normal": 2, "low": 1}
 PRIORITY_REVERSE = {3: "high", 2: "normal", 1: "low"}
 
 class ChapterService:
-    def __init__(self, repo: ContentRepositoryInterface, module_repo: ModuleRepositoryInterface, db: AsyncSession):
+    def __init__(self, repo: ChapterRepositoryInterface, module_repo: ModuleRepositoryInterface, db: AsyncSession):
         self.repo = repo
         self.module_repo = module_repo
         self.db = db

@@ -4,7 +4,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.domains.contents.repositories.interfaces.module_interface import ModuleRepositoryInterface
-from app.domains.contents.repositories.interfaces.content_interface import ContentRepositoryInterface
 from app.domains.contents.schemas.module.student_module_request import StudentModuleStatus
 from app.domains.quizz.repositories.interfaces.quiz_request_interface import QuizRequestRepositoryInterface
 from app.domains.quizz.models.quiz_request import QuizRequest, QuizRequestStatus
@@ -29,7 +28,7 @@ class QuizRequestService:
     def __init__(
         self,
         repo: QuizRequestRepositoryInterface,
-        content_repo: ContentRepositoryInterface,
+        content_repo: ModuleRepositoryInterface,
         db: AsyncSession,
         redis: Redis,
     ):

@@ -5,10 +5,6 @@ from app.domains.users.repositories.repository import UserRepository, TeacherRep
 from app.domains.users.services import UserService, TeacherService, StudentService
 from app.domains.classrooms.depedencies import get_classroom_repository
 from app.domains.classrooms.repositories.repository import ClassroomRepository
-from app.domains.contents.repositories.repository import ContentRepository
-from app.domains.contents.depedencies import get_content_repository
-from app.domains.quizz.depedencies import get_quiz_repository
-from app.domains.quizz.repositories.repository import QuizRepository
 
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     return UserRepository(db)

@@ -12,8 +12,8 @@ from annotation import annotation_regenerate
 from app.core.db import AsyncSession
 from app.core.exceptions import BadRequestException
 from app.domains.contents.models import Block, Chapter, Module, ModuleStatus
-from app.domains.contents.repositories.interfaces.content_interface import (
-    ContentRepositoryInterface,
+from app.domains.contents.repositories.interfaces.block_interface import (
+    BlockRepositoryInterface,
 )
 from app.domains.contents.schemas.blocks.regenerate_request import RegenerateRequest
 from app.domains.contents.schemas.blocks.regenerate_response import (
@@ -24,7 +24,7 @@ from app.tasks.progress_tasks import enqueue_chapter_progress_reset_job
 
 
 class BlockService:
-    def __init__(self, repo: ContentRepositoryInterface, db: AsyncSession):
+    def __init__(self, repo: BlockRepositoryInterface, db: AsyncSession):
         self.repo = repo
         self.db = db
 

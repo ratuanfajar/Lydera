@@ -30,6 +30,3 @@ class ModuleRepositoryInterface(ABC):
 
     @abstractmethod
     async def publish_module(self, module_id: int, teacher_id: int) -> bool: raise NotImplementedError
-
-    @abstractmethod
-    async def verify_chapter_teacher(self, chapter_id: int, teacher_id: int) -> bool: raise NotImplementedError
