@@ -347,6 +347,45 @@ async def mark_chapter(
         data=result
     )
 
+
+@router_student.get(
+    "/record-note",
+    response_model=Response[Optional[RecordNoteResponse]],
+    description="Requires the STUDENT role.",
+)
+async def get_record_note_chapter(
+    query: Annotated[RecordNoteRequest, Query()],
+    student: Roles(Role.STUDENT),
+    service: ContentService = Depends(get_content_service),
+):    
+    result = await service.get_record_note(
+        student_id=student.profile_id,
+        chapter_id=query.chapter_id
+    )
+    return Response(
+        message="Berhasil mendapatkan data catatan",
+        data=result
+    )
+
+@router_student.post(
+    "/record-note",
+    response_model=Response[RecordNoteResponse],
+    description="Requires the STUDENT role.",
+)
+async def save_note(
+    student: Roles(Role.STUDENT),
+    body: Annotated[RecordNoteCreate, Body()],
+    service: ContentService = Depends(get_content_service),
+):    
+    result = await service.save_record_note(
+        student_id=student.profile_id,
+        dto=body
+    )
+    return Response(
+        message="Berhasil menyimpan catatan",
+        data=result
+    )
+
 # @router_student.get(
 #     "/modules/{module_id}",
 #     response_model=Response[StudentModuleResponse],
