@@ -4,7 +4,9 @@ from app.core.exceptions import BadRequestException, ForbiddenException, NotFoun
 from app.domains.evaluaizer.evaluation import AnswerEvaluator, needs_evaluation
 from app.domains.quizzer.models import SoalJawaban
 from app.domains.quizzer.models.quiz_progress import QuizReviewStatus
-from app.domains.quizzer.repositories.interface import QuizRepositoryInterface
+from app.domains.quizzer.repositories.interfaces.quiz_progress_interface import QuizProgressRepositoryInterface
+from app.domains.quizzer.repositories.interfaces.quiz_request_interface import QuizRequestRepositoryInterface
+from app.domains.quizzer.repositories.interfaces.soal_interface import SoalRepositoryInterface
 from app.domains.quizzer.schemas import LetakKesalahan, QuizResultItem
 from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
 from app.tasks.process_exam_review_tasks import process_exam_review_task
@@ -12,12 +14,14 @@ from app.domains.quizzer.schemas.quiz_request_query import QuizRequestStudentDet
 
 
 class EvaluaizerService:
-    def __init__(self, repo: QuizRepositoryInterface, evaluator: AnswerEvaluator):
-        self.repo = repo
+    def __init__(self, quiz_req_repo: QuizRequestRepositoryInterface, quiz_prog_repo: QuizProgressRepositoryInterface, quiz_soal_repo: SoalRepositoryInterface, evaluator: AnswerEvaluator):
+        self.quiz_soal_repo = quiz_soal_repo
+        self.quiz_prog_repo = quiz_prog_repo
+        self.quiz_req_repo = quiz_req_repo
         self.evaluator = evaluator
 
     async def get_student_quiz_result_from_teacher(self, quiz_request_id: int, query: QuizRequestStudentDetailQuery, teacher_id: int):
-        is_valid = await self.quiz_repo.validate_quiz_request(quiz_request_id, teacher_id, query.classroom_id)
+        is_valid = await self.quiz_req_repo.validate_quiz_request(quiz_request_id, teacher_id, query.classroom_id)
         if not is_valid:
             raise ForbiddenException("Quiz Request tidak ditemukan atau Anda tidak memiliki akses.")
     
@@ -25,11 +29,11 @@ class EvaluaizerService:
 
     async def get_quiz_results(self, quiz_request_id: int, student_id: int) -> list[QuizResultItem]:
         """Hasil kuis siswa; jawaban salah yang belum dievaluasi dievaluasi sekarang kecuali proses lain sedang mengerjakannya."""
-        quiz_request = await self.repo.get_quiz_request(quiz_request_id)
+        quiz_request = await self.quiz_req_repo.get_quiz_request(quiz_request_id)
         if quiz_request is None:
             raise NotFoundException("Quiz request tidak ditemukan.")
 
-        progress = await self.repo.get_quiz_progress(quiz_request_id, student_id)
+        progress = await self.quiz_prog_repo.get_quiz_progress(quiz_request_id, student_id)
         now = datetime.now(timezone.utc)
 
         # -------------------------------------------------------------
@@ -43,7 +47,7 @@ class EvaluaizerService:
             if now >= deadline:
                 # Trigger grading immediately
                 await process_exam_review_task(quiz_request_id, student_id)
-                await self.repo.refresh_quiz_progress(progress)
+                await self.quiz_req_repo.refresh_quiz_progress(progress)
 
         # -------------------------------------------------------------
         # EDGE CASE 2: Server Restart / Taskiq Job Crash Recovery
@@ -57,15 +61,15 @@ class EvaluaizerService:
         )
         if progress and (progress.review_status == QuizReviewStatus.FAILED or is_stuck):
             await process_exam_review_task(quiz_request_id, student_id)
-            await self.repo.refresh_quiz_progress(progress)
+            await self.quiz_req_repo.refresh_quiz_progress(progress)
 
         if not progress or not progress.is_done or progress.review_status != QuizReviewStatus.COMPLETED:
             raise BadRequestException("Kuis belum selesai dikerjakan atau hasil belum siap.")
 
         evaluation = await self.evaluator.evaluate(quiz_request_id, student_id)
 
-        soal_list = await self.repo.get_soal_for_request(quiz_request_id)
-        jawaban_list = await self.repo.get_jawaban_for_request(quiz_request_id, student_id)
+        soal_list = await self.quiz_soal_repo.get_soal_for_request(quiz_request_id)
+        jawaban_list = await self.quiz_prog_repo.get_jawaban_for_request(quiz_request_id, student_id)
         jawaban_by_soal = {j.soal_id: j for j in jawaban_list}
 
         failed_ids = set(evaluation.failed)
