@@ -140,7 +140,7 @@ class QuizTakingService:
         if not progress or progress.is_done:
             raise BadRequestException("Sesi kuis telah selesai, jawaban tidak dapat diubah.")
 
-        quiz = await self.repo.get_quiz_request(soal.quiz_request_id)
+        quiz = await self.quiz_repo.get_quiz_request(soal.quiz_request_id)
         if quiz is not None and progress.started_at is not None:
             deadline = min(progress.started_at + timedelta(minutes=quiz.max_duration_minutes), quiz.end_time)
             if datetime.now(timezone.utc) > deadline + SUBMIT_GRACE:

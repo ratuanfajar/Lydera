@@ -18,6 +18,7 @@ from app.domains.contents.schemas.chapters.student_chapter_detail_response impor
 )
 from app.tasks.progress_tasks import enqueue_chapter_progress_reset_job, enqueue_module_progress_job
 from app.utils import paths
+from app.domains.contents.repositories.interfaces.curriculum_interface import CurriculumRepositoryInterface
 paths.setup()
 
 from annoter import annoter_regenerate
@@ -37,9 +38,10 @@ CONTEXT_TYPES = {"text", "heading"}
 
 
 class ChapterService:
-    def __init__(self, repo: ChapterRepositoryInterface, module_repo: ModuleRepositoryInterface, db: AsyncSession):
+    def __init__(self, repo: ChapterRepositoryInterface, curi_repo: CurriculumRepositoryInterface, module_repo: ModuleRepositoryInterface, db: AsyncSession):
         self.repo = repo
         self.module_repo = module_repo
+        self.curi_repo = curi_repo
         self.db = db
         self.READING_ORDER_STEP = 10
 
@@ -57,7 +59,7 @@ class ChapterService:
                 raise NotFoundException("modul tidak ditemukan")
 
             if cp_id is not None:
-                cp = await self.repo.get_cp_by_id(cp_id)
+                cp = await self.curi_repo.get_cp_by_id(cp_id)
                 if not cp:
                     raise NotFoundException(f"cp_id={cp_id} tidak ditemukan")
                 if cp.fase_id != module.fase_id:

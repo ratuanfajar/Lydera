@@ -242,9 +242,9 @@ class QuizRequestService:
 
             return CreateQuizRequestResult(
                 quiz_request_id=quiz_request_id,
-                status="done",
-                is_cached=True,
-                should_enqueue=False,
+                status="queued",
+                is_cached=False,
+                should_enqueue=True,
                 idem_digest=idem_digest,
                 content_fingerprint=content_fingerprint,
             )

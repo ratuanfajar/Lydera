@@ -5,6 +5,7 @@ from pathlib import Path
 from redis.asyncio import Redis
 import app.core.model_registry
 from app.utils import paths
+from app.domains.contents.repositories.curriculum_repository import CurriculumRepository
 paths.setup()
 
 from app.core.redis import get_redis_client
@@ -72,7 +73,7 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
 
         await repo.update_job_status(job, "running")
         await db.commit()
-        await publish_progress(redis, job_id, "running", 5, "Job Started.Initializing MinerU extraction...")
+        await publish_progress(redis, job_id, "running", 5, "Job Started. Initializing MinerU extraction...")
 
         try:
             # All in One
@@ -124,7 +125,8 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
             await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
             chapter_repo = ChapterRepository(db)
             module_repo = ModuleRepository(db)
-            chapter_service = ChapterService(chapter_repo, module_repo, db)
+            curi_repo = CurriculumRepository(db)
+            chapter_service = ChapterService(chapter_repo, curi_repo, module_repo, db)
 
             total_blocks = 0
             for json_path in list_json_paths:

@@ -51,9 +51,9 @@ class QuizRequestCreate(BaseModel):
             else self.end_time.replace(tzinfo=timezone.utc)
         )
 
-        # 1. Start time validation (must not be in the past)
-        if start < now:
-            raise ValueError("Waktu mulai (start_time) tidak boleh di masa lalu.")
+        # # 1. Start time validation (must not be in the past)
+        # if start < now:
+        #     raise ValueError("Waktu mulai (start_time) tidak boleh di masa lalu.")
 
         # 2. End time validation (must be strictly after start_time)
         if end <= start:

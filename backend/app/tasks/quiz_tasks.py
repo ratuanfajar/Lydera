@@ -92,6 +92,7 @@ def _mark_conversion_failure(report: dict, item: dict) -> None:
 
 @broker.task
 async def process_quiz_request_task(quiz_request_id: int, idem_key: str, content_fingerprint: str) -> None:
+    print('Jalanin Taskiq Service')
     redis: Redis = await get_redis_client()
 
     channel_key = QuizRedisKeys.stream(quiz_request_id)

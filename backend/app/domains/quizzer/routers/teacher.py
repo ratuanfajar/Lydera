@@ -146,20 +146,23 @@ async def create_quiz_request(
     service: QuizRequestService = Depends(get_quiz_service),
 ):
     """Upsert quiz request and immediately return an SSE progress stream."""
+    print('Test Router')
     result = await service.create_quiz_request(
         teacher_id=teacher.profile_id,
         dto=query,
         supplied_idem_key=idempotency_key,
     )
+    print('Selesai Service')
 
     quiz_request_id = result.quiz_request_id
+    print(f'Harus Enqueue : {result.should_enqueue}')
     # --------------------------------------------------
     # 1. Enqueue only when a new request needs generation
     # --------------------------------------------------
     if result.should_enqueue:
         await process_quiz_request_task.kiq(
             quiz_request_id=quiz_request_id,
-            idem_digest=result.idem_digest,
+            idem_key=result.idem_digest,
             content_fingerprint=result.content_fingerprint,
         )
 

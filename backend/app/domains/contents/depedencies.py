@@ -77,6 +77,7 @@ def get_module_service(
 def get_chapter_service(
     repo: ChapterRepository = Depends(get_chapter_repository),
     module_repo: ModuleRepository = Depends(get_module_repository),
+    curi_repo: CurriculumRepository = Depends(get_curriculum_repository),
     db: AsyncSession = Depends(get_db),
 ) -> ChapterService:
-    return ChapterService(repo, module_repo, db)
+    return ChapterService(repo, curi_repo, module_repo, db)
