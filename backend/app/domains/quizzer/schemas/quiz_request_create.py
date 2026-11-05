@@ -19,6 +19,23 @@ class QuizRequestCreate(BaseModel):
     start_time: datetime
     end_time: datetime
 
+    @model_validator(mode='after')
+    def validate_total_questions(self) -> "QuizRequestCreate":
+        total_questions = sum(c.lots_count + c.hots_count for c in self.chapters)
+
+        if total_questions <= 0:
+            raise ValueError(
+                "Total pertanyaan (HOTS + LOTS) minimal 1."
+            )
+
+        MAX_QUESTIONS_PER_QUIZ = 20
+        if total_questions > MAX_QUESTIONS_PER_QUIZ:
+            raise ValueError(
+                f"Total pertanyaan tidak bisa melebihi {MAX_QUESTIONS_PER_QUIZ} (mendapati {total_questions})."
+            )
+
+        return self
+
     @model_validator(mode="after")
     def validate_schedule(self) -> "QuizRequestCreate":
         now = datetime.now(timezone.utc)

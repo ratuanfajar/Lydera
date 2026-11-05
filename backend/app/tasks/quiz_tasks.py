@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import suppress
 import json
 import traceback
 
@@ -6,11 +7,12 @@ from redis.asyncio import Redis
 
 from app.core.taskiq import broker
 from app.core.db import AsyncSessionLocal
-from app.domains.quizzer.repositories.repository import QuizRepository
-
+from app.domains.quizzer.repositories.quiz_request_repository import QuizRequestRepository
+from app.domains.quizzer.repositories.soal_repository import SoalRepository
 from app.utils import paths
 from app.domains.quizzer.schemas.quiz_request_teacher_response import QuizRequestQuestionResponse
 from app.domains.quizzer.schemas.soal_create_request import SoalCreateRequest, SoalDataCreateRequest, StimulusCreateRequest
+from app.core.redis_keys import QuizRedisKeys
 paths.setup()
 
 from app.core.redis import get_redis_client
@@ -89,40 +91,70 @@ def _mark_conversion_failure(report: dict, item: dict) -> None:
 
 
 @broker.task
-async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None:
+async def process_quiz_request_task(quiz_request_id: int, idem_key: str, content_fingerprint: str) -> None:
     redis: Redis = await get_redis_client()
-    channel_key = f"quiz_stream:{quiz_request_id}"
-    result_key = f"quiz_result:{quiz_request_id}"
-    coverage_key = f"quiz_coverage:{quiz_request_id}"
-    map_key = f"quiz_idem_map:{quiz_request_id}"
+
+    channel_key = QuizRedisKeys.stream(quiz_request_id)
+    result_key = QuizRedisKeys.result(quiz_request_id)
+    coverage_key = QuizRedisKeys.coverage(quiz_request_id)
+    idem_key = QuizRedisKeys.idempotency(idem_key)
+    content_key = QuizRedisKeys.content(content_fingerprint)
+    worker_lock_key = QuizRedisKeys.lock(
+        f"worker:{quiz_request_id}"
+    )
+
     loop = asyncio.get_running_loop()
 
-    async with AsyncSessionLocal() as db:
-        repo = QuizRepository(db)
+    # Prevent the same request from being processed by two workers.
+    # The lock is renewed periodically while the task is running.
+    worker_lock = redis.lock(
+        worker_lock_key,
+        timeout=60,
+        blocking_timeout=0,
+    )
 
-        quiz_request = await repo.get_quiz_request(quiz_request_id)
-        if quiz_request is None:
-            return
+    acquired = await worker_lock.acquire(blocking=False)
 
-        await repo.update_quiz_request_status(quiz_request, "running")
-        await db.commit()
+    if not acquired:
+        return
 
-        await redis.set(
-            idem_key,
-            json.dumps({"quiz_request_id": quiz_request_id, "status": "running"}),
-            ex=TTL_3_MINUTES,
-        )
-        await redis.expire(map_key, TTL_3_MINUTES)
+    keep_alive_task = None
 
-        async def keep_alive() -> None:
-            while True:
-                await asyncio.sleep(KEEP_ALIVE_SECONDS)
-                await redis.expire(idem_key, TTL_3_MINUTES)
-                await redis.expire(map_key, TTL_3_MINUTES)
+    try:
+        async with AsyncSessionLocal() as db:
+            repo = QuizRequestRepository(db)
+            soal_repo = SoalRepository(db)
 
-        keep_alive_task = asyncio.create_task(keep_alive())
+            quiz_request = await repo.get_quiz_request(quiz_request_id)
 
-        try:
+            if quiz_request is None:
+                return
+
+            # Avoid processing requests that are already terminal.
+            if quiz_request.status in ("done", "failed"):
+                return
+
+            # 1. Update status to running
+            await repo.update_quiz_request_status(quiz_request, "running")
+            await db.commit()
+
+            await redis.set(
+                idem_key,
+                json.dumps({"quiz_request_id": quiz_request_id, "status": "running"}),
+                ex=TTL_3_MINUTES,
+            )
+
+            async def keep_alive() -> None:
+                while True:
+                    await asyncio.sleep(KEEP_ALIVE_SECONDS)
+                    await redis.expire(idem_key, TTL_3_MINUTES)
+                    await worker_lock.extend(
+                        60,
+                        replace_ttl=True
+                    )
+
+            keep_alive_task = asyncio.create_task(keep_alive())
+
             chapter_links = await repo.get_chapter_links(quiz_request_id)
             total_questions = sum(link.hots_count + link.lots_count for link in chapter_links)
             completed_questions = 0
@@ -137,7 +169,6 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
                     "message": f"Memulai pembuatan {total_questions} soal...",
                 }),
             )
-
             def on_question_completed():
                 nonlocal completed_questions
                 completed_questions += 1
@@ -153,10 +184,13 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
                     loop,
                 )
 
-            # 3. Generate questions via LLM pipeline (semua bab diproses bersama)
             chapters_input = []
+
             for link in chapter_links:
                 blocks = await repo.get_blocks_for_chapter(link.chapter_id)
+                cp_text = await repo.get_chapter_cp_text(
+                    link.chapter_id
+                )
                 chapters_input.append({
                     "chapter_id": link.chapter_id,
                     "blocks": [
@@ -167,7 +201,7 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
                         }
                         for b in blocks
                     ],
-                    "cp_text": await repo.get_chapter_cp_text(link.chapter_id),
+                    "cp_text": cp_text,
                     "hots_count": link.hots_count,
                     "lots_count": link.lots_count,
                 })
@@ -177,6 +211,7 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
                 chapters_input,
                 on_progress=on_question_completed,
             )
+
             report = computed["report"]
             items_to_save: list[SoalCreateRequest] = []
             for item in computed["items"]:
@@ -189,7 +224,6 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
             if not items_to_save:
                 raise QuizGenerationError(f"Tidak ada soal yang berhasil dibuat. {_failure_summary(report)}")
 
-            # 4. Save to Database using existing QuizRepository method
             saved = await repo.save_quiz_data(
                 quiz_request_id=quiz_request_id,
                 classroom_id=quiz_request.classroom_id,
@@ -201,50 +235,93 @@ async def process_quiz_request_task(quiz_request_id: int, idem_key: str) -> None
             if not saved:
                 raise Exception(f"Gagal menyimpan quiz_request_id={quiz_request_id}")
 
-            # 5. Load inserted records via repo and serialize with QuizRequestQuestionResponse
-            saved_soals = await repo.get_soal_for_request(quiz_request_id)
+            await db.commit()
+            saved_soals = await soal_repo.get_soal_for_request(quiz_request_id)
             serialized_questions = [
                 QuizRequestQuestionResponse.model_validate(soal).model_dump(mode="json")
                 for soal in saved_soals
             ]
 
-            # 6. Update Redis status & output payload
-            done_meta = json.dumps({"quiz_request_id": quiz_request_id, "status": "done"})
-            await redis.set(result_key, json.dumps(serialized_questions), ex=TTL_3_MINUTES)
-            await redis.set(coverage_key, json.dumps(report), ex=TTL_3_MINUTES)
-            await redis.set(idem_key, done_meta, ex=TTL_3_MINUTES)
-            await redis.expire(map_key, TTL_3_MINUTES)
-
-            # 7. Broadcast completion stream
             done_payload = {
                 "quiz_request_id": quiz_request_id,
                 "status": "done",
-                "completed": total_questions,
+                "completed": len(serialized_questions),
                 "total": total_questions,
                 "message": _done_message(len(serialized_questions), report),
                 "data": serialized_questions,
                 "coverage_report": report,
             }
-            await redis.publish(channel_key, json.dumps(done_payload))
 
-        except Exception as exc:
-            traceback.print_exc()
-            await db.rollback()
+            content_payload = {
+                'questions':serialized_questions,
+                'coverage_report':report
+            }
 
-            error_message = str(exc) if isinstance(exc, QuizGenerationError) else GENERIC_FAILURE_MESSAGE
-            await repo.update_quiz_request_status_by_id(quiz_request_id, "failed", error=error_message)
-            await db.commit()
+            await redis.set(result_key, json.dumps(serialized_questions), ex=TTL_3_MINUTES)
+            await redis.set(coverage_key, json.dumps(report), ex=TTL_3_MINUTES)
+            await redis.set(
+                idem_key, 
+                json.dumps({
+                    "quiz_request_id": quiz_request_id,
+                    "status": "done",
+                }),
+                ex=TTL_3_MINUTES
+            )
 
-            failed_meta = json.dumps({"quiz_request_id": quiz_request_id, "status": "failed"})
-            await redis.set(idem_key, failed_meta, ex=TTL_3_MINUTES)
-
+            # 14. Publish completion event
             await redis.publish(
                 channel_key,
+                json.dumps(done_payload),
+            )
+
+    except Exception as exc:
+        traceback.print_exc()
+        
+        error_message = str(exc) if isinstance(exc, QuizGenerationError) else GENERIC_FAILURE_MESSAGE
+
+        try:
+            async with AsyncSessionLocal() as db:
+                repo = QuizRequestRepository(db)
+
+                await repo.update_quiz_request_status_by_id(quiz_request_id, "failed", error=error_message)
+                await db.commit()
+
+        except Exception:
+            traceback.print_exc()
+
+            failed_payload = {
+                "quiz_request_id": quiz_request_id,
+                "status": "failed",
+                "error": error_message,
+            }
+
+            await redis.set(
+                result_key,
+                json.dumps(failed_payload),
+                ex=TTL_3_MINUTES,
+            )
+
+            await redis.set(
+                idem_key,
                 json.dumps({
                     "quiz_request_id": quiz_request_id,
                     "status": "failed",
-                    "error": error_message,
                 }),
+                ex=TTL_3_MINUTES,
+            )
+
+            await redis.publish(
+                channel_key,
+                json.dumps(failed_payload),
             )
         finally:
-            keep_alive_task.cancel()
+            # Stop the keep-alive task
+            if keep_alive_task is not None:
+                keep_alive_task.cancel()
+
+                with suppress(asyncio.CancelledError):
+                    await keep_alive_task
+
+            # Release the worker lock
+            with suppress(Exception):
+                await worker_lock.release()

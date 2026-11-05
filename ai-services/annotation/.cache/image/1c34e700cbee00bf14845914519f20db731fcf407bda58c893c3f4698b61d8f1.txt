@@ -1,0 +1,1 @@
+Gambar ini adalah kode QR berupa pola persegi hitam dan putih yang tersusun dalam matriks dengan tiga penanda posisi besar di sudut kiri atas, kanan atas, dan kiri bawah. Kode QR berfungsi sebagai pengait digital yang menyimpan informasi atau tautan web, dan dapat dibaca menggunakan perangkat pemindai untuk mengakses konten terkait dalam buku matematika ini.

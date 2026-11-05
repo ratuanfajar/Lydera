@@ -1,0 +1,1 @@
+Kolom pertama adalah x dan kolom kedua adalah f(x). Pada baris pertama, nilai x adalah -2 dan nilai f(x) adalah -1. Pada baris kedua, nilai x adalah -1 dan nilai f(x) kosong. Pada baris ketiga, nilai x adalah 0 dan nilai f(x) adalah 1. Pada baris keempat, nilai x adalah 1 dan nilai f(x) kosong. Pada baris kelima, nilai x adalah 2 dan nilai f(x) adalah 3.

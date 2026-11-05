@@ -2,7 +2,6 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-
 class SoalSubmitRequest(BaseModel):
     selected_option: str = Field(pattern="^[A-D]$")
     langkah: list[Annotated[str, Field(max_length=1000)]] | None = Field(default=None, max_length=30)

@@ -1,0 +1,520 @@
+[
+    {
+        "type": "text",
+        "text": "Satelit komunikasi mengorbit bumi pada posisi yang tetap terhadap bumi (artinya jika dilihat dari bumi, satelit tersebut akan berada pada ketinggian dan bujur yang sama, meskipun bumi berputar dan mengelilingi matahari). Satelit Telkom-4 (Merah Putih) mengorbit bumi pada garis bujur 108<sup>◦</sup> BT. Jika jari-jari bumi adalah 6.371 km dan satelit Telkom-4 terletak pada ketinggian 35.786 km dari permukaan bumi, apakah Satelit Telkom-4 dapat memancarkan sinyal ke seluruh wilayah Indonesia?",
+        "bbox": [
+            176,
+            164,
+            833,
+            307
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/75c75a98a94a692ede7cabfba0af215be3eadc103d7520426c70cc11f3371071.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            346,
+            313,
+            656,
+            413
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "5. Garis singgung persekutuan luar",
+        "text_level": 2,
+        "bbox": [
+            141,
+            422,
+            462,
+            441
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Garis singgung persekutuan adalah garis singgung yang merupakan garis singgung bagi dua lingkaran. CD merupakan garis singgung persekutuan luar untuk lingkaran A dan lingkaran B.",
+        "bbox": [
+            172,
+            443,
+            831,
+            503
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/327fa69323a4bbc922816187fb3e16f4598ab8b8477a1206b90abd6765e39d0e.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            322,
+            509,
+            682,
+            630
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. Lingkaran A dan lingkaran B memiliki dua buah garis singgung persekutuan luar. Gambarkan garis singgung persekutuan luar yang lain.",
+        "bbox": [
+            176,
+            638,
+            829,
+            679
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan panjang garis singgung persekutuan luar CD (s) jika jarak kedua pusat lingkaran (d) dan jari-jari masing-masing lingkaran diketahui (r dan R).",
+        "bbox": [
+            176,
+            682,
+            831,
+            743
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/bb001b53a7598f120187cb604c4cb549024ea8c428e3dd5c569b49ffd3afee04.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            216,
+            753,
+            282,
+            802
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Petunjuk",
+        "text_level": 2,
+        "bbox": [
+            295,
+            769,
+            374,
+            788
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gambarkan garis bantu sehingga kalian dapat memanfaatkan Teorema Pythagoras.",
+        "bbox": [
+            234,
+            810,
+            811,
+            850
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "0",
+        "bbox": [
+            179,
+            105,
+            247,
+            153
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "Ayo Berpikir Kritis",
+        "bbox": [
+            256,
+            120,
+            411,
+            139
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "66",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "6. Rantai sepeda berfungsi untuk memindahkan daya penggerak dari pedal ke roda.",
+        "bbox": [
+            166,
+            101,
+            855,
+            121
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/bb1721c3108ad396cbc75907ba4e54388c84dac9d721f1e325e78725b064e712.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            401,
+            133,
+            653,
+            202
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Tunjukkan garis singgung persekutuan luar pada gambar rantai sepeda tersebut.",
+        "bbox": [
+            201,
+            217,
+            856,
+            255
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan panjang garis singgung persekutuan luarnya jika jari-jari lingkaran yang lebih besar = 5 cm, jari-jari lingkaran yang lebih kecil = 3 cm, dan jarak antar kedua pusat lingkaran = 44 cm.",
+        "bbox": [
+            201,
+            260,
+            858,
+            321
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "7. Garis singgung persekutuan dalam",
+        "text_level": 2,
+        "bbox": [
+            166,
+            327,
+            508,
+            344
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Selain garis singgung persekutuan luar, ada juga garis singgung persekutuan dalam. $\\overline { { E F } }$ merupakan garis singgung persekutuan dalam untuk lingkaran A dan lingkaran B.",
+        "bbox": [
+            194,
+            347,
+            858,
+            407
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/cd88b05a522b1fde679f2570f8ee41ae08e6eb7a03d5afbce1d6702d689b6bb4.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            310,
+            413,
+            711,
+            576
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Lingkaran A dan lingkaran B memiliki dua buah garis singgung persekutuan dalam. Gambarkan garis singgung persekutuan dalam yang lain.",
+        "bbox": [
+            201,
+            584,
+            856,
+            625
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan panjang garis singgung persekutuan dalam $\\overline { { E F } } \\left( g \\right)$ jika jarak kedua pusat lingkaran (d ) dan jari-jari masing-masing lingkaran diketahui (r dan R ).",
+        "bbox": [
+            203,
+            629,
+            858,
+            688
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/5f7aa3fd9f8eb13c4ba390b9e7d99bc53633f7d1f5e3a61b527c537dd004d3be.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            242,
+            700,
+            310,
+            749
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Petunjuk",
+        "text_level": 2,
+        "bbox": [
+            319,
+            715,
+            401,
+            733
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Gambarkan garis bantu sehingga kalian dapat memanfaatkan Teorema Pythagoras.",
+        "bbox": [
+            260,
+            754,
+            836,
+            796
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "67",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "8. Dua buah lingkaran, pusatnya berjarak 5 cm. Jika kedua lingkaran tersebut masing-masing berjari-jari 1 cm dan 2 cm,",
+        "bbox": [
+            139,
+            101,
+            831,
+            143
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Gambarkan kedua lingkaran dengan ukuran sebenarnya, juga semua garis singgung persekutuan kedua lingkaran.",
+        "bbox": [
+            176,
+            147,
+            831,
+            186
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Tentukan panjang masing-masing garis singgung persekutuan.",
+        "bbox": [
+            176,
+            192,
+            726,
+            211
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "c. Manakah yang lebih panjang: garis singgung persekutuan dalam atau garis singgung persekutuan luar?",
+        "bbox": [
+            176,
+            215,
+            831,
+            255
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "9. AB, BC, dan $\\overline { { A C } }$ adalah garis-garis singgung pada lingkaran $D$",
+        "bbox": [
+            141,
+            259,
+            724,
+            279
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a. Lingkaran D adalah lingkaran $\\triangle A B C$",
+        "bbox": [
+            176,
+            284,
+            689,
+            304
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b. Buktikan: $A B + P C = A C + P B$",
+        "bbox": [
+            176,
+            308,
+            532,
+            327
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/c54b6f9ba6dce73b77d90484ce9ab51789f4c647897ae7ba89a3423f3e69dec1.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            357,
+            340,
+            711,
+            508
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "10.",
+        "bbox": [
+            143,
+            527,
+            172,
+            544
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/99afeef5b29c95c12ee7b2480f27fe0194ad8f504d29f7292de095858c048466.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            179,
+            528,
+            245,
+            578
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kritis",
+        "text_level": 2,
+        "bbox": [
+            256,
+            544,
+            411,
+            562
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "KL, LM, MN , dan $\\overline { { N K } }$ adalah garis-garis singgung pada lingkaran O.   \nSegiempat KLMN disebut segiempat garis singgung.",
+        "bbox": [
+            177,
+            586,
+            829,
+            629
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Buktikan: $L K + M N = L M + N K$",
+        "bbox": [
+            177,
+            633,
+            513,
+            651
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/d2f3340591c98217a32aff310a8d52724450f50f9b1b55222c841be901b7962c.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            442,
+            662,
+            629,
+            817
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Latihan 2.2 nomor 9 dan 10 disebut Teorema Pitot.",
+        "bbox": [
+            273,
+            841,
+            697,
+            858
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "68",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 2
+    }
+]

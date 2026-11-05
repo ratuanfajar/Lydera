@@ -1,0 +1,559 @@
+[
+    {
+        "type": "image",
+        "img_path": "images/01d3f4ce36598434a19cc3673b85ff97a16ab2b94777487ef15017533edaf30a.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            105,
+            236,
+            154
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Tahukah Kamu?",
+        "text_level": 2,
+        "bbox": [
+            247,
+            120,
+            381,
+            139
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Garis singgung dapat digunakan untuk menentukan bagian bumi yang akan mengalami gerhana matahari.",
+        "bbox": [
+            166,
+            164,
+            856,
+            203
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/08b04d24faf70712be33f667aadbf0d1a3bd98f28a9c1eec49de517aa8e85914.jpg",
+        "image_caption": [
+            "Gambar 2.6 Gerhana Matahari Sumber: sciencedirect.com (2020)"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            207,
+            849,
+            451
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Rangkuman",
+        "text_level": 2,
+        "bbox": [
+            168,
+            527,
+            348,
+            553
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Garis singgung berpotongan dengan lingkaran di satu titik.",
+        "bbox": [
+            166,
+            562,
+            688,
+            581
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Titik potong lingkaran dengan garis singgung disebut titik singgung.",
+        "bbox": [
+            166,
+            586,
+            763,
+            606
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Garis singgung dan jari-jari lingkaran di titik singgung berpotongan tegak lurus.",
+        "bbox": [
+            166,
+            611,
+            855,
+            631
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "4. Dari satu titik di luar lingkaran, dapat dibentuk dua garis singgung yang sama panjang.",
+        "bbox": [
+            166,
+            635,
+            856,
+            675
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/453d8497520207043ee1d4cc89a1fd4d99d8426e4a62c734a20decec8421b3f7.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            703,
+            234,
+            752
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berefleksi",
+        "text_level": 2,
+        "bbox": [
+            247,
+            717,
+            366,
+            737
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah saya dapat menggambar garis singgung?",
+        "bbox": [
+            188,
+            761,
+            623,
+            782
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Apakah saya dapat menentukan panjang garis singgung?",
+        "bbox": [
+            187,
+            786,
+            688,
+            806
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Apakah saya paham sifat-sifat garis singgung?",
+        "bbox": [
+            187,
+            810,
+            603,
+            830
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "69",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "C. Lingkaran dan Tali Busur",
+        "text_level": 2,
+        "bbox": [
+            141,
+            101,
+            557,
+            131
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/be3855351a4c69c27c7d7de7d2697dee9f9d3214ff1dd7f4e425ab6597000b7c.jpg",
+        "image_caption": [
+            "Gambar 2.7 Busur Panah"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            244,
+            156,
+            722,
+            214
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Busur panah merupakan bagian dari lingkaran dan talinya menghubungkan dua titik pada lingkaran. Dalam matematika, ruas garis yang menghubungkan dua titik pada lingkaran disebut tali busur.",
+        "bbox": [
+            139,
+            246,
+            833,
+            308
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2.3",
+        "bbox": [
+            273,
+            343,
+            313,
+            364
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/072c6e5ffceb054d8b2c6799e4769062396a0208e43f59089fd6961fab845684.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            388,
+            201,
+            431
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ayo Bereksplorasi",
+        "text_level": 2,
+        "bbox": [
+            212,
+            401,
+            346,
+            418
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "1. Tali busur $\\overline { { A B } }$ sama panjang dengan tali busur $\\overline { { C D } }$ Ingat bahwa busur $A B$ dituliskan $\\widehat { A B }$ . Besarnya $\\overbrace { A B }$ ditentukan oleh besarnya $\\angle A O B = \\alpha$ (Titik O adalah pusat lingkaran).",
+        "bbox": [
+            141,
+            445,
+            618,
+            527
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Apakah besarnya $\\widehat { A B }$ dan $\\widehat { C D }$ sama?",
+        "bbox": [
+            177,
+            527,
+            500,
+            552
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/1187ff3b0a865d572b51f81448a6c63668806646f3b34cb43c36b38a960038aa.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            638,
+            445,
+            831,
+            589
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/d3a9841ae2d7b689798da87339c2988121fbb5698415e8c8e87e3b3768e18863.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            179,
+            574,
+            245,
+            622
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kreatif",
+        "bbox": [
+            256,
+            589,
+            422,
+            609
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/541ed1c673a148802623f06ab1f5961d73e300405348ae498feff7aeef7e6e8a.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            231,
+            627,
+            798,
+            891
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "70",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            473,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "2. Jika AB dan CD adalah dua tali busur yang sama panjang, gambarkan $\\triangle O A B$ dan $\\triangle O C D$ . Apakah $\\triangle O A B$ dan $\\triangle O C D$ kongruen? Bagaimana kalian tahu?",
+        "bbox": [
+            166,
+            129,
+            858,
+            169
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3. Berdasarkan no. 2, bagaimana besar $\\angle A O B$ dan $\\angle C O D ?$",
+        "bbox": [
+            166,
+            174,
+            689,
+            193
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "4. Gunakan no. 3 untuk membuktikan temuanmu pada no. 1.",
+        "bbox": [
+            166,
+            200,
+            686,
+            218
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Eksplorasi 2.4",
+        "text_level": 2,
+        "bbox": [
+            177,
+            263,
+            339,
+            284
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/827cf28450432b3a0f151ca3591a07f90359f1407a505b0920fea3b0089a86e4.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            168,
+            308,
+            227,
+            352
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Bereksplorasi",
+        "text_level": 2,
+        "bbox": [
+            238,
+            323,
+            372,
+            339
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Suatu hari seorang siswi SMA kelas XI, Sondang, dengan gembira mengatakan kepada Nyoman dan Rani bahwa dia menemukan suatu teorema baru ketika sedang bereksplorasi dengan lingkaran. Sondang menemukan jika dia mengambil segitiga siku-siku (sudut siku-sikunya menghadap pada diameter lingkaran) dan mencerminkan segitiga ini pada diameter lingkaran, maka segiempat yang dihasilkan memiliki sifat yang menarik, yaitu jumlah sudut yang berhadapan selalu sama dengan 180°.",
+        "bbox": [
+            165,
+            366,
+            858,
+            508
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Apakah penemuan Sondang itu benar atau hanya kebetulan berlaku untuk kasus itu saja?",
+        "bbox": [
+            166,
+            519,
+            856,
+            557
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Bagaimana kalau diagonal segiempat tidak harus merupakan diameter lingkaran? Apakah sifat itu masih berlaku?",
+        "bbox": [
+            166,
+            564,
+            856,
+            603
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Coba kalian bereksplorasi dan membuat kesimpulan dari hasil eksplorasi kalian!",
+        "bbox": [
+            166,
+            629,
+            822,
+            647
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Gambarkan sebuah lingkaran dan segitiga siku-siku yang sisi miringnya adalah diameter lingkaran. Cerminkan segitiga siku-siku itu pada diameter lingkaran. Perhatikan segiempat yang terbentuk. Apakah keempat titik sudutnya terletak pada lingkaran? Jelaskan.",
+        "bbox": [
+            166,
+            656,
+            858,
+            737
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Untuk masing-masing titik sudut, tentukan sudut tersebut menghadap ke busur yang mana.",
+        "bbox": [
+            166,
+            743,
+            856,
+            782
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "a.",
+        "bbox": [
+            203,
+            789,
+            449,
+            806
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "b.",
+        "bbox": [
+            203,
+            811,
+            449,
+            830
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "c.",
+        "bbox": [
+            203,
+            838,
+            449,
+            854
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "d.",
+        "bbox": [
+            203,
+            860,
+            449,
+            879
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "71",
+        "bbox": [
+            822,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 2
+    }
+]

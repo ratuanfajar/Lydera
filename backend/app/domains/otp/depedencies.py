@@ -3,7 +3,7 @@ from redis.asyncio import Redis
 from app.core.db import AsyncSession, get_db
 from app.domains.otp.repositories.repository import OtpRepository, ResetTokenRepository
 from app.domains.otp.services import PasswordResetService
-from app.domains.users.depedencies import get_user_repository
+from app.domains.users.dependencies import get_user_repository
 from app.domains.users.repositories.repository import UserRepository
 from app.core.redis import get_redis_client
 

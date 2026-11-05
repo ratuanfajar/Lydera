@@ -23,8 +23,6 @@ class QuizRequestTeacherResponse(BaseModel):
     module: ModuleQuizResponse
 
 # Detail
-
-
 class QuestionExplanationSteps(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

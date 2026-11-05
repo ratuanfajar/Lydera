@@ -1,0 +1,577 @@
+[
+    {
+        "type": "text",
+        "text": "Kalian dapat mengerjakannya secara berkelompok. Setiap peserta didik menyelidiki gambar yang berbeda. Setelah itu diskusikan hasilnya.",
+        "bbox": [
+            203,
+            166,
+            856,
+            206
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/10c5be904b406c73f1eeff7a05866c8a478b4362816cd0580047aa7df820af36.jpg",
+        "image_caption": [
+            "a."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            231,
+            215,
+            458,
+            370
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/7ba69d104eddb5b4c482cf6d0cbd8e13bec807a88312932ce6d91cf0af232b0a.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            537,
+            215,
+            787,
+            362
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/64098feaefdb40d76ae981379b44d2ac93857ac18497cff0fd600b50fd4730fb.jpg",
+        "image_caption": [
+            "c."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            280,
+            370,
+            497,
+            528
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/f79e6a8c15fb9331b9a2b09f1107e4af2d47f3c89b04e3baff5f202ceaa69cfb.jpg",
+        "image_caption": [
+            "d."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            587,
+            377,
+            803,
+            520
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/43f9b438f0eddc799f7bc158a3be78fd1f4306b7f8f9fd02060eef6d930221d1.jpg",
+        "image_caption": [
+            "e."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            236,
+            544,
+            460,
+            701
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/f07ad271559c573a9da34e2121e3d30fe016b6e8dd43537e4cb8e56b0688bce6.jpg",
+        "image_caption": [
+            "f."
+        ],
+        "image_footnote": [],
+        "bbox": [
+            590,
+            545,
+            763,
+            684
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pada setiap titik singgung, sudut yang dibentuk oleh garis singgung dan jari-jari lingkaran di titik singgung itu besarnya",
+        "bbox": [
+            201,
+            717,
+            856,
+            758
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Pada sebuah titik pada lingkaran, gambarkan garis yang tidak membentuk sudut siku-siku dengan jari-jari lingkaran.",
+        "bbox": [
+            166,
+            765,
+            856,
+            805
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "a. Garis tersebut memotong lingkaran di berapa titik?",
+        "bbox": [
+            203,
+            810,
+            660,
+            830
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "b. Apakah garis tersebut merupakan garis singgung?",
+        "bbox": [
+            203,
+            835,
+            651,
+            855
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Garis sekan adalah garis yang memotong lingkaran pada dua titik.",
+        "bbox": [
+            203,
+            859,
+            748,
+            879
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "",
+        "bbox": [
+            205,
+            103,
+            273,
+            152
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "Ayo Bekerja Sama",
+        "bbox": [
+            282,
+            119,
+            434,
+            136
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "63",
+        "bbox": [
+            822,
+            916,
+            851,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Rani dan Nyoman mempelajari lebih lanjut tentang garis singgung lingkaran. Mereka menggambar garis singgung dari titik P ke lingkaran A.",
+        "bbox": [
+            141,
+            101,
+            829,
+            143
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/55e1882ce041b8e0b6d388d5294a843704244cb6c87214b660df7d642067bd87.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            411,
+            149,
+            658,
+            291
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Rani ingat teorema Thales, sehingga ia menduga ada sebuah lingkaran yang dapat digambarkan yang melalui titik A, B, dan P.",
+        "bbox": [
+            176,
+            299,
+            831,
+            337
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/4547ad012ca01eec5cbbfdbefd57b66db0280f95cc8551b94653f9f4467f6f7c.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            409,
+            348,
+            660,
+            496
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Tariklah ruas garis dari titik P ke setiap titik potong kedua lingkaran. Tentukan:",
+        "bbox": [
+            176,
+            519,
+            829,
+            537
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Garis PB merupakan garis singgung/garis sekan (pilih salah satu).",
+        "bbox": [
+            176,
+            547,
+            759,
+            565
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. Garis PC merupakan garis singgung/garis sekan (pilih salah satu).",
+        "bbox": [
+            176,
+            570,
+            759,
+            589
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "4. Tentukan besar sudutnya.",
+        "bbox": [
+            141,
+            596,
+            392,
+            613
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. $\\angle A B P =$",
+        "bbox": [
+            177,
+            619,
+            456,
+            637
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. $\\angle A C P =$",
+        "bbox": [
+            177,
+            642,
+            456,
+            660
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "c. Jelaskan alasannya.",
+        "bbox": [
+            177,
+            668,
+            376,
+            686
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "5. Tunjukkan bahwa $\\triangle A B P$ kongruen dengan $\\triangle A C P$",
+        "bbox": [
+            141,
+            691,
+            627,
+            711
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Akibatnya:",
+        "bbox": [
+            177,
+            717,
+            275,
+            735
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "a. Panjang $\\overline { { P B } }$ panjang $\\overline { { P C } }$",
+        "bbox": [
+            177,
+            736,
+            555,
+            756
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "b. $\\angle A P B$ dan $\\angle A P C$ besarnya",
+        "bbox": [
+            177,
+            760,
+            576,
+            778
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Dari sebuah titik di luar lingkaran dapat dibuat sebanyak \\_ \\_ buah garis singgung yang panjangnya",
+        "bbox": [
+            176,
+            790,
+            829,
+            830
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Yang dimaksud panjang garis singgung adalah panjang ruas garis PB atau ruas garis $P C$",
+        "bbox": [
+            177,
+            838,
+            831,
+            878
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "64",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            916,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "6. Jika navigator tersebut mengetahui jari-jari bumi, dan ketinggiannya dari permukaan air (berdasarkan ukuran kapal), bagaimana cara dia menentukan jarak kapal dengan pelabuhan yang tampak di cakrawala?",
+        "bbox": [
+            165,
+            101,
+            858,
+            164
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Latihan",
+        "text_level": 2,
+        "bbox": [
+            177,
+            210,
+            256,
+            231
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2.2",
+        "bbox": [
+            273,
+            210,
+            313,
+            231
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "1. Jika jari-jari lingkaran A adalah 7 cm dan titik P berjarak 25 cm dari titik A, berapakah panjang garis singgung $\\overline { { P B } } ?$",
+        "bbox": [
+            166,
+            251,
+            856,
+            292
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/2b3bfaf82948b977994ea4be3a93125ffe966566c578778d87c802dc790f8955.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            282,
+            299,
+            737,
+            426
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "2. Pada gambar berikut, $\\overline { { B D } }$ dan $\\overline { { C D } }$ adalah garis singgung lingkaran A. Jika $\\angle B A C = 1 4 7 ^ { \\circ }$ , tentukan besar $\\angle B D C$",
+        "bbox": [
+            165,
+            446,
+            856,
+            487
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/bf0d7de9f5816f96499567c665f0fa3d7e6d7fbe7f20963c7de5f1af4b8bc817.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            286,
+            494,
+            733,
+            647
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "3.",
+        "bbox": [
+            168,
+            664,
+            188,
+            682
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/2fcc39e5bcdc0bce38832297cf8f7a13aaf40a520951c031476d1bc41c71465c.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            205,
+            667,
+            273,
+            716
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Ayo Berpikir Kreatif",
+        "text_level": 2,
+        "bbox": [
+            282,
+            682,
+            449,
+            701
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Bram, seorang navigator kapal laut, tahu bahwa jari-jari lingkaran bumi panjangnya 6.371 km. Ruang kemudi kapal berada pada ketinggian 40 m dari permukaan laut. Tentukan jarak cakrawala yang dapat Bram lihat.",
+        "bbox": [
+            201,
+            727,
+            588,
+            830
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/0081b18f5c4e578177c9c1cae939633cbf2ede8a276b66f1f32ef329397603ca.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            601,
+            727,
+            855,
+            827
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "65",
+        "bbox": [
+            820,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 2
+    }
+]

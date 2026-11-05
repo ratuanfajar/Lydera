@@ -12,6 +12,8 @@ from app.utils import paths
 
 paths.setup()
 
+from app.domains.quizzer.repositories.interfaces.quiz_progress_interface import QuizProgressRepositoryInterface
+from app.domains.quizzer.repositories.interfaces.soal_interface import SoalRepositoryInterface
 from common.config import LLM_MAX_WORKERS
 from evaluaizer import evaluate as evaluaizer_evaluate
 from quizzer.segment import span_text
@@ -31,8 +33,9 @@ class Evaluation:
 
 
 class AnswerEvaluator:
-    def __init__(self, repo: QuizRepositoryInterface, db: AsyncSession, redis: Redis):
-        self.repo = repo
+    def __init__(self, soal_repo: SoalRepositoryInterface, quiz_progress_repo: QuizProgressRepositoryInterface, db: AsyncSession, redis: Redis):
+        self.soal_repo = soal_repo
+        self.quiz_progress_repo = quiz_progress_repo
         self.db = db
         self.redis = redis
 
@@ -47,8 +50,8 @@ class AnswerEvaluator:
             await _release(lock)
 
     async def _evaluate_pending(self, quiz_request_id: int, student_id: int) -> set[int]:
-        soal_list = await self.repo.get_soal_for_request(quiz_request_id)
-        jawaban_by_soal = {j.soal_id: j for j in await self.repo.get_jawaban_for_request(quiz_request_id, student_id)}
+        soal_list = await self.soal_repo.get_soal_for_request(quiz_request_id)
+        jawaban_by_soal = {j.soal_id: j for j in await self.quiz_progress_repo.get_jawaban_for_request(quiz_request_id, student_id)}
         pending = [
             (soal, jawaban_by_soal[soal.id]) for soal in soal_list
             if soal.id in jawaban_by_soal and needs_evaluation(jawaban_by_soal[soal.id])
@@ -62,7 +65,7 @@ class AnswerEvaluator:
         arguments = []
         for soal, jawaban in ready:
             if soal.chapter_id not in chapter_blocks:
-                blocks = await self.repo.get_blocks_for_chapter(soal.chapter_id)
+                blocks = await self.soal_repo.get_blocks_for_chapter(soal.chapter_id)
                 chapter_blocks[soal.chapter_id] = [
                     {"reading_order": b.reading_order, "block_type": b.block_type, "readable_text": b.readable_text} for b in blocks
                 ]
@@ -83,7 +86,7 @@ class AnswerEvaluator:
                     failed.add(jawaban.id)
                     failures.append((jawaban.id, outcome))
                 else:
-                    await self.repo.save_evaluation(jawaban, outcome)
+                    await self.quiz_progress_repo.save_evaluation(jawaban, outcome)
             await self.db.commit()
         except Exception:
             await self.db.rollback()

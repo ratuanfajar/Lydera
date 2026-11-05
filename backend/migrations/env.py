@@ -30,6 +30,7 @@ from app.domains.contents.models.cp import Cp
 from app.domains.contents.models.fase import Fase
 from app.domains.contents.models.module_progress import ModuleProgress
 from app.domains.contents.models.chapter_progress import ChapterProgress
+from app.domains.contents.models.record_note import RecordNote
 from app.domains.jobs.models.job import Job
 from app.domains.quizzer.models.quiz_request import QuizRequest
 from app.domains.quizzer.models.quiz_request_chapter import QuizRequestChapter

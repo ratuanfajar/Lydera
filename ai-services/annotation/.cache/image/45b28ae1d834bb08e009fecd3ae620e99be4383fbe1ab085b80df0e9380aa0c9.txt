@@ -1,0 +1,1 @@
+Gambar ini menampilkan sebuah lingkaran dengan dua titik berwarna hijau yang menandai pusat lingkaran dan salah satu titik pada kelilingnya. Sebuah ruas garis lurus menghubungkan kedua titik tersebut, yang secara visual mewakili definisi jari-jari sebagai jarak dari pusat ke tepi lingkaran atau ruas garis yang menghubungkan pusat dengan titik pada lingkaran.

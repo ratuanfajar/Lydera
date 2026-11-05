@@ -17,16 +17,14 @@ async def enqueue_module_progress_job(module_id: int) -> bool:
     lock_key = f"lock:recalculate_module:{module_id}"
     pending_key = f"pending:recalculate_module:{module_id}"
 
-    try:
-        is_new_job = await redis.set(lock_key, "locked", ex=60, nx=True)
-        if not is_new_job:
-            await redis.set(pending_key, "true", ex=60)
-            return False
+    is_new_job = await redis.set(lock_key, "locked", ex=60, nx=True)
+    if not is_new_job:
+        await redis.set(pending_key, "true", ex=60)
+        return False
+    
+    await recalculate_module_progress_task.kiq(module_id=module_id)
+    return True
 
-        await recalculate_module_progress_task.kiq(module_id=module_id)
-        return True
-    finally:
-        await redis.aclose()
 
 
 
@@ -64,7 +62,7 @@ async def recalculate_module_progress_task(module_id: int) -> None:
             has_pending = await redis.get(pending_key)
             await redis.delete(lock_key)
             await redis.delete(pending_key)
-            await redis.aclose()
+
 
             if has_pending:
                 await enqueue_module_progress_job(module_id)
@@ -75,18 +73,15 @@ async def enqueue_chapter_progress_reset_job(chapter_id: int) -> bool:
     lock_key = f"lock:reset_chapter_progress:{chapter_id}"
     pending_key = f"pending:reset_chapter_progress:{chapter_id}"
 
-    try:
-        # Acquire lock
-        is_new_job = await redis.set(lock_key, "locked", ex=60, nx=True)
-        if not is_new_job:
-            # Task is currently running; flag it so it re-runs after finishing
-            await redis.set(pending_key, "true", ex=60)
-            return False
+    # Acquire lock
+    is_new_job = await redis.set(lock_key, "locked", ex=60, nx=True)
+    if not is_new_job:
+    # Task is currently running; flag it so it re-runs after finishing
+        await redis.set(pending_key, "true", ex=60)
+        return False
 
-        await reset_chapter_progress_task.kiq(chapter_id=chapter_id)
-        return True
-    finally:
-        await redis.aclose()
+    await reset_chapter_progress_task.kiq(chapter_id=chapter_id)
+    return True
 
 @broker.task
 async def reset_chapter_progress_task(chapter_id: int) -> None:
@@ -146,7 +141,7 @@ async def reset_chapter_progress_task(chapter_id: int) -> None:
             has_pending = await redis.get(pending_key)
             await redis.delete(lock_key)
             await redis.delete(pending_key)
-            await redis.aclose()
+
 
             if has_pending:
                 await enqueue_chapter_progress_reset_job(chapter_id)

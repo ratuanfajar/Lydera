@@ -1,0 +1,412 @@
+[
+    {
+        "type": "text",
+        "text": "Komposisi Fungsi dan Fungsi Invers",
+        "text_level": 1,
+        "bbox": [
+            181,
+            259,
+            858,
+            403
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Tujuan Pembelajaran",
+        "text_level": 2,
+        "bbox": [
+            423,
+            503,
+            669,
+            527
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Setelah mempelajari bab ini, diharapkan kalian dapat",
+        "bbox": [
+            422,
+            533,
+            836,
+            576
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Menjelaskan pengertian fungsi",
+        "bbox": [
+            423,
+            582,
+            717,
+            603
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Menentukan domain, kodomain, dan range dari suatu fungsi",
+        "bbox": [
+            423,
+            607,
+            836,
+            649
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Menjelaskan syarat dan aturan komposisi fungsi",
+        "bbox": [
+            423,
+            651,
+            834,
+            692
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "4. Membuat komposisi fungsi yang terdiri atas dua atau lebih fungsi",
+        "bbox": [
+            423,
+            696,
+            836,
+            739
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "5. Menggunakan konsep komposisi fungsi untuk menyelesaikan masalah",
+        "bbox": [
+            423,
+            741,
+            836,
+            782
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "6. Menyelidiki sifat komutatif dan sifat asosiatif pada komposisi fungsi",
+        "bbox": [
+            423,
+            786,
+            836,
+            829
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "7. Menjelaskan syarat dan aturan pembuatan fungsi invers",
+        "bbox": [
+            422,
+            831,
+            836,
+            872
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "8. Menggunakan konsep fungsi invers untuk menyelesaikan masalah",
+        "bbox": [
+            422,
+            876,
+            836,
+            917
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "Bab 1",
+        "bbox": [
+            722,
+            15,
+            856,
+            246
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "header",
+        "text": "Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi Republik Indonesia, 2021 Matematika untuk SMA/SMK Kelas XI Penulis: Dicky Susanto, dkk. ISBN: 978-602-244-789-5 (jil.2)",
+        "bbox": [
+            177,
+            80,
+            544,
+            173
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pengantar Bab",
+        "text_level": 2,
+        "bbox": [
+            141,
+            103,
+            365,
+            131
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Setiap dari kalian pasti pernah ke Stasiun Pengisian Bahan Bakar Umum (SPBU). Kalian pasti paham bahwa biaya yang dibayar untuk pembelian bahan bakar kendaraan bergantung pada jenis bahan bakar dan volumenya.",
+        "bbox": [
+            139,
+            139,
+            831,
+            200
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/4cab9cee44def6e32e9a1b1fb18c507b38293b17fb9c6c8ed175f09502d3a4e3.jpg",
+        "image_caption": [
+            "Gambar 1.1 Pembacaan Volume Bensin dan Harga yang Harus Dibayar Sumber: liputan6.com/Faizal Fanani (2018)"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            144,
+            209,
+            478,
+            354
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Bagaimana hubungan antara volume bahan bakar yang dibeli dan biaya yang dikeluarkan? Apakah penambahan volume bahan bakar berbanding lurus dengan biaya? Dapatkah relasi antara biaya dengan volume bahan bakar dituliskan sebagai $B = f ( V ) ? \\qquad V$ menyatakan volume bahan bakar yang dibeli dan B merupakan biaya yang dibayar.",
+        "bbox": [
+            491,
+            209,
+            833,
+            413
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Grafik di bawah menunjukkan hubungan jarak tempuh suatu kendaraan terhadap penggunaan bahan bakar. Apakah penambahan penggunaan volume bahan bakar berbanding lurus dengan jarak tempuh kendaraan? Bagaimana menuliskan relasi antara keduanya?",
+        "bbox": [
+            139,
+            421,
+            831,
+            503
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "chart",
+        "img_path": "images/f0dfb71547b0052f116205c2b6fb2df6368e477f70058a509d4574590decae5a.jpg",
+        "content": "",
+        "chart_caption": [
+            "Gambar 1.2 Grafik Jarak Tempuh terhadap Volume Bahan Bakar"
+        ],
+        "chart_footnote": [],
+        "bbox": [
+            148,
+            513,
+            822,
+            765
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Dapatkah kalian menyatakan semua volume bahan bakar yang dapat ditampung sebuah kendaraan sebagai suatu himpunan? Dapatkah kalian menyatakan semua jarak maksimal yang dapat ditempuh untuk setiap volume bahan bakar sebagai suatu himpunan? Konsep seperti ini akan kalian pelajari dalam topik domain, kodomain, dan range dari fungsi.",
+        "bbox": [
+            139,
+            801,
+            833,
+            862
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "2",
+        "bbox": [
+            141,
+            916,
+            157,
+            931
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "",
+        "bbox": [
+            166,
+            101,
+            856,
+            143
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Jika kalian menggabungkan kedua informasi di atas, relasi baru apa yang kalian dapatkan? Hal ini yang akan dipelajari lebih mendalam dalam subbab komposisi fungsi. Kalian juga akan mempelajari operasi-operasi yang dapat diterapkan pada dua atau lebih fungsi.",
+        "bbox": [
+            166,
+            150,
+            858,
+            231
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Kembali ke relasi biaya terhadap pembelian bahan bakar, bagaimana kalian menentukan banyak bahan bakar yang dibeli jika kalian mempunyai sejumlah uang tertentu? Bagaimana kalian dapat menentukan jarak tempuh jika kendaraan kalian mempunyai volume bahan bakar tertentu? Hubungan timbal balik ini akan dipelajari dalam fungsi invers.",
+        "bbox": [
+            166,
+            241,
+            858,
+            341
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Secara umum, bab dimulai dengan pemahaman tentang pengertian fungsi termasuk di dalamnya domain, kodomain, dan range. Bagian kedua dari bab ini akan membahas tentang komposisi fungsi serta operasi-operasi fungsi yang lain yang sering digunakan dalam kehidupan sehari-hari. Di sini juga akan dibahas syarat yang harus dipenuhi untuk mengomposisikan dua atau lebih fungsi. Pada bagian akhir dari bab kalian akan mempelajari invers dari suatu fungsi beserta syarat dan sifat-sifatnya; termasuk di dalamnya invers dari komposisi fungsi.",
+        "bbox": [
+            166,
+            352,
+            858,
+            495
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Pertanyaan Pemantik",
+        "text_level": 2,
+        "bbox": [
+            166,
+            525,
+            489,
+            550
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Apakah setiap relasi merupakan fungsi?",
+        "bbox": [
+            166,
+            560,
+            532,
+            578
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Apa peran domain, kodomain, dan range dari sebuah fungsi?",
+        "bbox": [
+            166,
+            585,
+            702,
+            603
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Bagaimana menerapkan operasi dan komposisi fungsi untuk memodelkan suatu keadaan atau masalah?",
+        "bbox": [
+            166,
+            609,
+            856,
+            646
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Kapan fungsi invers dapat diperoleh?",
+        "bbox": [
+            166,
+            654,
+            508,
+            672
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Bagaimana menggunakan fungsi invers untuk memodelkan suatu keadaan atau masalah?",
+        "bbox": [
+            166,
+            678,
+            856,
+            716
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Kata Kunci",
+        "text_level": 2,
+        "bbox": [
+            168,
+            745,
+            333,
+            770
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Fungsi, domain, kodomain, range, relasi, komposisi fungsi, fungsi invers",
+        "bbox": [
+            166,
+            781,
+            754,
+            801
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Bab 1 | Komposisi Fungsi dan Fungsi Invers",
+        "bbox": [
+            447,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "3",
+        "bbox": [
+            833,
+            916,
+            849,
+            932
+        ],
+        "page_idx": 2
+    }
+]

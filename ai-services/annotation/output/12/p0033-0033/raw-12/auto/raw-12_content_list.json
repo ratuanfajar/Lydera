@@ -1,0 +1,121 @@
+[
+    {
+        "type": "text",
+        "text": "6. Segiempat BDCE adalah segiempat tali busur, O adalah titik pusat lingkaran, dan besar $\\angle B O C = 1 3 0 ^ { \\circ }$ . Tentukan besar $\\angle B E C$",
+        "bbox": [
+            139,
+            104,
+            831,
+            144
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/81b76c1098c73b239f2f6705c5041666ad557d6da9463ab6ba8e657a4af0b56e.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            372,
+            152,
+            598,
+            319
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Pengayaan",
+        "text_level": 2,
+        "bbox": [
+            141,
+            386,
+            310,
+            413
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gambar 2.8 menunjukkan segitiga sama sisi. Titik P terletak pada lingkaran luar segitiga ABC. Titik P dihubungkan dengan setiap titik sudut segitiga ABC.",
+        "bbox": [
+            141,
+            421,
+            831,
+            462
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Jika AP lebih panjang daripada $B P$ dan $C P ,$ buktikan bahwa:",
+        "bbox": [
+            141,
+            468,
+            662,
+            490
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "equation",
+        "img_path": "images/ce75f54389aa14a9917e13822988fcbf9cca6b6bb0f5122fdbcc219620697efa.jpg",
+        "text": "$$\nA P = B P + C P\n$$",
+        "text_format": "latex",
+        "bbox": [
+            403,
+            496,
+            572,
+            515
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/b74f33eff1b13e99a6733bfff7b4273ec91a9de065fc8467478c5c8c6ecb1aea.jpg",
+        "image_caption": [
+            "Gambar 2.8 Segitiga Sama Sisi ABC"
+        ],
+        "image_footnote": [],
+        "bbox": [
+            368,
+            527,
+            600,
+            695
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Sifat ini pertama kali ditemukan oleh matematikawan Belanda bernama Frans van Schooten, karena itu disebut sebagai Teorema van Schooten.",
+        "bbox": [
+            141,
+            729,
+            831,
+            770
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "78",
+        "bbox": [
+            141,
+            916,
+            168,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas XI",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    }
+]

@@ -1,0 +1,1 @@
+Grafik ini menampilkan fungsi linear g(x) pada bidang kartesius dengan sumbu horizontal membentang dari -6 hingga 10 dan sumbu vertikal dari -5 hingga 6. Garis lurus berwarna biru menunjukkan tren positif yang konstan, di mana nilai fungsi meningkat seiring bertambahnya nilai x. Titik potong utama terjadi pada sumbu y di koordinat (0, 3) dan pada sumbu x di koordinat (-3, 0).

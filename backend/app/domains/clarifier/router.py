@@ -1,23 +1,21 @@
-from __future__ import annotations
-
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Depends, Path as FastAPIPath, Query, status
 
-from app.core.response import Response, get_response_message, COMMON_VALIDATION_RESPONSES
+from app.core.response import COMMON_VALIDATION_RESPONSES, Response, get_response_message
 from app.core.route import WrappedRoute
 from app.core.security import Roles
 from app.utils.role import Role
 from app.domains.clarifier.depedencies import get_chatbot_service
 from app.core.exceptions import BadRequestException, ForbiddenException
 from app.domains.clarifier.schemas import (
+from app.domains.clarifier.depedencies import get_chatbot_service
+from app.domains.clarifier.schemas import (
     ChatAnswerResponse,
     ChatAskRequest,
     ChatMessageResponse,
     ChatSessionCreate,
     ChatSessionResponse,
-    ReindexClassroomQueuedResponse,
-    ReindexQueuedResponse,
 )
 from app.domains.clarifier.services import ChatbotService
 from app.tasks.chatbot_tasks import reindex_chapter_task, reindex_classroom_task
@@ -89,11 +87,25 @@ async def reindex_classroom(
 
 
 @router_clarifier.post(
+========
+from app.domains.clarifier.schemas.chat import ChatSessionQuery, ChatSessionResponseWithMessage
+from app.domains.clarifier.services import ChatbotService
+from app.utils.role import Role
+
+router_chatbot_student = APIRouter(
+    prefix="/chatbot",
+    tags=["chatbot"],
+    route_class=WrappedRoute,
+)
+
+
+@router_chatbot_student.post(
+>>>>>>>> develop:backend/app/domains/chatbot/routers/student.py
     "/sessions",
     description=(
-        "Requires the STUDENT role. Mulai sesi tanya-jawab baru, di-scope ke satu classroom -- "
-        "retrieval otomatis lintas semua chapter published di classroom itu, tidak perlu pilih "
-        "chapter_id manual."
+        "Requires the STUDENT role. Mulai sesi tanya-jawab baru, di-scope ke satu "
+        "classroom -- retrieval otomatis lintas semua chapter published di classroom "
+        "itu, tidak perlu pilih chapter_id manual."
     ),
     response_model=Response[ChatSessionResponse],
     status_code=status.HTTP_201_CREATED,
@@ -105,10 +117,17 @@ async def create_session(
     service: ChatbotService = Depends(get_chatbot_service),
 ):
     session = await service.start_session(student.profile_id, payload.classroom_id)
-    return Response(message=get_response_message(), data={"id": session.id, "classroom_id": session.classroom_id})
+    return Response(
+        message=get_response_message(),
+        data={"id": session.id, "classroom_id": session.classroom_id},
+    )
 
 
+<<<<<<<< HEAD:backend/app/domains/clarifier/router.py
 @router_clarifier.post(
+========
+@router_chatbot_student.post(
+>>>>>>>> develop:backend/app/domains/chatbot/routers/student.py
     "/sessions/{session_id}/messages",
     description="Requires the STUDENT role. Ajukan pertanyaan ke chatbot dalam sesi ini.",
     response_model=Response[ChatAnswerResponse],
@@ -128,7 +147,11 @@ async def ask_question(
     return Response(message=get_response_message(), data=_answer_payload(result))
 
 
+<<<<<<<< HEAD:backend/app/domains/clarifier/router.py
 @router_clarifier.get(
+========
+@router_chatbot_student.get(
+>>>>>>>> develop:backend/app/domains/chatbot/routers/student.py
     "/sessions",
     description="Requires the STUDENT role. Riwayat sesi.",
     response_model=Response[list[ChatSessionResponseWithMessage]],
@@ -142,11 +165,15 @@ async def list_sessions(
     sessions = await service.list_session(student.profile_id, query.classroom_id)
     return Response(
         message=get_response_message(),
-        data=sessions
+        data=sessions,
     )
 
 
+<<<<<<<< HEAD:backend/app/domains/clarifier/router.py
 @router_clarifier.get(
+========
+@router_chatbot_student.get(
+>>>>>>>> develop:backend/app/domains/chatbot/routers/student.py
     "/sessions/{session_id}/messages",
     description="Requires the STUDENT role. Riwayat pesan dalam sesi ini.",
     response_model=Response[list[ChatMessageResponse]],

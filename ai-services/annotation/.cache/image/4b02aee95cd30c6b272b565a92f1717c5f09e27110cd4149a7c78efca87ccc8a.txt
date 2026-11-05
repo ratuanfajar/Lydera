@@ -1,0 +1,1 @@
+Ikon ini menampilkan simbol pertanyaan di dalam balon ucapan yang dikelilingi oleh lingkaran bertingkat berwarna pink, berfungsi sebagai indikator visual untuk bagian "Tahukah Kamu?" yang mengajak siswa memikirkan hubungan sudut-sudut pada segitiga guna menentukan besar sudut ACB.

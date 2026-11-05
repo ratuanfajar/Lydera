@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
-from app.core.exceptions import BadRequestException, NotFoundException
+from app.core.exceptions import BadRequestException, ForbiddenException, NotFoundException
 from app.domains.evaluaizer.evaluation import AnswerEvaluator, needs_evaluation
 from app.domains.quizzer.models import SoalJawaban
 from app.domains.quizzer.models.quiz_progress import QuizReviewStatus
@@ -8,12 +8,20 @@ from app.domains.quizzer.repositories.interface import QuizRepositoryInterface
 from app.domains.quizzer.schemas import LetakKesalahan, QuizResultItem
 from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
 from app.tasks.process_exam_review_tasks import process_exam_review_task
+from app.domains.quizzer.schemas.quiz_request_query import QuizRequestStudentDetailQuery
 
 
 class EvaluaizerService:
     def __init__(self, repo: QuizRepositoryInterface, evaluator: AnswerEvaluator):
         self.repo = repo
         self.evaluator = evaluator
+
+    async def get_student_quiz_result_from_teacher(self, quiz_request_id: int, query: QuizRequestStudentDetailQuery, teacher_id: int):
+        is_valid = await self.quiz_repo.validate_quiz_request(quiz_request_id, teacher_id, query.classroom_id)
+        if not is_valid:
+            raise ForbiddenException("Quiz Request tidak ditemukan atau Anda tidak memiliki akses.")
+    
+        return await self.get_quiz_results(quiz_request_id, query.student_id)
 
     async def get_quiz_results(self, quiz_request_id: int, student_id: int) -> list[QuizResultItem]:
         """Hasil kuis siswa; jawaban salah yang belum dievaluasi dievaluasi sekarang kecuali proses lain sedang mengerjakannya."""

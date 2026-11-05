@@ -16,35 +16,40 @@ from app.core.config import settings
 from app.core.db import AsyncSessionLocal
 from app.domains.jobs.models import Job
 from app.domains.jobs.repositories.repository import JobRepository
-from app.domains.contents.repositories.repository import ContentRepository
-from app.domains.contents.services import ContentService
+from app.domains.contents.repositories.chapter_repository import ChapterRepository
+from app.domains.contents.repositories.module_repository import ModuleRepository
+from app.domains.contents.services import ChapterService
 from app.tasks.chatbot_tasks import reindex_chapter_task
 
 MAX_RETRIES = 3
 
-_last_progress_map: dict[int, int] = {}
-
 async def publish_progress(redis: Redis, job_id: int, status: str, progress:int, message: str, annotation_paths: list[str] = []):
     """Helper to publish real-time progress events to Redis Pub/Sub with monotonic progress safeguard."""
-    global _last_progress_map
+    if annotation_paths is None:
+        annotation_paths = []
 
-    if status == "retrying":
-        _last_progress_map[job_id] = 0
+    redis_progress_key = f"job_last_progress:{job_id}"
+    redis_state_key = f"job_last_state:{job_id}"
+
+    if status in ("retrying", "queued"):
+        p_to_send = 0
+        await redis.delete(redis_progress_key)
     else:
-        last_p = _last_progress_map.get(job_id, 0)
-        if progress < last_p:
-            progress = last_p
-        else:
-            _last_progress_map[job_id] = progress
+        last_p_raw = await redis.get(redis_progress_key)
+        last_p = int(last_p_raw) if last_p_raw is not None else 0
+        
+        p_to_send = max(progress, last_p)
+        await redis.set(redis_progress_key, p_to_send, ex=3600)
 
     payload = json.dumps({
         "job_id": job_id,
         "status": status,
-        "progress": progress,
+        "progress": p_to_send,
         "message": message,
         "annotation_paths":annotation_paths
     })
 
+    await redis.set(redis_state_key, payload, ex=3600)
     await redis.publish(f"job_progress:{job_id}", payload)
 
 
@@ -63,7 +68,6 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
         repo = JobRepository(db)
         job = await db.get(Job, job_id)
         if not job:
-            await redis.aclose()
             return
 
         await repo.update_job_status(job, "running")
@@ -118,13 +122,13 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
 
             # 3. Database Ingestion
             await publish_progress(redis, job_id, "running", 85, "Ingesting extracted content to database...")
-            content_repo = ContentRepository(db)
-            job_repo = JobRepository(db)
-            content_service = ContentService(content_repo, job_repo, db)
+            chapter_repo = ChapterRepository(db)
+            module_repo = ModuleRepository(db)
+            chapter_service = ChapterService(chapter_repo, module_repo, db)
 
             total_blocks = 0
             for json_path in list_json_paths:
-                blocks_inserted = await content_service.ingest_annotated_json(json_path, chapter_id, teacher_id)
+                blocks_inserted = await chapter_service.ingest_annotated_json(json_path, chapter_id, teacher_id)
                 total_blocks += blocks_inserted
             annotation_output_dir = Path(out_dir).parent
             relative_json_paths = [
@@ -162,5 +166,4 @@ async def process_mineru_job_task(job_id:int, pdf_path:str, out_dir:str, chapter
                 await repo.update_job_status(job, "failed", error=str(exc))
                 await db.commit()
                 await publish_progress(redis, job_id, "failed", 0, f"Final Failure: {str(exc)}")
-        finally:
-            await redis.aclose()
+

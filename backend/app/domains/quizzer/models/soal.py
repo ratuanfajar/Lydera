@@ -29,7 +29,6 @@ class Soal(Base):
         CheckConstraint("correct_option IN ('A', 'B', 'C', 'D')", name="check_soal_correct_opt"),
         CheckConstraint("review_status IN ('pending', 'approved', 'rejected', 'edited')", name="check_soal_review"),
         CheckConstraint("review_priority IN ('low', 'normal', 'high')", name="check_soal_priority"),
-        Index("ix_soal_quiz_req_id", "quiz_request_id", "id"),
     )
 
     # Relationships

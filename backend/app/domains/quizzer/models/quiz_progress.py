@@ -31,7 +31,7 @@ class QuizProgress(Base):
     review_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
-        UniqueConstraint("quiz_request_id", "student_id", name="uq_quiz_progress_quiz_student"),
+        UniqueConstraint("quiz_request_id", "student_id", "attempt_count", name="uq_quiz_progress_student_attempt"),
         Index("ix_quiz_progress_student_id", "student_id"),
         Index("ix_quiz_progress_sse_check", "quiz_request_id", "student_id", "is_done"),
         Index(

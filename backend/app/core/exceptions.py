@@ -39,3 +39,7 @@ class CredentialException(AppException):
 class ValidationException(AppException):
     status_code = 422
     detail = "Validation failed"
+
+class ConflictException(AppException):
+    status_code = 409
+    detail = "Conflict"

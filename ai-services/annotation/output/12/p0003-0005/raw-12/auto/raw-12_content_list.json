@@ -1,0 +1,420 @@
+[
+    {
+        "type": "text",
+        "text": "Kata Kunci",
+        "text_level": 2,
+        "bbox": [
+            141,
+            103,
+            310,
+            128
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Lingkaran, jari-jari, diameter, sudut pusat, sudut keliling, busur lingkaran, garis singgung, tali busur, segiempat tali busur, teorema Thales, teorema Ptolemeus",
+        "bbox": [
+            139,
+            139,
+            831,
+            180
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Peta Konsep",
+        "text_level": 2,
+        "bbox": [
+            141,
+            210,
+            333,
+            238
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/19ec4591eb5510c19e54126b8ee6da5dc8bfb4f04091033939a74aa69103f960.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            139,
+            242,
+            827,
+            566
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/68e2f6c65efef96627898b3b20989aa732e5a2fee06eb2a35a7dff5d1de85aa2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            143,
+            585,
+            211,
+            633
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Ayo Mengingat Kembali",
+        "text_level": 2,
+        "bbox": [
+            220,
+            600,
+            416,
+            619
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "Gambarkan sebuah titik pada kertas, beri nama titik O. Ambil penggaris dan tandai sebuah titik yang berjarak 2 cm dari titik O (beri nama titik A). Tandai titik lain yang berjarak 2 cm dari titik O. Gambarkan 10 titik lain yang berjarak 2 cm dari titik O.",
+        "bbox": [
+            141,
+            641,
+            831,
+            703
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "1. Jika semua (termasuk titik-titik lain yang belum kalian gambarkan) titik yang berjarak 2 cm dari titik O dihubungkan, bangun datar apa yang kalian dapatkan?",
+        "bbox": [
+            141,
+            711,
+            831,
+            750
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "2. Titik O disebut apa untuk bangun datar tersebut?",
+        "bbox": [
+            141,
+            754,
+            583,
+            774
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "text",
+        "text": "3. Jarak 2 cm itu disebut apa bagi bangun datar tersebut?",
+        "bbox": [
+            141,
+            780,
+            622,
+            800
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "page_number",
+        "text": "48",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 0
+    },
+    {
+        "type": "image",
+        "img_path": "images/e262abc21e8257d67a469b059700ed335f8996af9d82fd81d7eb087ea2ba359f.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            425,
+            103,
+            594,
+            221
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Lingkaran adalah tempat kedudukan titik-titik yang jaraknya sama dari suatu titik tertentu (disebut pusat lingkaran). Jarak yang sama itu disebut jari-jari.",
+        "bbox": [
+            166,
+            233,
+            858,
+            274
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/4a91c3eea45fe5cb9a453c2df566a51190720bbe94b421014536186ce6552177.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            429,
+            286,
+            590,
+            397
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Ruas garis yang menghubungkan pusat lingkaran dengan salah satu titik pada lingkaran juga disebut jari-jari.",
+        "bbox": [
+            165,
+            413,
+            858,
+            452
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Daerah yang dibatasi oleh lingkaran disebut daerah lingkaran.",
+        "bbox": [
+            166,
+            460,
+            682,
+            480
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/0fc15de3ac4df47d996ddd4a0cf31e9559853968ff68c7e2809c7860c61630d2.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            427,
+            490,
+            592,
+            607
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "A. Lingkaran dan Busur Lingkaran",
+        "text_level": 2,
+        "bbox": [
+            166,
+            654,
+            677,
+            683
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/606225fe55c49bfb9259aa309bc551583652a3175003135a9bdc23377eafe0ee.jpg",
+        "image_caption": [],
+        "image_footnote": [
+            "Gambar 2.3 Mercusuar"
+        ],
+        "bbox": [
+            170,
+            694,
+            502,
+            864
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "text",
+        "text": "Pada masa sebelum adanya GPS (Global Positioning System), mercusuar dibangun untuk menolong kapal bernavigasi sehingga tidak menabrak karang. Daerah yang diterangi oleh lampu mercusuar berbentuk daerah lingkaran. Kapal bernavigasi dengan memanfaatkan perhitungan sudut yang akurat sehingga dapat berlayar dengan aman.",
+        "bbox": [
+            515,
+            694,
+            858,
+            880
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "footer",
+        "text": "Bab 2 | Lingkaran",
+        "bbox": [
+            649,
+            915,
+            794,
+            933
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "page_number",
+        "text": "49",
+        "bbox": [
+            820,
+            916,
+            851,
+            932
+        ],
+        "page_idx": 1
+    },
+    {
+        "type": "image",
+        "img_path": "images/0b21c9ca26192bc080c7c2d6dec1910b74e0d66f953285cf4b69c7db9c32f9fd.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            383,
+            104,
+            583,
+            238
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Bagian dari lingkaran disebut busur lingkaran. Busur yang lebih kecil disebut busur minor (pada gambar berwarna biru) dan bagian yang lebih besar disebut busur mayor (berwarna merah).",
+        "bbox": [
+            139,
+            252,
+            831,
+            313
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Jika hanya disebutkan kata busur, maka yang dimaksud adalah busur minor.",
+        "bbox": [
+            141,
+            316,
+            761,
+            335
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Busur BC dituliskan $\\widehat { B C }$ . Besarnya $\\widehat { B C }$ ditentukan oleh besarnya $\\angle B A C = \\alpha$ (Titik A adalah pusat lingkaran).",
+        "bbox": [
+            141,
+            340,
+            831,
+            382
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Dalam matematika,",
+        "bbox": [
+            141,
+            392,
+            308,
+            410
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Sudut α disebut sudut pusat yang menghadap pada $\\widehat { B C }$",
+        "bbox": [
+            141,
+            418,
+            645,
+            438
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Sudut pusat adalah sudut yang titik sudutnya terletak pada pusat lingkaran dan kaki-kaki sudutnya adalah jari-jari lingkaran.",
+        "bbox": [
+            146,
+            441,
+            829,
+            480
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "image",
+        "img_path": "images/266b19704d1e62a561d45036947849ae3f221da378f0910e03358c3aa3abf749.jpg",
+        "image_caption": [],
+        "image_footnote": [],
+        "bbox": [
+            383,
+            488,
+            587,
+            619
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "• Sudut <sup>θ</sup> disebut sudut keliling yang menghadap pada $\\widehat { B C }$",
+        "bbox": [
+            141,
+            634,
+            662,
+            655
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Sudut keliling adalah sudut yang titik sudutnya terletak pada lingkaran dan kaki-kaki sudutnya berupa tali busur.",
+        "bbox": [
+            150,
+            656,
+            831,
+            696
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "text",
+        "text": "Apakah kalian ingat apa yang dimaksud tali busur? Tali busur adalah ruas garis yang menghubungkan dua titik pada lingkaran.",
+        "bbox": [
+            176,
+            698,
+            831,
+            739
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "page_number",
+        "text": "50",
+        "bbox": [
+            141,
+            916,
+            168,
+            931
+        ],
+        "page_idx": 2
+    },
+    {
+        "type": "footer",
+        "text": "Matematika untuk SMA/SMK Kelas X",
+        "bbox": [
+            187,
+            915,
+            471,
+            932
+        ],
+        "page_idx": 2
+    }
+]
