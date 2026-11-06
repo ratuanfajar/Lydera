@@ -92,11 +92,13 @@ class EvaluaizerService:
                 selected_option=jawaban.selected_option if jawaban else None,
                 correct_option=soal.correct_option,
                 kesimpulan=soal.kesimpulan,
+                divergence_step=jawaban.divergence_step,
                 langkah_kunci=[l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
                 is_correct=jawaban.is_correct if jawaban else None,
                 letak_kesalahan=_letak_kesalahan(jawaban),
                 evaluasi_gagal=failed,
                 evaluasi_diproses=processing,
+            
                 langkah=[
                     SoalJawabanLangkahResponse.model_validate(step)
                         for step in (jawaban.langkah if jawaban and jawaban.langkah else [])

@@ -40,6 +40,7 @@ class QuizResultItem(BaseModel):
     correct_option: str
     kesimpulan: str
     langkah_kunci: list[str]
+    divergence_step: int | None
     is_correct: bool | None
     stimulus: QuestionStimulusStudentResponse | None
     letak_kesalahan: LetakKesalahan | None
