@@ -217,10 +217,21 @@ class SoalService:
         ]
 
         try:
+            print(f'Block As Rows :{len(blocks_as_rows)}')
+            print(f'Source Reading Order Start :{target_soal.source_reading_order_start}')
+            print(f'Source Reading Order End :{target_soal.source_reading_order_end}')
+            print(f'Stimulus Source Markup :{stimulus.source_markup}')
+            print(f'Stimulus Readble text:{stimulus.readable_text}')
+            print(f'Soal to Dict :{_soal_to_dict(target_soal)}')
+            print(f'Feedback :{feedback}')
+            print(f'Stimulus Jenis :{stimulus.jenis}')
+            print(f'Stimulus Spesifikasi :{stimulus.spesifikasi}')
+
             result = await asyncio.to_thread(
                 quizzer_regenerate.compute_regeneration,
                 blocks_as_rows,
-                target_soal.source_reading_order_start, target_soal.source_reading_order_end,
+                target_soal.source_reading_order_start, 
+                target_soal.source_reading_order_end,
                 stimulus.source_markup or "",
                 stimulus.readable_text, 
                 _soal_to_dict(target_soal),
@@ -228,6 +239,7 @@ class SoalService:
                 feedback,
                 stimulus.jenis, stimulus.spesifikasi,
             )
+            print(f'Result :{result}')
         except Exception:
             logger.exception("regenerasi soal %s gagal", soal_id)
             raise BadRequestException("Regenerasi gagal, coba lagi.")
@@ -247,6 +259,7 @@ class SoalService:
                 soal.correct_option = data["correct_option"]
                 soal.kesimpulan = data["kesimpulan"]
                 soal.review_status = "pending"
+                print(f'Issue : {issues}')
                 soal.review_priority, soal.validation_notes = _review_flags(issues)
                 await self.repo.replace_soal_opsi(sid, data["options"])
                 await self.repo.replace_soal_langkah(sid, data["langkah"])

@@ -148,10 +148,9 @@ class QuizTakingService:
 
         existing = await self.progress_repo.get_soal_jawaban(soal_id, student_id)
         is_correct = payload.selected_option.upper() == soal.correct_option.upper()
-
         if existing is not None:
             try:
-                self.progress_repo.update_soal_jawaban(
+                await self.progress_repo.update_soal_jawaban(
                     jawaban_id=existing.id,
                     selected_option=payload.selected_option,
                     is_correct=is_correct,
