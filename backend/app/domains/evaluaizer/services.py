@@ -12,6 +12,7 @@ from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.domains.quizzer.schemas.quiz_request_query import QuizRequestStudentDetailQuery
 from app.domains.quizzer.schemas.soal_response import SoalOpsiResponse
+from app.domains.quizzer.schemas.quiz_request_student_response import QuestionStimulusStudentResponse
 
 
 class EvaluaizerService:
@@ -86,6 +87,7 @@ class EvaluaizerService:
             results.append(QuizResultItem(
                 soal_id=soal.id,
                 options=[SoalOpsiResponse(label=o.label, opsi_text=o.opsi_text) for o in sorted(soal.opsi, key=lambda o: o.label)],
+                stimulus=QuestionStimulusStudentResponse.model_validate(soal.stimulus) if soal.stimulus else None,
                 question_text=soal.question_text,
                 selected_option=jawaban.selected_option if jawaban else None,
                 correct_option=soal.correct_option,

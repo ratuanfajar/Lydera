@@ -3,6 +3,7 @@ from typing import Annotated
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.domains.quizzer.schemas.soal_response import SoalOpsiResponse
+from app.domains.quizzer.schemas.quiz_request_student_response import QuestionStimulusStudentResponse
 
 class SoalSubmitRequest(BaseModel):
     selected_option: str = Field(pattern="^[A-D]$")
@@ -40,6 +41,7 @@ class QuizResultItem(BaseModel):
     kesimpulan: str
     langkah_kunci: list[str]
     is_correct: bool | None
+    stimulus: QuestionStimulusStudentResponse | None
     letak_kesalahan: LetakKesalahan | None
     evaluasi_gagal: bool = False
     evaluasi_diproses: bool = False
