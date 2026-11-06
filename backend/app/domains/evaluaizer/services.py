@@ -11,7 +11,7 @@ from app.domains.quizzer.schemas import LetakKesalahan, QuizResultItem
 from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.domains.quizzer.schemas.quiz_request_query import QuizRequestStudentDetailQuery
-from backend.app.domains.quizzer.schemas.soal_response import SoalOpsiResponse
+from app.domains.quizzer.schemas.soal_response import SoalOpsiResponse
 
 
 class EvaluaizerService:
