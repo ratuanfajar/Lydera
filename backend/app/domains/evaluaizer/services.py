@@ -11,6 +11,7 @@ from app.domains.quizzer.schemas import LetakKesalahan, QuizResultItem
 from app.domains.quizzer.schemas.soal_jawaban import SoalJawabanLangkahResponse
 from app.tasks.process_exam_review_tasks import process_exam_review_task
 from app.domains.quizzer.schemas.quiz_request_query import QuizRequestStudentDetailQuery
+from backend.app.domains.quizzer.schemas.soal_response import SoalOpsiResponse
 
 
 class EvaluaizerService:
@@ -81,8 +82,10 @@ class EvaluaizerService:
             jawaban = jawaban_by_soal.get(soal.id)
             failed = jawaban is not None and jawaban.id in failed_ids
             processing = jawaban is not None and evaluation.busy and not failed and needs_evaluation(jawaban)
+            
             results.append(QuizResultItem(
                 soal_id=soal.id,
+                options=[SoalOpsiResponse(label=o.label, opsi_text=o.opsi_text) for o in sorted(soal.opsi, key=lambda o: o.label)],
                 question_text=soal.question_text,
                 selected_option=jawaban.selected_option if jawaban else None,
                 correct_option=soal.correct_option,

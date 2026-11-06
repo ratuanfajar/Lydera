@@ -2,6 +2,8 @@ from typing import Annotated
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.domains.quizzer.schemas.soal_response import SoalOpsiResponse
+
 class SoalSubmitRequest(BaseModel):
     selected_option: str = Field(pattern="^[A-D]$")
     langkah: list[Annotated[str, Field(max_length=1000)]] | None = Field(default=None, max_length=30)
@@ -42,3 +44,4 @@ class QuizResultItem(BaseModel):
     evaluasi_gagal: bool = False
     evaluasi_diproses: bool = False
     langkah: list[SoalJawabanLangkahResponse]
+    options: list[SoalOpsiResponse]
