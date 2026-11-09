@@ -1,8 +1,0 @@
-Tabel ini memiliki dua kolom dengan judul "Jumlah Potong Tempe (Masukan)" dan "Jumlah Keripik yang Dihasilkan (Keluaran)".
-
-Baris pertama berisi nilai 200 pada kolom Masukan, sedangkan kolom Keluaran kosong.
-Baris kedua berisi nilai 200,25 pada kolom Masukan, sedangkan kolom Keluaran kosong.
-Baris ketiga berisi nilai 500,75 pada kolom Masukan, sedangkan kolom Keluaran kosong.
-Baris keempat berisi tanda titik tiga atau elipsis (...) pada kolom Masukan, sedangkan kolom Keluaran kosong.
-Baris kelima berisi nilai 600 pada kolom Masukan, sedangkan kolom Keluaran kosong.
-Baris keenam berisi nilai 601 pada kolom Masukan, sedangkan kolom Keluaran kosong.

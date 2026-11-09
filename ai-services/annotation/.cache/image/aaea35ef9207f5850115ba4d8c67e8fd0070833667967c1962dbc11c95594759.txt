@@ -1,1 +1,0 @@
-Gambar ini adalah kode QR, yaitu matriks barcode dua dimensi yang berfungsi sebagai tautan digital atau pembawa informasi terenkripsi. Kode ini tidak menampilkan grafik, diagram, sumbu, satuan, tren, nilai data, atau hubungan visual lainnya. Untuk mengakses konten yang dimaksud, kode ini perlu dipindai menggunakan perangkat pemindai kode QR yang terhubung ke internet.

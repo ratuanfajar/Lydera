@@ -1,1 +1,0 @@
-Tabel ini memiliki dua kolom dengan judul alpha dan theta. Kolom pertama adalah alpha dan kolom kedua adalah theta. Baris pertama berisi sel kosong di bawah kolom alpha dan sel kosong di bawah kolom theta. Baris kedua berisi sel kosong di bawah kolom alpha dan sel kosong di bawah kolom theta. Baris ketiga berisi sel kosong di bawah kolom alpha dan sel kosong di bawah kolom theta.

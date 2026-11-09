@@ -52,8 +52,16 @@ def _soal_to_dict(soal: Soal) -> dict:
     }
 
     
-def _review_flags(self, issues: list[str]) -> tuple[str, str | None]:
-    return ("high" if issues else "normal"), ("\n".join(issues) or None)
+def _review_flags(issues: list[str]) -> tuple[str, str | None]:
+    try:
+        print("Review Flags Issue :", issues)
+        return ("high" if issues else "normal"), ("\n".join(issues) or None)
+    except Exception as exc:
+        logger.exception("Review Flag Error", issues)
+        raise BadRequestException(
+            "Flag error."
+        ) from exc
+    
 
 
 def _readable_dict(soal: Soal) -> dict:
@@ -260,7 +268,8 @@ class SoalService:
                 soal.kesimpulan = data["kesimpulan"]
                 soal.review_status = "pending"
                 print(f'Issue : {issues}')
-                soal.review_priority, soal.validation_notes = _review_flags(issues)
+                if issues:
+                    soal.review_priority, soal.validation_notes = _review_flags(issues)
                 await self.repo.replace_soal_opsi(sid, data["options"])
                 await self.repo.replace_soal_langkah(sid, data["langkah"])
 

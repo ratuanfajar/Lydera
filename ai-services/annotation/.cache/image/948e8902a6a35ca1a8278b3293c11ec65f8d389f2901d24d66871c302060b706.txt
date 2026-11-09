@@ -1,1 +1,0 @@
-Gambar ini menampilkan punggung seorang pemain sepak bola yang mengenakan seragam berwarna merah dengan tulisan nama RONALDO dan angka 7 di bagian tengah. Gambar ini mengilustrasikan konsep relasi melalui pemetaan satu lawan satu antara anggota himpunan pemain dengan nomor punggungnya, di mana Ronaldo secara spesifik berelasi dengan nomor 7.

@@ -1,1 +1,0 @@
-Gambar menampilkan sebuah segiempat tak beraturan dengan titik sudut L, M, N, dan K yang menyinggung lingkaran di dalam pada keempat sisinya. Titik O merupakan pusat lingkaran tersebut. Hubungan yang ditunjukkan adalah sifat geometri segiempat tangen, yaitu jumlah panjang sisi-sisi yang berlawanan sama besar, sehingga berlaku persamaan LK + MN = LM + NK.

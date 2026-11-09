@@ -1,1 +1,0 @@
-f dari x sama dengan pecahan, pembilangnya x ditambah 1, penyebutnya 2 dikurangi x

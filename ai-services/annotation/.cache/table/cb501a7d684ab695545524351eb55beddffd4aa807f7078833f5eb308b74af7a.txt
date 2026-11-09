@@ -1,1 +1,0 @@
-Kolom pertama adalah alpha, kolom kedua adalah theta. Baris pertama pada kolom alpha kosong dan kolom theta juga kosong. Baris kedua pada kolom alpha kosong dan kolom theta juga kosong. Baris ketiga pada kolom alpha kosong dan kolom theta juga kosong.

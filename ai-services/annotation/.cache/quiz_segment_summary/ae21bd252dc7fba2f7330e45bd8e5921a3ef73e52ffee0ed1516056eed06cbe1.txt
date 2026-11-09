@@ -1,1 +1,0 @@
-Bagian ini membahas geometri lingkaran, terutama mengenai konsep tali busur dan segiempat tali busur dalam lingkaran, termasuk sifat-sifat sudut-sudut yang berhubungan, kesebangunan segitiga, dan penerapan Teorema Ptolemeus. Juga terdapat eksplorasi aplikasi geometri melalui kasus praktis seperti pengukuran diameter guci dan aplikasi dalam bentuk mekanisme kincir air.

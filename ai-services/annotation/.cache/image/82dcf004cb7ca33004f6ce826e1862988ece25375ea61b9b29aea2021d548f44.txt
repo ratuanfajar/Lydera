@@ -1,1 +1,0 @@
-Sebuah garis lurus berwarna biru menyentuh lingkaran hitam pada satu titik tunggal yang ditandai dengan titik biru, menunjukkan hubungan garis singgung lingkaran. Sebuah garis hitam menghubungkan pusat lingkaran ke titik singgung tersebut, merepresentasikan jari-jari yang tegak lurus terhadap garis singgung di titik temunya.

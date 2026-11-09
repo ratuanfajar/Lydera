@@ -1,1 +1,0 @@
-f dari x sama dengan dua x ditambah satu, g dari x sama dengan x kuadrat ditambah empat dan h dari x sama dengan satu atas x ditambah satu

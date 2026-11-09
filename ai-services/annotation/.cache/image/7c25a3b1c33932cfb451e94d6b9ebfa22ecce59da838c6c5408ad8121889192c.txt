@@ -1,1 +1,0 @@
-Gambar ini menampilkan sebuah lingkaran dengan sebuah garis lurus yang menyentuh tepinya di satu titik saja, yang dikenal sebagai garis singgung. Terlihat juga sebuah jari-jari yang menghubungkan pusat lingkaran dengan titik singgung tersebut. Hubungan geometris yang ditunjukkan adalah bahwa garis singgung selalu tegak lurus terhadap jari-jari pada titik temunya.

@@ -1,0 +1,48 @@
+{
+  "new_stimulus": {
+    "readable_text": "Grafik pertama berbentuk kurva yang naik dari kiri bawah ke kanan atas dan mewakili fungsi f dari x samadengan x pangkat tiga. Grafik kedua selalu naik saat x bertambah dan mewakili fungsi g dari x sama dengan dua pangkat x. Grafik ketiga juga selalu naik pada domain x lebih dari atau sama dengan nol dan mewakili fungsi h dari x sama dengan akar kuadrat dari dua x.",
+    "source_markup": "Grafik pertama berbentuk kurva yang naik dari kiri bawah ke kanan atas dan mewakili fungsi $f(x)=x^{3}$. Grafik kedua selalu naik saat $x$ bertambah dan mewakili fungsi $g(x)=2^{x}$. Grafik ketiga juga selalu naik pada domain $x\\ge 0$ dan mewakili fungsi $h(x)=\\sqrt{2x}$.",
+    "ringkasan": null,
+    "tabel": null
+  },
+  "soal_updates": [
+    [
+      70,
+      {
+        "question_text": "Berdasarkan keterangan tadi, pernyataan manakah yang paling tepat tentang fungsi yang mempunyai invers?",
+        "options": {
+          "A": "Fungsi f dari x sama dengan x pangkat tiga dan h dari x sama dengan akar kuadrat dari dua x mempunyai invers, sedangkan g dari x sama dengan dua pangkat x tidak.",
+          "B": "Fungsi g dari x sama dengan dua pangkat x dan h dari x sama dengan akar kuadrat dari dua x mempunyai invers, sedangkan f dari x sama dengan x pangkat tiga tidak.",
+          "C": "Fungsi f dari x sama dengan x pangkat tiga dan g dari x sama dengan dua pangkat x mempunyai invers, sedangkan h dari x sama dengan akar kuadrat dari dua x tidak.",
+          "D": "Ketiga fungsi mempunyai invers karena semuanya naik terus pada domainnya."
+        },
+        "correct_option": "D",
+        "langkah": [
+          "Grafik f dari x sama dengan x pangkat tiga, g dari x sama dengan dua pangkat x, dan h dari x sama dengan akar kuadrat dari dua x semuanya naik terus pada domain masing-masing.",
+          "Karena setiap garis mendatar memotong masing-masing grafik paling banyak satu titik, ketiga fungsi mempunyai invers."
+        ],
+        "kesimpulan": "Ketiga fungsi mempunyai invers.",
+        "markup": {
+          "question": "Berdasarkan keterangan tadi, pernyataan manakah yang paling tepat tentang fungsi yang mempunyai invers?",
+          "options": {
+            "A": "Fungsi $f(x)=x^{3}$ dan $h(x)=\\sqrt{2x}$ mempunyai invers, sedangkan $g(x)=2^{x}$ tidak.",
+            "B": "Fungsi $g(x)=2^{x}$ dan $h(x)=\\sqrt{2x}$ mempunyai invers, sedangkan $f(x)=x^{3}$ tidak.",
+            "C": "Fungsi $f(x)=x^{3}$ dan $g(x)=2^{x}$ mempunyai invers, sedangkan $h(x)=\\sqrt{2x}$ tidak.",
+            "D": "Ketiga fungsi mempunyai invers karena semuanya naik terus pada domainnya."
+          },
+          "langkah": [
+            "Grafik $f(x)=x^{3}$, $g(x)=2^{x}$, dan $h(x)=\\sqrt{2x}$ semuanya naik terus pada domain masing-masing.",
+            "Karena setiap garis mendatar memotong masing-masing grafik paling banyak satu titik, ketiga fungsi mempunyai invers."
+          ],
+          "kesimpulan": "Ketiga fungsi mempunyai invers."
+        },
+        "stimulus": {
+          "readable_text": "Grafik pertama berbentuk kurva yang naik dari kiri bawah ke kanan atas dan mewakili fungsi f dari x sama dengan x pangkat tiga. Grafik kedua selalu naik saat x bertambah dan mewakili fungsi g dari x sama dengan dua pangkat x. Grafik ketiga juga selalu naik pada domain x lebih dari atau sama dengan nol dan mewakili fungsi h dari x sama dengan akar kuadrat dari dua x.",
+          "source_markup": "Grafik pertama berbentuk kurva yang naik dari kiri bawah ke kanan atas dan mewakili fungsi $f(x)=x^{3}$. Grafik kedua selalu naik saat $x$ bertambah dan mewakili fungsi $g(x)=2^{x}$. Grafik ketiga juga selalu naik pada domain $x\\ge 0$ dan mewakili fungsi $h(x)=\\sqrt{2x}$.",
+          "ringkasan": null,
+          "tabel": null
+        }
+      }
+    ]
+  ]
+}
