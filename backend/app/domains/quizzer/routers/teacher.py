@@ -146,16 +146,13 @@ async def create_quiz_request(
     service: QuizRequestService = Depends(get_quiz_service),
 ):
     """Upsert quiz request and immediately return an SSE progress stream."""
-    print('Test Router')
     result = await service.create_quiz_request(
         teacher_id=teacher.profile_id,
         dto=query,
         supplied_idem_key=idempotency_key,
     )
-    print('Selesai Service')
 
     quiz_request_id = result.quiz_request_id
-    print(f'Harus Enqueue : {result.should_enqueue}')
     # --------------------------------------------------
     # 1. Enqueue only when a new request needs generation
     # --------------------------------------------------
@@ -170,20 +167,31 @@ async def create_quiz_request(
     # 3. SSE stream
     # --------------------------------------------------
     async def event_generator():
+        progress_key = QuizRedisKeys.progress(quiz_request_id)
         result_key = QuizRedisKeys.result(quiz_request_id)
         channel_key = QuizRedisKeys.stream(quiz_request_id)
+
         pubsub = redis.pubsub()
+        last_seq = -1
 
         try:
             await pubsub.subscribe(channel_key)
-            cached_result = await redis.get(result_key)
+            cached_event = await redis.get(progress_key)
 
-            if cached_result:
-                if isinstance(cached_result, bytes):
-                    cached_result = cached_result.decode("utf-8")
+            if not cached_event:
+                cached_event = await redis.get(progress_key)
 
-                yield f"data: {cached_result}\n\n"
-                return
+            if cached_event:
+                if isinstance(cached_event, bytes):
+                    cached_event = cached_event.decode("utf-8")
+
+                parsed = json.loads(cached_event)
+                last_seq = parsed.get("seq", -1)
+
+                yield f"data: {cached_event}\n\n"
+
+                if parsed.get("status") in ("done", "failed"):
+                    return
             
             while True:
                 message = await pubsub.get_message(
@@ -196,8 +204,15 @@ async def create_quiz_request(
                     if isinstance(data, bytes):
                         data = data.decode("utf-8")
 
-                    yield f"data: {data}\n\n"
                     parsed = json.loads(data)
+                    seq = parsed.get("seq", -1)
+                    
+                    if seq <= last_seq:
+                        continue
+
+                    last_seq = seq
+
+                    yield f"data: {data}\n\n"
 
                     if parsed.get("status") in ("done", "failed"):
                         break

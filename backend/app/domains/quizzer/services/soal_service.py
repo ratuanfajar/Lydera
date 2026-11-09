@@ -54,7 +54,7 @@ def _soal_to_dict(soal: Soal) -> dict:
     
 def _review_flags(issues: list[str]) -> tuple[str, str | None]:
     try:
-        print("Review Flags Issue :", issues)
+        # print("Review Flags Issue :", issues)
         return ("high" if issues else "normal"), ("\n".join(issues) or None)
     except Exception as exc:
         logger.exception("Review Flag Error", issues)
@@ -62,8 +62,6 @@ def _review_flags(issues: list[str]) -> tuple[str, str | None]:
             "Flag error."
         ) from exc
     
-
-
 def _readable_dict(soal: Soal) -> dict:
     return {
         "question": soal.question_text,
@@ -101,6 +99,10 @@ class SoalService:
         if soal is None:
             raise NotFoundException("soal tidak ditemukan")
         await self._ensure_quiz_editable(soal.quiz_request_id)
+        # print(f"Stimulus : {soal.stimulus_id}")
+        # print(f"Soal id : {soal.id}")
+        # print(f'Payload markup : {payload.markup}')
+        
 
         if soal.stimulus_id is not None:
             raise BadRequestException("soal ini punya stimulus, koreksi lewat POST /soal/{id}/regenerate")
@@ -111,6 +113,8 @@ class SoalService:
                 "question": payload.question_text, "options": payload.options,
                 "langkah": payload.langkah, "kesimpulan": payload.kesimpulan,
             }
+            # print(f"Second If {any(value is not None for value in text_fields.values())}")
+            # print(value for value in text_fields.values())
             if payload.markup or any(value is not None for value in text_fields.values()):
                 merged = {**_readable_dict(soal), **(soal.markup or {})}
                 merged.update({key: value for key, value in text_fields.items() if value is not None})
@@ -225,15 +229,15 @@ class SoalService:
         ]
 
         try:
-            print(f'Block As Rows :{len(blocks_as_rows)}')
-            print(f'Source Reading Order Start :{target_soal.source_reading_order_start}')
-            print(f'Source Reading Order End :{target_soal.source_reading_order_end}')
-            print(f'Stimulus Source Markup :{stimulus.source_markup}')
-            print(f'Stimulus Readble text:{stimulus.readable_text}')
-            print(f'Soal to Dict :{_soal_to_dict(target_soal)}')
-            print(f'Feedback :{feedback}')
-            print(f'Stimulus Jenis :{stimulus.jenis}')
-            print(f'Stimulus Spesifikasi :{stimulus.spesifikasi}')
+            # print(f'Block As Rows :{len(blocks_as_rows)}')
+            # print(f'Source Reading Order Start :{target_soal.source_reading_order_start}')
+            # print(f'Source Reading Order End :{target_soal.source_reading_order_end}')
+            # print(f'Stimulus Source Markup :{stimulus.source_markup}')
+            # print(f'Stimulus Readble text:{stimulus.readable_text}')
+            # print(f'Soal to Dict :{_soal_to_dict(target_soal)}')
+            # print(f'Feedback :{feedback}')
+            # print(f'Stimulus Jenis :{stimulus.jenis}')
+            # print(f'Stimulus Spesifikasi :{stimulus.spesifikasi}')
 
             result = await asyncio.to_thread(
                 quizzer_regenerate.compute_regeneration,
@@ -304,7 +308,5 @@ class SoalService:
             issues = ["Verifikasi otomatis gagal dijalankan; periksa soal ini secara manual."]
         soal.review_priority, soal.validation_notes = _review_flags(issues)
         await self.db.commit()
-
-
 
 

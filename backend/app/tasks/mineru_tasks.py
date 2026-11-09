@@ -23,6 +23,7 @@ from app.domains.contents.services import ChapterService
 from app.tasks.chatbot_tasks import reindex_chapter_task
 
 MAX_RETRIES = 3
+TTL_60_MINUTES = 3600
 
 async def publish_progress(redis: Redis, job_id: int, status: str, progress:int, message: str, annotation_paths: list[str] = []):
     """Helper to publish real-time progress events to Redis Pub/Sub with monotonic progress safeguard."""
@@ -40,7 +41,7 @@ async def publish_progress(redis: Redis, job_id: int, status: str, progress:int,
         last_p = int(last_p_raw) if last_p_raw is not None else 0
         
         p_to_send = max(progress, last_p)
-        await redis.set(redis_progress_key, p_to_send, ex=3600)
+        await redis.set(redis_progress_key, p_to_send, ex=TTL_60_MINUTES)
 
     payload = json.dumps({
         "job_id": job_id,
@@ -50,7 +51,7 @@ async def publish_progress(redis: Redis, job_id: int, status: str, progress:int,
         "annotation_paths":annotation_paths
     })
 
-    await redis.set(redis_state_key, payload, ex=3600)
+    await redis.set(redis_state_key, payload, ex=TTL_60_MINUTES)
     await redis.publish(f"job_progress:{job_id}", payload)
 
 

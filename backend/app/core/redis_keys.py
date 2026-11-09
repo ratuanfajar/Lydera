@@ -7,6 +7,10 @@ class QuizRedisKeys:
         return f"quiz:idem:{key}"
 
     @staticmethod
+    def progress(quiz_request_id: int) -> str:
+        return f"quiz:{quiz_request_id}:progress"
+
+    @staticmethod
     def content(key: str) -> str:
         return f"quiz:content:{key}"
 
