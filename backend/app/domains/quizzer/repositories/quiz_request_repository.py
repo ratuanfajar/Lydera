@@ -117,6 +117,7 @@ class QuizRequestRepository(QuizRequestRepositoryInterface):
         quiz_request_id: int,
         title: Optional[str] = None,
         max_duration_minutes: Optional[int] = None,
+        max_retry: Optional[int] = None,
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
     ) -> Optional[QuizRequest]:
@@ -132,6 +133,8 @@ class QuizRequestRepository(QuizRequestRepositoryInterface):
             quiz.start_time = start_time
         if end_time is not None:
             quiz.end_time = end_time
+        if max_retry is not None:
+            quiz.max_retry = max_retry
 
         await self.db.flush()
         return quiz

@@ -9,6 +9,9 @@ class QuizRequestUpdate(BaseModel):
     max_duration_minutes: Optional[int] = Field(
         None, gt=0, description="Durasi pengerjaan dalam menit (> 0)"
     )
+    max_retry: Optional[int] = Field(
+        None, gt=0, description="Maksimal ngulang (> 0)"
+    )
     start_time: Optional[datetime] = None
     end_time: Optional[datetime] = None
 

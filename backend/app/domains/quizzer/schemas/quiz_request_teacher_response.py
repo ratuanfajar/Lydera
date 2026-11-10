@@ -89,6 +89,7 @@ class QuizRequestTeacherDetailResponse(BaseModel):
     status_published: QuizRequestStatus
     status: str
     max_duration_minutes: int
+    max_retry:int
     start_time: datetime
     end_time: datetime
     error: Optional[str] = None

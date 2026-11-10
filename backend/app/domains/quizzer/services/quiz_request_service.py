@@ -314,6 +314,7 @@ class QuizRequestService:
         await self.repo.update_quiz_request_settings(
             quiz_request_id=quiz_request_id,
             title=dto.title,
+            max_retry=dto.max_retry,
             max_duration_minutes=dto.max_duration_minutes,
             start_time=dto.start_time,
             end_time=dto.end_time,
@@ -329,6 +330,7 @@ class QuizRequestService:
             title=quiz.title,
             start_time=quiz.start_time,
             end_time= quiz.end_time,
+            max_retry=quiz.max_retry,
             max_duration_minutes=quiz.max_duration_minutes,
         )
 

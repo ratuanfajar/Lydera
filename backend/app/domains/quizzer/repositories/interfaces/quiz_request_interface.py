@@ -51,6 +51,7 @@ class QuizRequestRepositoryInterface(ABC):
         quiz_request_id: int,
         title: Optional[str] = None,
         max_duration_minutes: Optional[int] = None,
+        max_retry: Optional[int] = None,
         start_time: Optional[datetime] = None,
         end_time: Optional[datetime] = None,
     ) -> Optional[QuizRequest]: raise NotImplementedError
