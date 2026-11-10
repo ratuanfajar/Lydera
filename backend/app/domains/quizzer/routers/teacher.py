@@ -27,6 +27,7 @@ from app.domains.quizzer.schemas.quiz_request_query import (
     QuizRequestStudentDetailQuery,
 )
 from app.domains.quizzer.schemas.quiz_request_teacher_response import (
+    QuestionStimulusResponse,
     QuizRequestTeacherDetailResponse,
     QuizRequestTeacherResponse,
 )
@@ -60,7 +61,8 @@ def _to_soal_response(soal: Soal) -> SoalResponse:
         correct_option=soal.correct_option,
         langkah=[l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
         kesimpulan=soal.kesimpulan,
-        stimulus_text=soal.stimulus.readable_text if soal.stimulus else None,
+        stimulus_text = soal.stimulus.readable_text if soal.stimulus else None,
+        stimulus =  QuestionStimulusResponse.model_validate(soal.stimulus) if soal.stimulus else None,
         review_status=soal.review_status,
         review_priority=soal.review_priority,
         validation_notes=soal.validation_notes,

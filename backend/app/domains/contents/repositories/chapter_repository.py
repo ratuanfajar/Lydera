@@ -37,7 +37,7 @@ class ChapterRepository(ChapterRepositoryInterface):
                 Classroom.teacher_id == teacher_id,
             )
             .options(
-                selectinload(Chapter.blocks)
+                selectinload(Chapter.blocks)    
             )
         )
         result = await self.db.execute(stmt)

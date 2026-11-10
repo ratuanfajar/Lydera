@@ -1,4 +1,8 @@
+from typing import Optional
+
 from pydantic import BaseModel
+
+from app.domains.quizzer.schemas.quiz_request_teacher_response import QuestionStimulusResponse
 
 
 class SoalOpsiResponse(BaseModel):
@@ -12,6 +16,7 @@ class SoalResponse(BaseModel):
     stimulus_id: int | None
     bloom_level: int
     question_text: str
+    stimulus: Optional[QuestionStimulusResponse]
     options: list[SoalOpsiResponse]
     correct_option: str
     langkah: list[str]
