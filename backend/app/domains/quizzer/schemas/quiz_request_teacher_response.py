@@ -14,6 +14,7 @@ class QuizRequestTeacherResponse(BaseModel):
     title: str
     status_published: QuizRequestStatus
     max_duration_minutes: int
+    max_retry:int
     start_time: datetime
     end_time: datetime
     status: str
