@@ -23,6 +23,7 @@ from app.domains.users.schemas.student_tasks_request import StudentTaskRequest
 from app.domains.users.schemas.student_tasks_response import StudentTaskResponse
 from app.core.redis_keys import QuizRedisKeys
 from app.domains.quizzer.schemas.create_quiz_request_result import CreateQuizRequestResult
+from app.domains.quizzer.schemas.quiz_edit_response import QuizEditResponse
 TTL_3_MINUTES = 180
 
 
@@ -279,7 +280,7 @@ class QuizRequestService:
         classroom_id: int,
         quiz_request_id: int,
         dto: QuizRequestUpdate,
-    ) -> QuizRequestTeacherDetailResponse:
+    ) -> QuizEditResponse:
         """
         Validates teacher authorization, merges partial updates with existing DB schedule 
         to guarantee schedule validity, updates DB record, and returns full details.
@@ -319,10 +320,16 @@ class QuizRequestService:
         )
         await self.db.commit()
 
-        return await self.get_quiz_teacher(
+        quiz =  await self.get_quiz_teacher(
             QuizRequestDetailQuery(classroom_id=classroom_id),
             teacher_id=teacher_id,
             id=quiz_request_id,
+        )
+        return QuizEditResponse(
+            title=quiz.title,
+            start_time=quiz.start_time,
+            end_time= quiz.end_time,
+            max_duration_minutes=quiz.max_duration_minutes,
         )
 
     async def update_publish_status(

@@ -27,10 +27,6 @@ class QuizRequestUpdate(BaseModel):
             else self.end_time
         )
 
-        # 1. Start time must not be in the past (if provided)
-        if start and start < now:
-            raise ValueError("Waktu mulai (start_time) tidak boleh di masa lalu.")
-
         # 2. End time must be after start time (if both provided in payload)
         if start and end and end <= start:
             raise ValueError("Waktu selesai (end_time) harus lebih besar dari waktu mulai.")

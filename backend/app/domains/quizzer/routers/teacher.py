@@ -40,6 +40,8 @@ from app.utils.role import Role
 from app.core.exceptions import BadRequestException
 from app.domains.quizzer.schemas.soal_edit_request import StimulusEditRequest
 from app.core.redis_keys import QuizRedisKeys
+from app.domains.quizzer.schemas.quiz_edit_response import QuizEditResponse
+from app.domains.quizzer.schemas.quiz_request_update import QuizRequestUpdate
 
 router_teacher_quizz = APIRouter(
     prefix="/teachers",
@@ -234,7 +236,6 @@ async def create_quiz_request(
         },
     )
 
-
 @router_teacher_quizz.patch(
     "/quizzes/statuses/{quiz_id}",
     description="Requires the TEACHER role. change status quiz.",
@@ -263,6 +264,33 @@ async def save_quiz_requets(
         data=True,
     )
 
+@router_teacher_quizz.patch(
+    "/quizzes/{quiz_id}",
+    description="Requires the TEACHER role. change quiz setting.",
+    response_model=Response[QuizEditResponse],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def edit_quiz_requets(
+    quiz_id: Annotated[
+        int,
+        FastAPIPath(..., description="ID of the quiz request to finalize"),
+    ],
+    payload: Annotated[QuizRequestUpdate, Body(...)],
+    teacher: Roles(Role.TEACHER),
+    service: QuizRequestService = Depends(get_quiz_service),
+):
+    quiz_setting = await service.update_quiz_settings(
+        teacher_id=teacher.profile_id,
+        classroom_id=payload.classroom_id,
+        quiz_request_id=quiz_id,
+        dto=payload
+    )
+
+    return Response(
+        message=f"Quiz request berhasil disimpan dengan status",
+        data=quiz_setting,
+    )
 
 @router_teacher_quizz.post(
     "/soal/stimulus/regenerate/{soal_id}",
