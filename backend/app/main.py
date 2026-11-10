@@ -23,7 +23,7 @@ from app.core.exceptions import AppException
 from app.core.response import Response
 from app.domains.cities.router import router as router_city
 from app.domains.schools.router import router as router_school
-from app.domains.quizzer.routers import router_teacher_quizz, router_student_quizz
+from app.domains.quizzer.routers import router_teacher_quizz, router_student_quizz, router_teacher_quizz_v2
 from app.domains.otp.router import router_otp
 from app.core.redis import close_redis_client, get_redis_client
 from app.domains.clarifier.routers.student import router_clarifier
@@ -55,6 +55,7 @@ api_router.include_router(router_teacher)
 api_router.include_router(router_student_contents)
 api_router.include_router(router_teacher_contents)
 api_router.include_router(router_teacher_quizz)
+api_router.include_router(router_teacher_quizz_v2)
 api_router.include_router(router_student_quizz)
 api_router.include_router(router_classrooms_types)
 api_router.include_router(router_classrooms)

@@ -249,6 +249,19 @@ class QuizRequestService:
                 idem_digest=idem_digest,
                 content_fingerprint=content_fingerprint,
             )
+    
+    async def create_quiz_request_v2(self, teacher_id: int, dto: QuizRequestCreate, supplied_idem_key, ) -> CreateQuizRequestResult:
+        return await self.create_quiz_request(teacher_id, dto, supplied_idem_key)
+
+    async def get_quiz_request_v2(self, quiz_request_id: int, teacher_id: int, classroom_id:int):
+        is_valid = await self.repo.validate_quiz_request(
+            quiz_request_id=quiz_request_id,
+            teacher_id=teacher_id,
+            classroom_id=classroom_id,
+        )
+        if not is_valid:
+            raise ForbiddenException("Kelas atau Quiz Request tidak ditemukan atau Anda tidak memiliki akses.")
+        return await self.repo.get_quiz_request(quiz_request_id)
 
     async def delete_quiz(self, teacher_id: int, quiz_request_id: int, classroom_id: int):
         is_valid = await self.repo.validate_quiz_request(

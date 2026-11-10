@@ -27,7 +27,6 @@ GENERIC_FAILURE_MESSAGE = "Pembuatan kuis gagal. Coba lagi beberapa saat lagi."
 class QuizGenerationError(Exception):
     pass
 
-
 def _to_soal_create_request(item: dict) -> SoalCreateRequest:
     data = item["data"]
     stimulus = None
@@ -62,7 +61,6 @@ def _to_soal_create_request(item: dict) -> SoalCreateRequest:
         source_point=item["source_point"],
     )
 
-
 def _failure_summary(report: dict) -> str:
     reasons = []
     for chapter in report["chapters"]:
@@ -71,7 +69,6 @@ def _failure_summary(report: dict) -> str:
         reasons.extend(f"Bab {chapter['chapter_id']} level C{f['level']}: {f['error']}" for f in chapter["failed"][:3])
     return " ".join(reasons)[:1000]
 
-
 def _done_message(saved: int, report: dict) -> str:
     failed = report["summary"]["failed"]
     skipped = sum(1 for chapter in report["chapters"] if chapter["skipped_reason"])
@@ -79,7 +76,6 @@ def _done_message(saved: int, report: dict) -> str:
     message = f"Berhasil membuat dan menyimpan {saved} soal."
     notes = ", ".join(note for note in notes if note)
     return f"{message} {notes}; lihat laporan cakupan." if notes else message
-
 
 def _mark_conversion_failure(report: dict, item: dict) -> None:
     chapter = next(c for c in report["chapters"] if c["chapter_id"] == item["chapter_id"])
@@ -551,3 +547,4 @@ async def process_quiz_request_task(
         # --------------------------------------------------
         with suppress(Exception):
             await worker_lock.release()
+            
