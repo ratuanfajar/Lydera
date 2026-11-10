@@ -24,6 +24,7 @@ class Chapter(Base):
     module: Mapped["Module"] = relationship(back_populates="chapters")
     chapter_progress: Mapped[List["ChapterProgress"]] = relationship(
         back_populates="chapter",
+        order_by="Block.reading_order",
         cascade="all, delete-orphan",
         passive_deletes=True
     )

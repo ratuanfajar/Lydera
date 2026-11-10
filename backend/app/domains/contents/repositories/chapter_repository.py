@@ -39,7 +39,6 @@ class ChapterRepository(ChapterRepositoryInterface):
             .options(
                 selectinload(Chapter.blocks)
             )
-            .order_by(Block.reading_order)
         )
         result = await self.db.execute(stmt)
         return result.scalar_one_or_none()
