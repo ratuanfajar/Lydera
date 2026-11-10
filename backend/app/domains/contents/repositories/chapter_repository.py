@@ -27,6 +27,23 @@ class ChapterRepository(ChapterRepositoryInterface):
         self.db.add_all(blocks)
         await self.db.flush()
 
+    async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> Chapter | None:
+        stmt = (
+            select(Chapter)
+            .join(Module, Chapter.module_id == Module.id)
+            .join(Classroom, Module.classroom_id == Classroom.id)
+            .where(
+                Chapter.id == chapter_id,
+                Classroom.teacher_id == teacher_id,
+            )
+            .options(
+                selectinload(Chapter.blocks)
+            )
+            .order_by(Block.reading_order)
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def student_get_blocks_by_chapter_id(self, chapter_id: int, student_id: int) -> Chapter | None:
         has_access = await self.validate_student_chapter_access(chapter_id, student_id)
         if not has_access:
@@ -134,22 +151,6 @@ class ChapterRepository(ChapterRepositoryInterface):
         self.db.add(new_chapter)
         await self.db.flush()
         return new_chapter.id
-
-    async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> Chapter | None:
-        stmt = (
-            select(Chapter)
-            .join(Module, Chapter.module_id == Module.id)
-            .join(Classroom, Module.classroom_id == Classroom.id)
-            .where(
-                Chapter.id == chapter_id,
-                Classroom.teacher_id == teacher_id,
-            )
-            .options(
-                selectinload(Chapter.blocks)
-            )
-        )
-        result = await self.db.execute(stmt)
-        return result.scalar_one_or_none()
 
     async def student_update_chapter_progress(self, chapter_id: int, student_id: int) -> bool:
         stmt = (
