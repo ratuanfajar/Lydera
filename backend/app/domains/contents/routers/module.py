@@ -58,3 +58,20 @@ async def publish_module(
         message="Berhasil publish",
         data=result,
     )
+
+@router_modules.post(
+    "/draft/{module_id}",
+    description="Requires the TEACHER role",
+    response_model=Response[bool],
+    status_code=status.HTTP_200_OK,
+)
+async def draft_module(
+    module_id: int,
+    teacher: Roles(Role.TEACHER),
+    service: ModuleService = Depends(get_module_service),
+):
+    result = await service.draft_module(module_id, teacher.profile_id)
+    return Response(
+        message="Berhasil membuat draft",
+        data=result,
+    )

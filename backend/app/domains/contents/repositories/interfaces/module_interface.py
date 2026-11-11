@@ -29,4 +29,4 @@ class ModuleRepositoryInterface(ABC):
     async def delete_module_teacher(self, module_id: int, classroom_id: int, teacher_id: int) -> bool: raise NotImplementedError
 
     @abstractmethod
-    async def publish_module(self, module_id: int, teacher_id: int) -> bool: raise NotImplementedError
+    async def set_module_status(self, module_id: int, teacher_id: int, status: ModuleStatus) -> bool: raise NotImplementedError

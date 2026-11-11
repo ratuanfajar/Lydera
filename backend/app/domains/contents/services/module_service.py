@@ -31,7 +31,10 @@ class ModuleService:
             raise e
 
     async def publish_module(self, module_id: int, teacher_id: int) -> bool:
-        return await self.repo.publish_module(module_id, teacher_id)
+        return await self.repo.set_module_status(module_id, teacher_id, ModuleStatus.PUBLISH)
+
+    async def draft_module(self, module_id: int, teacher_id: int) -> bool:
+        return await self.repo.set_module_status(module_id, teacher_id, ModuleStatus.DRAFT)
 
     async def delete_module(self, teacher_id: int, classroom_id: int, module_id: int) -> bool:
         file_paths = await self.job_repo.get_job_file_paths_by_module(

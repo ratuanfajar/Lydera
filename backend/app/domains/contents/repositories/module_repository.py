@@ -169,7 +169,7 @@ class ModuleRepository(ModuleRepositoryInterface):
         await self.db.flush()
         return new_module
 
-    async def publish_module(self, module_id: int, teacher_id: int) -> bool:
+    async def set_module_status(self, module_id: int, teacher_id: int, status: ModuleStatus) -> bool: 
         ownership_stmt = (
             select(Module)
             .join(Classroom, Module.classroom_id == Classroom.id)
@@ -182,7 +182,7 @@ class ModuleRepository(ModuleRepositoryInterface):
         module = result.scalar_one_or_none()
         if not module:
             return False
-        module.status = ModuleStatus.PUBLISH
+        module.status = status
         await self.db.commit()
 
         return True

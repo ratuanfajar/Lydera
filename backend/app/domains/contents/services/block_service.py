@@ -50,10 +50,7 @@ class BlockService:
         update_data = [{"id": b.id, "readable_text": dto.feedback} for b in blocks]
 
         await self.repo.bulk_update_readable_text(update_data)
-
-        unique_chapter_ids = list(set(b.chapter_id for b in blocks))
-        for cid in unique_chapter_ids:
-            await enqueue_chapter_progress_reset_job(cid)
+        await self._resetChapterProgress(blocks)
 
         return RegenerateResponse(block_ids=dto.block_ids, readable_text=dto.feedback)
 
@@ -107,7 +104,9 @@ class BlockService:
         update_data = await asyncio.gather(*[
                     asyncio.to_thread(run_ai, block, job_map.get(block.chapter_id)) for block in blocks
                 ])
+        
         await self.repo.bulk_update_readable_text(update_data)
+        await self._resetChapterProgress(blocks)
 
         return [
             RegenerateDetailResponse(
@@ -119,6 +118,12 @@ class BlockService:
             )
             for item in update_data
         ]
+
+    async def _resetChapterProgress(self, blocks: list[Block]):
+        unique_chapter_ids = list(set(b.chapter_id for b in blocks))
+        for cid in unique_chapter_ids:
+            await enqueue_chapter_progress_reset_job(cid)
+    
 
     async def update_block_text(self, block_id: int, new_text: str) -> None:
         try:
