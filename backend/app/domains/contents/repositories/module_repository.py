@@ -13,6 +13,7 @@ from app.domains.contents.repositories.interfaces.module_interface import (
 )
 from app.domains.contents.schemas.module.student_module_request import StudentModuleStatus
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleStatus
+from app.domains.contents.models.fase import Fase
 
 
 class ModuleRepository(ModuleRepositoryInterface):
@@ -96,10 +97,12 @@ class ModuleRepository(ModuleRepositoryInterface):
         stmt = (
             select(Module)
             .join(Classroom, Classroom.id == Module.classroom_id)
+            .outerjoin(Fase, Fase.id == Module.fase_id)
             .where(
                 Module.classroom_id == classroom_id,
                 Classroom.teacher_id == teacher_id,
             )
+            .options(selectinload(Module.fase))
         )
 
         if status != TeacherModuleStatus.ALL:

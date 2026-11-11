@@ -19,8 +19,8 @@ class Module(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    fase_id: Mapped[Optional[int]] = mapped_column(ForeignKey("fase.id"))
-    classroom_id: Mapped[int] = mapped_column(ForeignKey("classrooms.id"),index=True)
+    fase_id: Mapped[Optional[int]] = mapped_column(ForeignKey("fase.id"), index=True)
+    classroom_id: Mapped[int] = mapped_column(ForeignKey("classrooms.id"))
     status: Mapped[ModuleStatus] = mapped_column(
         SQLEnum(ModuleStatus, native_enum=False, length=20),
         nullable=False,

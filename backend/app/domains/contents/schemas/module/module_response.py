@@ -3,6 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 from app.domains.contents.models.module import ModuleStatus
+from app.domains.contents.schemas.fase_response import FaseResponse
 
 class ModuleResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -10,4 +11,5 @@ class ModuleResponse(BaseModel):
     id: int
     title: str
     fase_id: int | None
+    fase: FaseResponse | None
     created_at: datetime
