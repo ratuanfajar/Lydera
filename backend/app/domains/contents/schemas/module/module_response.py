@@ -11,5 +11,4 @@ class ModuleResponse(BaseModel):
     id: int
     title: str
     fase_id: int | None
-    fase: FaseResponse | None
     created_at: datetime

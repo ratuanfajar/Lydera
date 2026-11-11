@@ -5,6 +5,7 @@ from app.domains.contents.schemas.module.module_response import ModuleResponse
 from app.domains.contents.schemas.chapters.student_chapter_detail_response import StudentChapterDetailResponse
 from app.domains.contents.models.module import ModuleStatus
 from app.domains.contents.schemas.chapters.chapter_response import ChapterResponse
+from app.domains.contents.schemas.fase_response import FaseResponse
 
 class TeacherModuleResponse(ModuleResponse):
     model_config = ConfigDict(from_attributes=True)
@@ -15,5 +16,5 @@ class TeacherModuleResponse(ModuleResponse):
 
 class TeacherModuleWithoutChapterResponse(ModuleResponse):
     model_config = ConfigDict(from_attributes=True)
-    
+    fase: FaseResponse | None
     status: ModuleStatus | None = None
