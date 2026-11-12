@@ -13,6 +13,10 @@ class BlockRepository(BlockRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def delete_block(self, block: Block):
+        await self.db.delete(block)
+        await self.db.commit()
+
     async def get_teacher_blocks(self, block_ids: list[int], teacher_id: int) -> list[Block]:
         unique_ids = list(set(block_ids))
         stmt = (
