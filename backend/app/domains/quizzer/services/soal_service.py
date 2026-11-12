@@ -92,6 +92,17 @@ class SoalService:
             raise NotFoundException("soal tidak ditemukan")
         return soal
 
+    async def delete_soal(self, quiz_request_id: int, student_id:int) -> bool:
+        try:
+            await self.repo.delete_student_answers_by_quiz(quiz_request_id, student_id)
+            await self.db.commit()
+            return True
+        
+        except Exception as e:
+            await self.db.rollback()
+            raise e
+        
+
     async def edit_soal(self, soal_id: int, teacher_id: int, payload: SoalEditRequest) -> Soal:
         """Edit langsung isi soal (LOTS maupun HOTS); sesudah simpan, validator memverifikasi ulang. Stimulus HOTS diedit lewat edit_stimulus."""
         await self._ensure_soal_owner(soal_id, teacher_id)

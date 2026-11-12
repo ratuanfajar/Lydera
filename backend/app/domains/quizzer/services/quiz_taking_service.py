@@ -62,6 +62,9 @@ class QuizTakingService:
         if not session_active:
             if progress.attempt_count >= quiz.max_retry:
                 raise BadRequestException("Anda telah mencapai batas maksimal percobaan kuis")
+            
+            if progress.attempt_count > 0:
+                await self.soal_repo.delete_student_answers_by_quiz(quiz_id, student_id)
 
             progress.attempt_count += 1
             progress.completed_at = None
@@ -69,7 +72,7 @@ class QuizTakingService:
             progress.started_at = now
             progress.review_status = QuizReviewStatus.PENDING
 
-            await self.progress_repo.db.commit()
+            await self.db.commit()
 
         target_end_time = min(
             progress.started_at + timedelta(minutes=quiz.max_duration_minutes),

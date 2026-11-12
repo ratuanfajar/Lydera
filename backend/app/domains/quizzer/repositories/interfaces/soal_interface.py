@@ -38,3 +38,6 @@ class SoalRepositoryInterface(ABC):
 
     @abstractmethod
     async def get_quiz_questions_with_answers(self, quiz_id: int, student_id: int) -> list[Soal]: raise NotImplementedError
+
+    @abstractmethod
+    async def delete_student_answers_by_quiz(self, quiz_request_id: int, student_id: int) -> None: raise NotImplementedError

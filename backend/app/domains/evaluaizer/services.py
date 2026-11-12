@@ -92,7 +92,7 @@ class EvaluaizerService:
                 selected_option=jawaban.selected_option if jawaban else None,
                 correct_option=soal.correct_option,
                 kesimpulan=soal.kesimpulan,
-                divergence_step=jawaban.divergence_step,
+                divergence_step=jawaban.divergence_step if jawaban else None,
                 langkah_kunci=[l.teks for l in sorted(soal.langkah, key=lambda l: l.urutan)],
                 is_correct=jawaban.is_correct if jawaban else None,
                 letak_kesalahan=_letak_kesalahan(jawaban),

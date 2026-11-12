@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from sqlalchemy import exists, select
+from sqlalchemy import delete, exists, select
 from sqlalchemy.orm import selectinload
 
 from app.core.db import AsyncSession
@@ -79,6 +79,21 @@ class SoalRepository(SoalRepositoryInterface):
         for label, opsi_text in options.items():
             soal.opsi.append(SoalOpsi(soal_id=soal_id, label=label, opsi_text=opsi_text))
         await self.db.flush()
+
+    async def delete_student_answers_by_quiz(
+        self, quiz_request_id: int, student_id: int
+    ) -> None:
+        soal_ids_subq = (
+            select(Soal.id)
+            .where(Soal.quiz_request_id == quiz_request_id)
+            .scalar_subquery()
+        )
+
+        stmt = delete(SoalJawaban).where(
+            SoalJawaban.student_id == student_id,
+            SoalJawaban.soal_id.in_(soal_ids_subq),
+        )
+        await self.db.execute(stmt)
 
     async def replace_soal_langkah(self, soal_id: int, langkah: list[str]) -> None:
         soal = await self.get_soal_by_id(soal_id)
