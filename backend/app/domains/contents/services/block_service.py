@@ -11,7 +11,7 @@ from annoter import annoter_regenerate
 from common.speakable import manual_reading_issues
 
 from app.core.db import AsyncSession
-from app.core.exceptions import BadRequestException
+from app.core.exceptions import BadRequestException, NotFoundException
 from app.domains.contents.models import Block, Chapter, Module, ModuleStatus
 from app.domains.contents.repositories.interfaces.block_interface import (
     BlockRepositoryInterface,
@@ -30,6 +30,15 @@ class BlockService:
     def __init__(self, repo: BlockRepositoryInterface, db: AsyncSession):
         self.repo = repo
         self.db = db
+
+    async def delete_block_by_id(self, block_id: int):
+        block = await self.repo.get_block_by_id(block_id)
+        if not block:
+            raise NotFoundException(
+                f"Block {block_id} tidak ditemukan"
+            )
+        
+        await self.repo.delete_block(block)
 
     async def get_block_by_id(self, block_id: int) -> Block | None:
         return await self.repo.get_block_by_id(block_id)

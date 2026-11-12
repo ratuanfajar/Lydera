@@ -17,6 +17,20 @@ from app.domains.contents.schemas.blocks.block_edit import BlockEditRequest, Blo
 
 router_blocks = APIRouter(prefix="/blocks", tags=["blocks"], route_class=WrappedRoute)
 
+@router_blocks.delete(
+    "/{block_id}",
+    response_model=Response[None],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES
+)
+async def delete_block_by_id(
+    block_id: Annotated[int, FastAPIPath()],
+    teacher: Roles(Role.TEACHER),
+    service: BlockService = Depends(get_block_service),
+):
+    result = await service.delete_block_by_id(block_id)
+    return Response(message="Delete block successfully", data=None)
+
 @router_blocks.patch(
     "/{block_id}",
     description=(
