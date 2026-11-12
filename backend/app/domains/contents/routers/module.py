@@ -41,7 +41,6 @@ async def create_module(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
 @router_modules.post(
     "/publish/{module_id}",
     description="Requires the TEACHER role",

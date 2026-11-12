@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from sqlalchemy import delete, exists, or_, select
+from sqlalchemy import delete, exists, func, or_, select
 from sqlalchemy.orm import contains_eager, selectinload
 
 from app.core.db import AsyncSession
@@ -14,6 +14,8 @@ from app.domains.contents.repositories.interfaces.module_interface import (
 from app.domains.contents.schemas.module.student_module_request import StudentModuleStatus
 from app.domains.contents.schemas.module.teacher_module_request import TeacherModuleStatus
 from app.domains.contents.models.fase import Fase
+from app.domains.jobs.models.job import Job
+from app.domains.contents.models.block import Block
 
 
 class ModuleRepository(ModuleRepositoryInterface):
@@ -115,11 +117,30 @@ class ModuleRepository(ModuleRepositoryInterface):
         result = await self.db.scalars(stmt)
         return result.all()
 
-    async def get_detail_module_teacher(self, module_id: int, classroom_id: int, teacher_id: int) -> Module | None:
+    async def get_detail_module_teacher(
+        self, module_id: int, classroom_id: int, teacher_id: int
+    ) -> Module | None:
+        latest_job_id = (
+            select(Job.id)
+            .where(Job.chapter_id == Chapter.id)
+            .order_by(Job.created_at.desc(), Job.id.desc())
+            .limit(1)
+            .correlate(Chapter)
+            .scalar_subquery()
+        )
+
+        blocks_count_subq = (
+            select(func.count(Block.id))
+            .where(Block.chapter_id == Chapter.id)
+            .correlate(Chapter)
+            .scalar_subquery()
+        )
+
         stmt = (
-            select(Module)
+            select(Module, Chapter, Job, blocks_count_subq)
             .join(Classroom, Module.classroom_id == Classroom.id)
             .outerjoin(Module.chapters)
+            .outerjoin(Job, Job.id == latest_job_id)
             .options(
                 contains_eager(Module.chapters)
             )
@@ -131,10 +152,21 @@ class ModuleRepository(ModuleRepositoryInterface):
             .order_by(Chapter.number)
         )
 
-        result = await self.db.scalars(stmt)
-        module = result.unique().first()
-        return module
+        result = await self.db.execute(stmt)
+        rows = result.unique().all()
 
+        if not rows:
+            return None
+
+        module = rows[0][0]
+
+        for _, chapter, latest_job, blocks_count in rows:
+            if chapter is not None:
+                chapter.latest_job = latest_job
+                chapter.blocks_count = blocks_count or 0
+
+        return module
+    
     async def delete_module_teacher(self, module_id: int, classroom_id: int, teacher_id: int) -> bool:
         classroom_subquery = (
             select(Classroom.id)

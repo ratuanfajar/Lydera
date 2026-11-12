@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Tuple
 
 from app.domains.contents.models import Block, Chapter, Cp
+from app.domains.jobs.models import Job
 
 
 class ChapterRepositoryInterface(ABC):
@@ -8,7 +10,7 @@ class ChapterRepositoryInterface(ABC):
     async def create_chapter(self, module_id: int, source_file: str, number: int | None = None, title: str | None = None, cp_id: int | None = None) -> int: raise NotImplementedError
 
     @abstractmethod
-    async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> Chapter | None: raise NotImplementedError
+    async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> Chapter | None : raise NotImplementedError # type: ignore
 
     @abstractmethod
     async def get_current_max_order(self, chapter_id: int) -> int: raise NotImplementedError

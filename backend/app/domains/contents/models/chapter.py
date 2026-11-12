@@ -30,3 +30,30 @@ class Chapter(Base):
     cp: Mapped[Optional["Cp"]] = relationship(back_populates="chapters")
     blocks: Mapped[List["Block"]] = relationship(back_populates="chapter", order_by="Block.reading_order", cascade="all, delete-orphan")
     jobs: Mapped[List["Job"]] = relationship(back_populates="chapter", cascade="all, delete-orphan")
+
+    @property
+    def latest_job(self) -> "Job | None":
+        return self.__dict__.get("_latest_job")
+
+    @latest_job.setter
+    def latest_job(self, value: "Job | None") -> None:
+        self.__dict__["_latest_job"] = value
+
+    @property
+    def blocks_count(self) -> int | None:
+        return self.__dict__.get("_blocks_count")
+
+    @blocks_count.setter
+    def blocks_count(self, value: int | None) -> None:
+        self.__dict__["_blocks_count"] = value
+
+    @property
+    def is_need_review(self) -> bool:
+        latest_job = self.latest_job
+        if latest_job is None or latest_job.status != "done":
+            return False
+
+        if self.blocks_count is not None:
+            return self.blocks_count == 0
+
+        return len(self.blocks) == 0

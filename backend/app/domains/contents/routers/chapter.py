@@ -179,9 +179,11 @@ async def confirm_chapter(
         }
     },
 )
-async def stream_job_progress(job_id: int):
-    """Real-time SSE stream for monitoring MinerU job progress."""
+async def stream_job_progress(
+    job_id: int,
+    ):
 
+    """Real-time SSE stream for monitoring MinerU job progress."""
     async def event_generator():
         redis: Redis = get_redis_client()
         pubsub = redis.pubsub()
