@@ -32,6 +32,21 @@ class BlockService:
         self.repo = repo
         self.db = db
 
+    async def _update_regenerated_blocks_cache(self, updated_blocks: list) -> None:
+        if not updated_blocks:
+            return
+
+        redis_client = get_redis_client()
+        async with redis_client.pipeline(transaction=False) as pipe:
+            for block in updated_blocks:
+                b_key = ChapterRedisKeys.chapter_block(
+                    chapter_id=block.chapter_id,
+                    block_id=block.id,
+                )
+                block_json = BlockDetailResponse.model_validate(block).model_dump_json()
+                pipe.set(b_key, block_json, xx=True, keepttl=True)
+            await pipe.execute()
+
     async def delete_block_by_id(self, block_id: int):
         block = await self.repo.get_block_by_id(block_id)
         if not block:
@@ -63,15 +78,9 @@ class BlockService:
         await self.repo.bulk_update_readable_text(update_data)
         await self._resetChapterProgress(blocks)
 
-        keys_to_delete = set()
-
         for b in blocks:
-            keys_to_delete.add(ChapterRedisKeys.chapter_teacher(chapter_id=b.chapter_id,teacher_id=teacher_id))
-            keys_to_delete.add(ChapterRedisKeys.chapter_student(chapter_id=b.chapter_id))
-        
-        if keys_to_delete:
-            redis_client = get_redis_client()
-            await redis_client.delete(*keys_to_delete)
+            b.readable_text = dto.feedback
+        await self._update_regenerated_blocks_cache(blocks)
 
         return RegenerateResponse(block_ids=dto.block_ids, readable_text=dto.feedback)
 
@@ -124,21 +133,22 @@ class BlockService:
             }
 
         update_data = await asyncio.gather(*[
-                    asyncio.to_thread(run_ai, block, job_map.get(block.chapter_id)) for block in blocks
-                ])
+            asyncio.to_thread(run_ai, block, job_map.get(block.chapter_id)) for block in blocks
+        ])
         
         await self.repo.bulk_update_readable_text(update_data)
         await self._resetChapterProgress(blocks)
 
-        keys_to_delete = set()
-
+        update_map = {item["id"]: item for item in update_data}
         for b in blocks:
-            keys_to_delete.add(ChapterRedisKeys.chapter_teacher(chapter_id=b.chapter_id,teacher_id=teacher_id))
-            keys_to_delete.add(ChapterRedisKeys.chapter_student(chapter_id=b.chapter_id))
-        
-        if keys_to_delete:
-            redis_client = get_redis_client()
-            await redis_client.delete(*keys_to_delete)
+            item = update_map[b.id]
+            b.readable_text = item["readable_text"]
+            b.image_kind = item["image_kind"]
+            b.ringkasan = item["ringkasan"]
+            b.tabel = item["tabel"]
+            b.review_priority = item["review_priority"]
+
+        await self._update_regenerated_blocks_cache(blocks)
 
         return [
             RegenerateDetailResponse(

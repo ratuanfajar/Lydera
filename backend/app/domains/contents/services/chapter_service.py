@@ -1,5 +1,6 @@
 import json
 import math
+import json
 from pathlib import Path
 from typing import Any, Dict, List
 from app.core.redis_keys import TTL_30_MINUTES, ChapterRedisKeys
@@ -47,26 +48,62 @@ class ChapterService:
         self.db = db
         self.READING_ORDER_STEP = 10
 
-    async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> ChapterDetailResponse:
-        redis_client = get_redis_client()
-        
-        chapter_key = ChapterRedisKeys.chapter_teacher(chapter_id=chapter_id,teacher_id=teacher_id)
+    async def _get_cached_chapter_dict(self, redis_client, chapter_id: int) -> dict | None:
+        meta_key = ChapterRedisKeys.chapter_meta(chapter_id)
+        cached_meta = await redis_client.get(meta_key)
+        if not cached_meta:
+            return None
 
-        cached_chapter = redis_client.get(chapter_key)
-        if cached_chapter:
-            return ChapterDetailResponse.model_validate_json(cached_chapter)
+        block_keys = [
+            key async for key in redis_client.scan_iter(match=f"chapter:{chapter_id}:block_id:*")
+        ]
+        if not block_keys:
+            return None
+
+        raw_blocks = await redis_client.mget(block_keys)
+        if not all(raw_blocks):
+            return None
+
+        chapter_dict = json.loads(cached_meta)
+        blocks_list = [json.loads(b) for b in raw_blocks]
+        blocks_list.sort(key=lambda x: x["reading_order"])
+        chapter_dict["blocks"] = blocks_list
+        return chapter_dict
+
+
+    async def _set_cached_chapter(
+        self, redis_client, chapter_id: int, chapter_response: ChapterDetailResponse, ttl: int
+    ) -> None:
+        meta_key = ChapterRedisKeys.chapter_meta(chapter_id)
+        full_dict = chapter_response.model_dump(mode="json")
+        blocks_data = full_dict.pop("blocks", [])
+
+        async with redis_client.pipeline(transaction=False) as pipe:
+            pipe.setex(meta_key, ttl, json.dumps(full_dict))
+            for block in blocks_data:
+                b_key = ChapterRedisKeys.chapter_block(chapter_id=chapter_id, block_id=block["id"])
+                pipe.setex(b_key, ttl, json.dumps(block))
+            await pipe.execute()
+
+    async def get_chapter_by_id(
+        self, chapter_id: int, teacher_id: int
+    ) -> ChapterDetailResponse:
+        redis_client = get_redis_client()
+
+        has_access = await self.repo.validate_teacher_chapter_access(chapter_id, teacher_id)
+        if not has_access:
+            raise ForbiddenException("Tidak mempunyai akses atau tidak ada")
+
+        cached_dict = await self._get_cached_chapter_dict(redis_client, chapter_id)
+        if cached_dict:
+            return ChapterDetailResponse.model_validate(cached_dict)
 
         chapter = await self.repo.get_chapter_by_id(chapter_id, teacher_id)
         if not chapter:
             raise ForbiddenException("Tidak mempunyai akses atau tidak ada")
 
         response = ChapterDetailResponse.model_validate(chapter)
-
-        await redis_client.setex(
-            name=chapter_key,
-            time=TTL_30_MINUTES,
-            value=response.model_dump_json()
-        )
+        await self._set_cached_chapter(redis_client, chapter_id, response, TTL_30_MINUTES)
 
         return response 
 
@@ -155,33 +192,44 @@ class ChapterService:
         blocks_data = self._combine_annotated_blocks(raw_blocks_data, MAX_BLOCK_CHARS)
         return blocks_data
 
-    async def start_chapter(self, student_id: int, chapter_id: int) -> StudentChapterDetailWithoutProgressResponse:
+    async def start_chapter(
+        self, student_id: int, chapter_id: int
+    ) -> StudentChapterDetailWithoutProgressResponse:
         redis_client = get_redis_client()
-        has_access = await self.repo.validate_student_chapter_access(chapter_id, student_id)
-        if not has_access:
-            raise ForbiddenException(detail="Anda tidak memiliki akses ke chapter ini.")
 
-        chapter_key = ChapterRedisKeys.chapter_student(chapter_id=chapter_id)
+        cached_dict = await self._get_cached_chapter_dict(redis_client, chapter_id)
+        if cached_dict:
+            has_access = await self.repo.validate_student_chapter_access(chapter_id, student_id)
+            if not has_access:
+                raise ForbiddenException(detail="Anda tidak memiliki akses ke chapter ini.")
 
-        cached_chapter = await redis_client.get(chapter_key)
-        if cached_chapter:    
-            return StudentChapterDetailWithoutProgressResponse.model_validate_json(cached_chapter)
+            await self.repo.student_create_chapter_progress(student_id, chapter_id)
+            await self.db.commit()
 
-        chapter = await self.repo.student_get_blocks_by_chapter_id(chapter_id=chapter_id, student_id=student_id)
+            block_keys = [
+                key async for key in redis_client.scan_iter(match=f"chapter:{chapter_id}:block_id:*")
+            ]
+            async with redis_client.pipeline(transaction=False) as pipe:
+                pipe.expire(ChapterRedisKeys.chapter_meta(chapter_id), 180)
+                for b_key in block_keys:
+                    pipe.expire(b_key, 180)
+                await pipe.execute()
+
+            return StudentChapterDetailWithoutProgressResponse.model_validate(cached_dict)
+
+        chapter = await self.repo.student_get_blocks_by_chapter_id(
+            chapter_id=chapter_id, student_id=student_id
+        )
         if not chapter:
             raise NotFoundException(detail="Chapter tidak ditemukan.")
+
         await self.repo.student_create_chapter_progress(student_id, chapter_id)
         await self.db.commit()
 
-        response = StudentChapterDetailWithoutProgressResponse.model_validate(chapter) 
+        full_response = ChapterDetailResponse.model_validate(chapter)
+        await self._set_cached_chapter(redis_client, chapter_id, full_response, 180)
 
-        await redis_client.setex(
-            name=chapter_key,
-            time=TTL_30_MINUTES,
-            value=response.model_dump_json()
-        )
-
-        return response
+        return StudentChapterDetailWithoutProgressResponse.model_validate(chapter)
 
     async def start_chapter_v2(
         self, student_id: int, chapter_id: int, page: int = 1, per_page: int = 10

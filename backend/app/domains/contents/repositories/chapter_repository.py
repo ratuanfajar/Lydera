@@ -13,7 +13,6 @@ from app.domains.contents.repositories.interfaces.chapter_interface import (
 )
 from app.domains.users.models.student import student_classrooms
 
-
 class ChapterRepository(ChapterRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db

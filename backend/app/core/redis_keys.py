@@ -3,12 +3,12 @@ TTL_30_MINUTES = 1800
 
 class ChapterRedisKeys:
     @staticmethod
-    def chapter_teacher(chapter_id: int, teacher_id: int) -> str:
-        return f"chapter:{chapter_id}:teacher:{teacher_id}"
-    
+    def chapter_meta(chapter_id: int) -> str:
+        return f"chapter:{chapter_id}:meta"
+
     @staticmethod
-    def chapter_student(chapter_id: int) -> str:
-        return f"chapter:{chapter_id}"
+    def chapter_block(chapter_id: int, block_id: int) -> str:
+        return f"chapter:{chapter_id}:block_id:{block_id}"
 
 class QuizRedisKeys:
     @staticmethod
