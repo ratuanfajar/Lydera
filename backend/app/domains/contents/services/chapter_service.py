@@ -2,6 +2,8 @@ import json
 import math
 from pathlib import Path
 from typing import Any, Dict, List
+from app.core.redis_keys import TTL_30_MINUTES, ChapterRedisKeys
+from app.core.redis import get_redis_client
 from app.core.config import settings
 from app.core.config import DEFAULT_AI_OUTPUT_DIR
 from app.core.db import AsyncSession
@@ -46,10 +48,27 @@ class ChapterService:
         self.READING_ORDER_STEP = 10
 
     async def get_chapter_by_id(self, chapter_id: int, teacher_id: int) -> ChapterDetailResponse:
+        redis_client = get_redis_client()
+        
+        chapter_key = ChapterRedisKeys.chapter_teacher(chapter_id=chapter_id,teacher_id=teacher_id)
+
+        cached_chapter = redis_client.get(chapter_key)
+        if cached_chapter:
+            return ChapterDetailResponse.model_validate_json(cached_chapter)
+
         chapter = await self.repo.get_chapter_by_id(chapter_id, teacher_id)
         if not chapter:
             raise ForbiddenException("Tidak mempunyai akses atau tidak ada")
-        return ChapterDetailResponse.model_validate(chapter)
+
+        response = ChapterDetailResponse.model_validate(chapter)
+
+        await redis_client.setex(
+            name=chapter_key,
+            time=TTL_30_MINUTES,
+            value=response.model_dump_json()
+        )
+
+        return response 
 
     async def validate_and_create_chapter(self, module_id: int, cp_id: int | None, number: int | None, title: str | None, source_file: str) -> int:
         """Menggantikan validasi panjang di router."""
@@ -137,16 +156,32 @@ class ChapterService:
         return blocks_data
 
     async def start_chapter(self, student_id: int, chapter_id: int) -> StudentChapterDetailWithoutProgressResponse:
+        redis_client = get_redis_client()
         has_access = await self.repo.validate_student_chapter_access(chapter_id, student_id)
         if not has_access:
             raise ForbiddenException(detail="Anda tidak memiliki akses ke chapter ini.")
+
+        chapter_key = ChapterRedisKeys.chapter_student(chapter_id=chapter_id)
+
+        cached_chapter = await redis_client.get(chapter_key)
+        if cached_chapter:    
+            return StudentChapterDetailWithoutProgressResponse.model_validate_json(cached_chapter)
 
         chapter = await self.repo.student_get_blocks_by_chapter_id(chapter_id=chapter_id, student_id=student_id)
         if not chapter:
             raise NotFoundException(detail="Chapter tidak ditemukan.")
         await self.repo.student_create_chapter_progress(student_id, chapter_id)
         await self.db.commit()
-        return StudentChapterDetailWithoutProgressResponse.model_validate(chapter)
+
+        response = StudentChapterDetailWithoutProgressResponse.model_validate(chapter) 
+
+        await redis_client.setex(
+            name=chapter_key,
+            time=TTL_30_MINUTES,
+            value=response.model_dump_json()
+        )
+
+        return response
 
     async def start_chapter_v2(
         self, student_id: int, chapter_id: int, page: int = 1, per_page: int = 10

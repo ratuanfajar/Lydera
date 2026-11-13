@@ -2,7 +2,8 @@ import asyncio
 from pathlib import Path
 
 from sqlalchemy import select
-
+from app.core.redis import get_redis_client
+from app.core.redis_keys import TTL_30_MINUTES, ChapterRedisKeys
 import app.utils.paths as paths
 from app.domains.contents.schemas.blocks.block_edit import BlockEditRequest, BlockEditResponse
 
@@ -48,6 +49,7 @@ class BlockService:
         dto: RegenerateRequest,
         teacher_id: int,
     ) -> RegenerateResponse:
+        redis_client = get_redis_client()
         blocks = await self.repo.get_teacher_blocks(dto.block_ids, teacher_id)
 
         for block in blocks:
@@ -60,6 +62,16 @@ class BlockService:
 
         await self.repo.bulk_update_readable_text(update_data)
         await self._resetChapterProgress(blocks)
+
+        keys_to_delete = set()
+
+        for b in blocks:
+            keys_to_delete.add(ChapterRedisKeys.chapter_teacher(chapter_id=b.chapter_id,teacher_id=teacher_id))
+            keys_to_delete.add(ChapterRedisKeys.chapter_student(chapter_id=b.chapter_id))
+        
+        if keys_to_delete:
+            redis_client = get_redis_client()
+            await redis_client.delete(*keys_to_delete)
 
         return RegenerateResponse(block_ids=dto.block_ids, readable_text=dto.feedback)
 
@@ -78,6 +90,7 @@ class BlockService:
         teacher_id: int,
         job_service,
     ) -> list[RegenerateDetailResponse]:
+        redis_client = get_redis_client()
         blocks = await self.repo.get_teacher_blocks(dto.block_ids, teacher_id)
 
         for block in blocks:
@@ -116,6 +129,16 @@ class BlockService:
         
         await self.repo.bulk_update_readable_text(update_data)
         await self._resetChapterProgress(blocks)
+
+        keys_to_delete = set()
+
+        for b in blocks:
+            keys_to_delete.add(ChapterRedisKeys.chapter_teacher(chapter_id=b.chapter_id,teacher_id=teacher_id))
+            keys_to_delete.add(ChapterRedisKeys.chapter_student(chapter_id=b.chapter_id))
+        
+        if keys_to_delete:
+            redis_client = get_redis_client()
+            await redis_client.delete(*keys_to_delete)
 
         return [
             RegenerateDetailResponse(
