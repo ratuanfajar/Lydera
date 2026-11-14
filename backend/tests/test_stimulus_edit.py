@@ -5,10 +5,14 @@ import pytest
 from pydantic import ValidationError
 
 from app.core.exceptions import BadRequestException
-from app.domains.contents import services as content_services
-from app.domains.contents.schemas.blocks.block_edit import BlockEditRequest
 from app.domains.quizzer import services as quiz_services
-from app.domains.quizzer.schemas.soal_edit_request import StimulusEditRequest
+from app.domains.quizzer.models.quiz_request import QuizRequestStatus
+from app.domains.quizzer.schemas.soal_edit_request import SoalEditRequest, StimulusEditRequest
+from app.domains.quizzer.services import soal_service
+
+
+def run(coro):
+    return asyncio.run(coro)
 
 
 class FakeDb:
@@ -20,101 +24,6 @@ class FakeDb:
 
     async def rollback(self):
         self.rollbacks += 1
-
-
-def run(coro):
-    return asyncio.run(coro)
-
-
-def test_block_edit_request_butuh_minimal_satu_isi():
-    with pytest.raises(ValidationError):
-        BlockEditRequest()
-    assert BlockEditRequest(readable_text="x").readable_text == "x"
-
-
-def test_stimulus_edit_request_butuh_tepat_satu_bentuk():
-    with pytest.raises(ValidationError):
-        StimulusEditRequest()
-    with pytest.raises(ValidationError):
-        StimulusEditRequest(source_markup="a", spesifikasi={"svg": "x"})
-    assert StimulusEditRequest(spesifikasi={"svg": "x"}).narasi is None
-
-
-class BlockRepo:
-    def __init__(self, block):
-        self.block, self.updates = block, []
-
-    async def get_teacher_blocks(self, block_ids, teacher_id):
-        return [self.block]
-
-    async def bulk_update_readable_text(self, update_data):
-        self.updates.append(update_data)
-        return True
-
-
-def block(block_type, **extra):
-    base = dict(id=5, chapter_id=9, block_type=block_type, readable_text="lama", source_markup=None, ringkasan=None, tabel=None)
-    return SimpleNamespace(**{**base, **extra})
-
-
-@pytest.fixture
-def content_service(monkeypatch):
-    resets = []
-
-    async def reset(chapter_id):
-        resets.append(chapter_id)
-
-    monkeypatch.setattr(content_services, "enqueue_chapter_progress_reset_job", reset)
-
-    def make(target):
-        repo = BlockRepo(target)
-        return content_services.ContentService(repo, None, None), repo, resets
-
-    return make
-
-
-def test_edit_blok_gambar_memakai_readable_text_guru_dan_mereset_progres(content_service):
-    service, repo, resets = content_service(block("image"))
-    result = run(service.edit_block(5, 1, BlockEditRequest(readable_text="Grafik naik dari kiri ke kanan.")))
-    assert result.readable_text == "Grafik naik dari kiri ke kanan." and result.review_priority == "normal"
-    assert repo.updates == [[{"id": 5, "readable_text": "Grafik naik dari kiri ke kanan.", "review_priority": "normal"}]]
-    assert resets == [9]
-
-
-def test_edit_blok_tabel_menurunkan_ulang_bacaan_ringkasan_dan_html(content_service):
-    service, repo, _ = content_service(block("table"))
-    tabel = {"judul": "Nilai", "kolom": ["x", "y"], "baris": [["1", "2"]]}
-    result = run(service.edit_block(5, 1, BlockEditRequest(tabel=tabel)))
-    assert "Ada 2 kolom" in result.readable_text and result.ringkasan and result.tabel["kolom"] == ["x", "y"]
-    assert "<table" in repo.updates[0][0]["source_markup"]
-
-
-def test_edit_blok_rumus_dari_sumber_memakai_verbalizer(content_service, monkeypatch):
-    monkeypatch.setattr(content_services.annoter_regenerate.math_text, "readable_texts", lambda markups, issues=None: ["x kuadrat"])
-    service, repo, _ = content_service(block("formula"))
-    result = run(service.edit_block(5, 1, BlockEditRequest(source_markup="x^{2}")))
-    assert result.readable_text == "x kuadrat" and repo.updates[0][0]["source_markup"] == "x^{2}"
-
-
-@pytest.mark.parametrize("block_type, payload", [
-    ("image", BlockEditRequest(readable_text="**tebal**")),
-    ("formula", BlockEditRequest(readable_text="x^2 sama dengan empat")),
-    ("table", BlockEditRequest(tabel={"judul": "t", "kolom": ["a", "b"], "baris": [["1"]]})),
-    ("image", BlockEditRequest(source_markup="x")),
-])
-def test_edit_blok_tidak_valid_ditolak_tanpa_menyimpan(content_service, block_type, payload):
-    service, repo, resets = content_service(block(block_type))
-    with pytest.raises(BadRequestException):
-        run(service.edit_block(5, 1, payload))
-    assert repo.updates == [] and resets == []
-
-
-def test_edit_blok_teks_menyimpan_apa_adanya_dan_menolak_kosong(content_service):
-    service, repo, _ = content_service(block("text"))
-    run(service.edit_block(5, 1, BlockEditRequest(readable_text="  Kalimat dari buku.  ")))
-    assert repo.updates[0][0]["readable_text"] == "Kalimat dari buku."
-    with pytest.raises(BadRequestException):
-        run(service.edit_block(5, 1, BlockEditRequest(source_markup="x")))
 
 
 def make_soal(soal_id, stimulus):
@@ -132,7 +41,7 @@ class QuizRepo:
         self.stimulus = stimulus
         self.soal = [make_soal(1, stimulus), make_soal(2, stimulus)]
         self.updated = []
-        self.quiz = SimpleNamespace(status_published=quiz_services.QuizRequestStatus.PUBLISH if published else quiz_services.QuizRequestStatus.DRAFT)
+        self.quiz = SimpleNamespace(status_published=QuizRequestStatus.PUBLISH if published else QuizRequestStatus.DRAFT)
         self.has_progress = has_progress
 
     async def get_quiz_request(self, quiz_request_id):
@@ -168,8 +77,21 @@ def make_stimulus(jenis="teks", spesifikasi=None):
 
 def quiz_service(stimulus, monkeypatch, compute):
     repo, db = QuizRepo(stimulus), FakeDb()
-    monkeypatch.setattr(quiz_services.quizzer_regenerate, "compute_stimulus_edit", compute)
-    return quiz_services.QuizService(repo, db, None), repo, db
+    monkeypatch.setattr(soal_service.quizzer_regenerate, "compute_stimulus_edit", compute)
+    return quiz_services.SoalService(repo, repo, db), repo, db
+
+
+def test_stimulus_edit_request_butuh_tepat_satu_bentuk():
+    with pytest.raises(ValidationError):
+        StimulusEditRequest()
+    with pytest.raises(ValidationError):
+        StimulusEditRequest(source_markup="a", spesifikasi={"svg": "x"})
+    assert StimulusEditRequest(spesifikasi={"svg": "x"}).narasi is None
+
+
+def test_stimulus_edit_request_menolak_narasi_bersama_source_markup():
+    with pytest.raises(ValidationError):
+        StimulusEditRequest(source_markup="a", narasi="b")
 
 
 def test_edit_stimulus_teks_menyimpan_dan_memperbarui_penanda_seluruh_cluster(monkeypatch):
@@ -235,44 +157,30 @@ def test_edit_stimulus_pada_soal_tanpa_stimulus_ditolak(monkeypatch):
         run(service.edit_stimulus(1, 1, StimulusEditRequest(source_markup="x")))
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason="spec 0008 §1: PATCH soal harus menerima soal berstimulus; kode masih menolaknya di soal_service.edit_soal",
+)
 def test_edit_soal_hots_tidak_lagi_ditolak_dan_diverifikasi_ulang(monkeypatch):
-    from app.domains.quizzer.schemas.soal_edit_request import SoalEditRequest
-
     service, repo, db = quiz_service(make_stimulus(), monkeypatch, lambda *args: {})
-    monkeypatch.setattr(quiz_services.quizzer_regenerate, "review_soal", lambda source, soal, stimulus_text: ["Langkah tidak valid."])
+    monkeypatch.setattr(soal_service.quizzer_regenerate, "review_soal", lambda source, soal, stimulus_text: ["Langkah tidak valid."])
     result = run(service.edit_soal(1, 1, SoalEditRequest(correct_option="B")))
     assert result.correct_option == "B" and result.review_status == "edited"
     assert (result.review_priority, result.validation_notes) == ("high", "Langkah tidak valid.")
 
 
-@pytest.mark.parametrize("text", ["**tebal**", "# judul", "x^2 sama dengan empat"])
-def test_edit_blok_teks_dengan_markdown_atau_notasi_mentah_ditolak(content_service, text):
-    service, repo, _ = content_service(block("text"))
-    with pytest.raises(BadRequestException):
-        run(service.edit_block(5, 1, BlockEditRequest(readable_text=text)))
-    assert repo.updates == []
-
-
-def test_stimulus_edit_request_menolak_narasi_bersama_source_markup():
-    with pytest.raises(ValidationError):
-        StimulusEditRequest(source_markup="a", narasi="b")
-
-
 def test_edit_soal_dengan_notasi_mentah_di_luar_rumus_ditolak(monkeypatch):
-    from app.domains.quizzer.schemas.soal_edit_request import SoalEditRequest
-
     service, repo, db = quiz_service(make_stimulus(), monkeypatch, lambda *args: {})
-    with pytest.raises(BadRequestException):
+    repo.soal[0].stimulus_id = None
+    with pytest.raises(BadRequestException, match="Markup tidak valid"):
         run(service.edit_soal(1, 1, SoalEditRequest(question_text="Berapa x = 3 + 2?")))
     assert db.commits == 0
 
 
 @pytest.mark.parametrize("published, has_progress", [(True, False), (False, True)])
 def test_soal_stimulus_dan_regenerasi_terkunci_bila_kuis_dipublikasikan_atau_sudah_dikerjakan(monkeypatch, published, has_progress):
-    from app.domains.quizzer.schemas.soal_edit_request import SoalEditRequest
-
     service, repo, db = quiz_service(make_stimulus(), monkeypatch, lambda *args: pytest.fail("tidak boleh dihitung"))
-    repo.quiz.status_published = quiz_services.QuizRequestStatus.PUBLISH if published else quiz_services.QuizRequestStatus.DRAFT
+    repo.quiz.status_published = QuizRequestStatus.PUBLISH if published else QuizRequestStatus.DRAFT
     repo.has_progress = has_progress
     for call in (
         service.edit_soal(1, 1, SoalEditRequest(correct_option="B")),

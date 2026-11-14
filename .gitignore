@@ -38,3 +38,5 @@ htmlcov/
 *.egg-info/
 .ipynb_checkpoints/
 .idea/
+
+artifacts/

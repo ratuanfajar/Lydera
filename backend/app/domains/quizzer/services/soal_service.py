@@ -52,7 +52,7 @@ def _soal_to_dict(soal: Soal) -> dict:
     }
 
     
-def _review_flags(self, issues: list[str]) -> tuple[str, str | None]:
+def _review_flags(issues: list[str]) -> tuple[str, str | None]:
     return ("high" if issues else "normal"), ("\n".join(issues) or None)
 
 

@@ -122,7 +122,7 @@ def stub_llm(monkeypatch):
 
 
 def run_evaluation(repo, redis, db=None):
-    evaluator = evaluation.AnswerEvaluator(repo, db or FakeDb(), redis)
+    evaluator = evaluation.AnswerEvaluator(repo, repo, db or FakeDb(), redis)
     return asyncio.run(evaluator.evaluate(7, 9))
 
 

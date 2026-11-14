@@ -17,13 +17,13 @@ def run(coro):
 
 class FakeDb:
     def __init__(self):
-        self.commits = 0
+        self.commits, self.rollbacks = 0, 0
 
     async def commit(self):
         self.commits += 1
 
     async def rollback(self):
-        pass
+        self.rollbacks += 1
 
 
 class Repo:
@@ -46,11 +46,11 @@ class Repo:
     async def get_soal_jawaban(self, soal_id, student_id):
         return self.existing
 
-    async def update_soal_jawaban(self, jawaban_id, selected_option, is_correct, langkah):
-        self.updated.append((selected_option, is_correct, langkah))
+    async def update_soal_jawaban(self, jawaban_id, selected_option, is_correct):
+        self.updated.append((selected_option, is_correct))
 
-    async def create_soal_jawaban(self, soal_id, student_id, selected_option, is_correct, langkah):
-        self.created.append((selected_option, is_correct, langkah))
+    async def create_soal_jawaban(self, soal_id, student_id, selected_option, is_correct):
+        self.created.append((selected_option, is_correct))
 
     async def validate_quiz_request(self, quiz_request_id, teacher_id, classroom_id):
         return True
@@ -63,12 +63,19 @@ class Repo:
         return True
 
 
-def service(repo):
-    return quiz_services.QuizService(repo, FakeDb(), None)
+def taking(repo, db=None):
+    db = db or FakeDb()
+    return quiz_services.QuizTakingService(progress_repo=repo, soal_repo=repo, quiz_repo=repo, db=db), db
+
+
+def requests(repo, db=None):
+    db = db or FakeDb()
+    return quiz_services.QuizRequestService(repo, None, db, None), db
 
 
 def submit(repo, **payload):
-    run(service(repo).submit_answer(1, 7, SoalSubmitRequest(**payload)))
+    service, _ = taking(repo)
+    run(service.submit_answer(1, 7, SoalSubmitRequest(**payload)))
 
 
 def test_langkah_tidak_dikirim_berarti_none_dan_kosong_berarti_hapus():
@@ -85,23 +92,23 @@ def test_opsi_di_luar_a_sampai_d_ditolak():
         SoalSubmitRequest(selected_option="E")
 
 
-def test_kirim_ulang_tanpa_langkah_mempertahankan_langkah_lama():
-    repo = Repo(existing=SimpleNamespace(id=3))
-    submit(repo, selected_option="A")
-    assert repo.updated == [("A", False, None)]
-
-
-def test_kirim_ulang_dengan_langkah_menggantinya_dan_daftar_kosong_menghapus():
-    repo = Repo(existing=SimpleNamespace(id=3))
-    submit(repo, selected_option="B", langkah=["baru"])
-    submit(repo, selected_option="B", langkah=[])
-    assert repo.updated == [("B", True, ["baru"]), ("B", True, [])]
-
-
-def test_jawaban_pertama_tanpa_langkah_tersimpan_dengan_daftar_kosong():
+def test_jawaban_pertama_disimpan_dengan_penilaian_kunci():
     repo = Repo()
     submit(repo, selected_option="B")
-    assert repo.created == [("B", True, [])]
+    assert repo.created == [("B", True)] and repo.updated == []
+
+
+def test_kirim_ulang_mengganti_jawaban_tanpa_menambah_baris_baru():
+    repo = Repo(existing=SimpleNamespace(id=3))
+    submit(repo, selected_option="A")
+    assert repo.updated == [("A", False)] and repo.created == []
+
+
+def test_kirim_ulang_diikuti_jawaban_benar():
+    repo = Repo(existing=SimpleNamespace(id=3))
+    submit(repo, selected_option="A")
+    submit(repo, selected_option="B")
+    assert repo.updated == [("A", False), ("B", True)]
 
 
 def test_submit_setelah_waktu_habis_ditolak_tetapi_dalam_masa_toleransi_diterima():
@@ -109,10 +116,19 @@ def test_submit_setelah_waktu_habis_ditolak_tetapi_dalam_masa_toleransi_diterima
     with pytest.raises(BadRequestException, match="Waktu pengerjaan"):
         submit(late, selected_option="A")
     assert late.created == [] and late.updated == []
-    near = Repo(started_minutes_ago=30)
+
+    near = Repo()
     near.progress.started_at = datetime.now(timezone.utc) - timedelta(minutes=30) - timedelta(seconds=5)
     submit(near, selected_option="A")
     assert near.created
+
+
+def test_submit_setelah_masa_toleransi_ditolak():
+    repo = Repo()
+    repo.progress.started_at = datetime.now(timezone.utc) - timedelta(minutes=30) - timedelta(seconds=11)
+    with pytest.raises(BadRequestException, match="Waktu pengerjaan"):
+        submit(repo, selected_option="A")
+    assert repo.created == []
 
 
 def test_submit_setelah_batas_akhir_kuis_ditolak_meski_durasi_belum_habis():
@@ -131,23 +147,26 @@ def test_submit_pada_sesi_selesai_tetap_ditolak():
 @pytest.mark.parametrize("status", ["queued", "running", "failed"])
 def test_kuis_yang_belum_selesai_dibuat_tidak_bisa_dipublikasikan(status):
     repo = Repo(quiz_status=status)
+    service, _ = requests(repo)
     with pytest.raises(BadRequestException, match="belum selesai dibuat"):
-        run(service(repo).update_publish_status(1, 2, 9, QuizRequestStatus.PUBLISH))
+        run(service.update_publish_status(1, 2, 9, QuizRequestStatus.PUBLISH))
     assert repo.published == []
 
 
 def test_kuis_selesai_bisa_dipublikasikan_dan_dikembalikan_ke_draft_kapan_saja():
     repo = Repo(quiz_status="failed")
-    run(service(repo).update_publish_status(1, 2, 9, QuizRequestStatus.DRAFT))
+    service, _ = requests(repo)
+    run(service.update_publish_status(1, 2, 9, QuizRequestStatus.DRAFT))
     repo.quiz.status = "done"
-    run(service(repo).update_publish_status(1, 2, 9, QuizRequestStatus.PUBLISH))
+    run(service.update_publish_status(1, 2, 9, QuizRequestStatus.PUBLISH))
     assert repo.published == ["draft", "publish"]
 
 
 def test_kuis_yang_sudah_dikerjakan_siswa_tidak_bisa_dikembalikan_ke_draft_tetapi_publish_ulang_boleh():
     repo = Repo()
     repo.started = True
+    service, _ = requests(repo)
     with pytest.raises(BadRequestException, match="tidak dapat dikembalikan ke draft"):
-        run(service(repo).update_publish_status(1, 2, 9, QuizRequestStatus.DRAFT))
-    run(service(repo).update_publish_status(1, 2, 9, QuizRequestStatus.PUBLISH))
+        run(service.update_publish_status(1, 2, 9, QuizRequestStatus.DRAFT))
+    run(service.update_publish_status(1, 2, 9, QuizRequestStatus.PUBLISH))
     assert repo.published == ["publish"]
