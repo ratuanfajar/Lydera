@@ -6,6 +6,7 @@ from app.core.redis import get_redis_client
 from app.core.redis_keys import TTL_30_MINUTES, ChapterRedisKeys
 import app.utils.paths as paths
 from app.domains.contents.schemas.blocks.block_edit import BlockEditRequest, BlockEditResponse
+from app.domains.contents.schemas.blocks.block_response import BlockResponse
 
 paths.setup()
 from annoter import annoter_regenerate
@@ -43,7 +44,7 @@ class BlockService:
                     chapter_id=block.chapter_id,
                     block_id=block.id,
                 )
-                block_json = BlockDetailResponse.model_validate(block).model_dump_json()
+                block_json = BlockResponse.model_validate(block).model_dump_json()
                 pipe.set(b_key, block_json, xx=True, keepttl=True)
             await pipe.execute()
 
@@ -64,7 +65,6 @@ class BlockService:
         dto: RegenerateRequest,
         teacher_id: int,
     ) -> RegenerateResponse:
-        redis_client = get_redis_client()
         blocks = await self.repo.get_teacher_blocks(dto.block_ids, teacher_id)
 
         for block in blocks:
@@ -99,7 +99,6 @@ class BlockService:
         teacher_id: int,
         job_service,
     ) -> list[RegenerateDetailResponse]:
-        redis_client = get_redis_client()
         blocks = await self.repo.get_teacher_blocks(dto.block_ids, teacher_id)
 
         for block in blocks:
