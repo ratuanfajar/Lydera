@@ -47,3 +47,6 @@ class ChapterRepositoryInterface(ABC):
     @abstractmethod
     async def validate_student_chapter_access(self, chapter_id: int, student_id: int) -> bool: raise NotImplementedError
 
+    @abstractmethod
+    async def validate_teacher_chapter_access(self, chapter_id: int, teacher_id: int) -> bool: raise NotImplementedError
+

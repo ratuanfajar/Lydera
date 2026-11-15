@@ -229,3 +229,19 @@ class ChapterRepository(ChapterRepositoryInterface):
         )
         result = await self.db.scalar(stmt)
         return bool(result)
+
+    async def validate_teacher_chapter_access(
+        self,
+        chapter_id: int,
+        teacher_id: int
+    ) -> bool:
+        """Checks whether the teacher owns the classroom containing this chapter."""
+        stmt = select(
+            exists()
+            .where(Chapter.id == chapter_id)
+            .where(Module.id == Chapter.module_id)
+            .where(Classroom.id == Module.classroom_id)
+            .where(Classroom.teacher_id == teacher_id)
+        )
+        result = await self.db.scalar(stmt)
+        return bool(result)
