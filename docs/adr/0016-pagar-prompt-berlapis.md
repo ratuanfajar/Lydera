@@ -5,7 +5,7 @@
 
 ## Konteks
 
-Masukan tak tepercaya masuk ke prompt dari banyak arah: pertanyaan dan langkah siswa, teks modul dan OCR hasil PDF guru, takarir dan teks di dalam gambar, umpan balik guru, dan hasil pencarian web. Sebelumnya hanya Clarifier yang menyatakan hasil tool sebagai data, tanpa pembatas, tanpa penyaring masukan, dan tanpa pemeriksa kebocoran instruksi di keluaran.
+Masukan tak tepercaya masuk ke prompt dari banyak arah: pertanyaan dan langkah siswa, teks modul dan OCR hasil PDF guru, takarir dan teks di dalam gambar, umpan balik guru, dan hasil pencarian web. Sebelumnya aturan bahwa isi tag adalah data hanya ada terpisah-pisah (Clarifier untuk hasil tool, Evaluaizer untuk langkah siswa, umpan balik guru dengan tag manual), tanpa pembatas seragam, tanpa penyaring masukan, dan tanpa pemeriksa kebocoran instruksi di keluaran.
 
 ## Keputusan
 

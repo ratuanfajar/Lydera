@@ -3,6 +3,7 @@
 | Folder / berkas | Isi |
 |---|---|
 | [architecture.md](architecture.md) | Batas tanggung jawab antar bagian dan alur data tiap fitur |
+| [perkembangan-versi.md](perkembangan-versi.md) | Perbandingan versi awal dan versi sekarang: arsitektur, alur, dan keterbaruan tiap fitur |
 | [adr/](adr/) | Architecture Decision Record: keputusan yang bertahan lama beserta alasannya |
 | [research/](research/) | Catatan riset dan brainstorming (sumber, opsi, rekomendasi), dibuat lewat `/research` |
 | [specs/](specs/) | Spec fitur, satu berkas per fitur (`NNNN-slug.md`), dibuat lewat `/feature-spec` |

@@ -9,7 +9,6 @@ __pycache__/
 
 .uv/
 .claude/
-.codex/
 
 ai-services/annoter/output/
 ai-services/.cache/
