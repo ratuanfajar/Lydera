@@ -42,7 +42,9 @@ class Classroom(Base):
     )
 
     modules: Mapped[list["Module"]] = relationship(
-        back_populates="classroom"
+        back_populates="classroom",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
     
     teacher: Mapped["Teacher"] = relationship(
@@ -53,6 +55,10 @@ class Classroom(Base):
         secondary=student_classrooms,
         back_populates="classrooms"
     )
-    quiz_requests: Mapped[list["QuizRequest"]] = relationship(back_populates="classroom", cascade="all, delete-orphan")
+    quiz_requests: Mapped[list["QuizRequest"]] = relationship(
+        back_populates="classroom",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
 

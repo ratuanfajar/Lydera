@@ -16,6 +16,27 @@ router_classrooms = APIRouter(
     route_class=WrappedRoute,
 )
 
+@router_classrooms.delete(
+    "/{classroom_id}",
+    description="Delete classroom. Requires the TEACHER role.",
+    response_model=Response[None],
+    status_code=status.HTTP_200_OK,
+    responses=COMMON_VALIDATION_RESPONSES,
+)
+async def delete_classroom(
+    classroom_id: Annotated[int, Path(title="The ID of the classroom")],
+    current_user: Roles(Role.TEACHER),
+    service: ClassroomService = Depends(get_classroom_service),
+):
+    await service.delete_classroom(
+        classroom_id, 
+        current_user.profile_id,
+        current_user.role
+    )
+    return Response(
+        data=None,
+        message="Classroom deleted successfully",
+    )
 
 @router_classrooms.post(
     "",

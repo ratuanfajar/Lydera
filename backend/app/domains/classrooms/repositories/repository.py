@@ -17,6 +17,9 @@ class ClassroomRepository(ClassroomRepositoryInterface):
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def delete_classroom(self, classroom: Classroom):
+        await self.db.delete(classroom)
+
     async def create_classroom(self, dto: ClassroomCreate, teacher_id: int) -> Classroom:
         alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         while True:

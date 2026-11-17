@@ -20,7 +20,9 @@ class Module(Base):
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     fase_id: Mapped[Optional[int]] = mapped_column(ForeignKey("fase.id"), index=True)
-    classroom_id: Mapped[int] = mapped_column(ForeignKey("classrooms.id"))
+    classroom_id: Mapped[int] = mapped_column(
+        ForeignKey("classrooms.id", ondelete="CASCADE")
+    )
     status: Mapped[ModuleStatus] = mapped_column(
         SQLEnum(ModuleStatus, native_enum=False, length=20),
         nullable=False,
@@ -55,5 +57,7 @@ class Module(Base):
     quiz_requests: Mapped[List["QuizRequest"]] = relationship(back_populates="module", cascade="all, delete-orphan")
     module_progress: Mapped[Optional["ModuleProgress"]] = relationship(
         back_populates="module",
-        uselist=False 
+        uselist=False,
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

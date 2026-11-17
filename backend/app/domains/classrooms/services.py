@@ -15,6 +15,19 @@ class ClassroomService:
         self.repo = repo
         self.db = db
 
+    async def delete_classroom(self, classroom_id: int, profile_id: int, role: Role):
+        classroom = await self.repo.get_classroom_by_id(classroom_id, profile_id, role)
+
+        if not classroom:
+            raise NotFoundException("Classroom not found or you don't have access")
+
+        try:
+            await self.repo.delete_classroom(classroom)
+            await self.db.commit()
+        except Exception as e:
+            await self.db.rollback()
+            raise e
+
     async def create_classroom(self, dto: ClassroomCreate, teacher_id: int) -> ClassroomResponse:
         try:
             classroom = await self.repo.create_classroom(dto, teacher_id)

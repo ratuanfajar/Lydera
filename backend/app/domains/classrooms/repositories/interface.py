@@ -11,6 +11,10 @@ class ClassroomRepositoryInterface(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def delete_classroom(self, classroom: Classroom) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_classrooms(self, profile_id: int, role: Role) -> list[Classroom]:
         raise NotImplementedError
 
